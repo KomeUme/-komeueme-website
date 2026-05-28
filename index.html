@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title data-i18n="page_title_index">Kome Ume portfolio</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <button class="lang-switch" data-lang-switch type="button">EN</button>
+  <header class="site-header">
+    <a class="brand" href="shop.html">Kome Ume</a>
+    <nav class="nav">
+      <a class="active" href="index.html" data-i18n="nav_top">TOP</a>
+      <div class="nav-item nav-dropdown">
+        <a class="nav-trigger" href="hanga-wood.html" data-i18n="nav_hanga">版画</a>
+        <div class="nav-submenu">
+          <a href="hanga-wood.html" data-i18n="nav_wood">木版画</a>
+          <a href="hanga-copper.html" data-i18n="nav_copper">銅版画</a>
+        </div>
+      </div>
+      <a href="digital.html" data-i18n="nav_digital">デジタル</a>
+      <a href="manga.html" data-i18n="nav_manga">漫画</a>
+      <a href="profile.html" data-i18n="nav_profile">Profile</a>
+      <a class="shop-link" href="shop.html" data-i18n="nav_shop">販売</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="top-hero">
+      <div class="top-hero-copy">
+        <p class="top-eyebrow">Portfolio</p>
+        <h1 data-i18n-html="top_hero_title">Kome Ume<br><span class="archive-line">作品アーカイブ</span></h1>
+        <p class="top-lead" data-i18n="top_hero_lead">木版画・銅版画・デジタル作品を、制作情報とキャプション付きで掲載。</p>
+      <div class="actions top-actions">
+        <a class="button" href="hanga-wood.html" data-i18n="btn_view_wood">木版画を見る</a>
+        <a class="button secondary" href="hanga-copper.html" data-i18n="btn_view_copper">銅版画を見る</a>
+      </div>
+      </div>
+      <figure class="top-hero-media">
+        <img data-feature-image src="assets/works/work-01.jpg" alt="featured work 1">
+        <figcaption class="top-hero-caption" data-feature-caption></figcaption>
+      </figure>
+    </section>
+
+    <section class="top-links">
+      <a class="top-link-card" href="hanga-wood.html">
+        <h2 data-i18n="nav_wood">木版画</h2>
+        <p data-i18n="card_wood_desc">大型作品を含む木版画作品一覧</p>
+      </a>
+      <a class="top-link-card" href="hanga-copper.html">
+        <h2 data-i18n="nav_copper">銅版画</h2>
+        <p data-i18n="card_copper_desc">エッチング、ドライポイント等の版画作品</p>
+      </a>
+      <a class="top-link-card" href="digital.html">
+        <h2 data-i18n="nav_digital">デジタル</h2>
+        <p data-i18n="card_digital_desc">シャドーボックス・デジタル制作作品</p>
+      </a>
+      <a class="top-link-card" href="manga.html">
+        <h2 data-i18n="nav_manga">漫画</h2>
+        <p data-i18n="card_manga_desc">漫画カテゴリ作品（掲載がある場合）</p>
+      </a>
+    </section>
+
+    <section class="intro">
+      <h2 class="section-title" data-i18n="intro_statement_title">はじめに</h2>
+      <p class="top-lead" data-i18n="intro_statement_body">私は制作を通し、自身の価値観の可視化を目的としている。過去、現在、未来において同じモチーフを見たとしても、自身の感性や周りの環境の変化により、そのモチーフから受け取る情報の異なることが往々にしてある。その為、作品制作を通し今現在の自身の価値観を測り、自身が何を重要視しているのか、その移り変わりを観察している。</p>
+    </section>
+
+    <section class="top-selected">
+      <h2 class="section-title" data-i18n="selected_works">Selected Works</h2>
+      <section class="gallery gallery-grid" data-gallery="all" data-limit="8" data-sort="random" data-gallery-id="top-selected" data-load-more="true"></section>
+      <div class="actions">
+        <button class="button secondary" type="button" data-load-more-for="top-selected">もっと見る</button>
+      </div>
+      <div class="actions" data-after-all-categories hidden>
+        <a class="button secondary" href="hanga-wood.html" data-i18n="nav_wood">木版画</a>
+        <a class="button secondary" href="hanga-copper.html" data-i18n="nav_copper">銅版画</a>
+        <a class="button secondary" href="digital.html" data-i18n="nav_digital">デジタル</a>
+        <a class="button secondary" href="manga.html" data-i18n="nav_manga">漫画</a>
+      </div>
+    </section>
+
+    <section class="site-mini-contact">
+      <div><strong class="label-sns" data-i18n="label_sns">SNS</strong> <a href="https://www.instagram.com/komeume1121/" target="_blank" rel="noopener noreferrer">@komeume1121</a></div>
+      <div><strong class="label-contact" data-i18n="label_contact">Contact</strong> <a href="mailto:komeume1121@gmail.com">komeume1121@gmail.com</a></div>
+    </section>
+  </main>
+
+  <footer>© Kome Ume</footer>
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+  <script src="i18n.js"></script>
+</body>
+</html>

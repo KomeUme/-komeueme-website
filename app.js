@@ -1,0 +1,522 @@
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+function withFallback(value) {
+  const text = String(value ?? "").trim();
+  return text || "—";
+}
+
+function uiT(key, fallback) {
+  let lang = "ja";
+  try {
+    lang = localStorage.getItem("site-lang") || "ja";
+  } catch (_) {
+    lang = "ja";
+  }
+  const dict = window.I18N?.[lang] || window.I18N?.ja || {};
+  return dict[key] || fallback;
+}
+
+const galleryState = new Map();
+let topCategoryButtonsVisible = false;
+
+function shuffle(items) {
+  const arr = [...items];
+  for (let i = arr.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function parseSizeInfo(sizeText) {
+  const text = String(sizeText ?? "");
+  const match = text.match(/(\d+(?:\.\d+)?)\s*mm\s*[×xX]\s*(\d+(?:\.\d+)?)\s*mm/);
+  if (!match) return { width: null, height: null, ratio: null, area: null };
+  const w = Number(match[1]);
+  const h = Number(match[2]);
+  if (!w || !h) return { width: null, height: null, ratio: null, area: null };
+  return { width: w, height: h, ratio: w / h, area: w * h };
+}
+
+function getWorkRatio(work) {
+  const { ratio } = parseSizeInfo(work.size);
+  return ratio ?? 1;
+}
+
+function getWorkArea(work) {
+  const { area } = parseSizeInfo(work.size);
+  return area ?? 0;
+}
+
+function getYearScore(value) {
+  const nums = String(value ?? "").match(/\d{4}/g);
+  if (!nums || !nums.length) return 0;
+  return Math.max(...nums.map(Number));
+}
+
+function arrangementKey(work) {
+  const ratio = getWorkRatio(work);
+  if (ratio < 0.85) return 0;
+  if (ratio > 1.2) return 2;
+  return 1;
+}
+
+function similarityScore(a, b) {
+  const ratioDiff = Math.abs(getWorkRatio(a) - getWorkRatio(b));
+  const areaDiff = Math.abs(Math.log10((getWorkArea(a) || 1) / (getWorkArea(b) || 1)));
+  return ratioDiff * 4 + areaDiff;
+}
+
+function isMainScaleWork(work) {
+  const { width, height } = parseSizeInfo(work.size);
+  return Number(width) > 1000 || Number(height) > 1000;
+}
+
+function arrangeBySimilarityInGroup(list) {
+  const base = [...list].sort((a, b) => {
+    const keyDiff = arrangementKey(a) - arrangementKey(b);
+    if (keyDiff) return keyDiff;
+    return getWorkRatio(a) - getWorkRatio(b);
+  });
+  const result = [];
+  while (base.length) {
+    const current = base.shift();
+    result.push(current);
+    if (!base.length) break;
+    let bestIndex = 0;
+    let bestScore = similarityScore(current, base[0]);
+    for (let i = 1; i < base.length; i += 1) {
+      const score = similarityScore(current, base[i]);
+      if (score < bestScore) {
+        bestScore = score;
+        bestIndex = i;
+      }
+    }
+    result.push(base.splice(bestIndex, 1)[0]);
+  }
+  return result;
+}
+
+function arrangeBySimilarity(list) {
+  const mainWorks = list.filter(isMainScaleWork);
+  const otherWorks = list.filter((work) => !isMainScaleWork(work));
+  return [...arrangeBySimilarityInGroup(mainWorks), ...arrangeBySimilarityInGroup(otherWorks)];
+}
+
+function getWorkCardClass(work) {
+  const classes = ["work"];
+  const { ratio, area } = parseSizeInfo(work.size);
+  if (ratio !== null && area !== null && area <= 12000 && ratio >= 0.9 && ratio <= 1.1) {
+    classes.push("is-compact");
+  }
+  return classes.join(" ");
+}
+
+function renderFeatureImages() {
+  const featureImages = document.querySelectorAll("[data-feature-image]");
+  if (!featureImages.length || !works.length) return;
+  const featureCaption = document.querySelector("[data-feature-caption]");
+
+  const isCopperTechnique = (technique) => /エッチング|ドライポイント|アクアチント|銅版/.test(String(technique ?? ""));
+  const woodLargePool = works.filter((work) => {
+    if (work.category !== "hanga") return false;
+    if (isCopperTechnique(work.technique)) return false;
+    const { width, height } = parseSizeInfo(work.size);
+    return Number(width) > 1000 || Number(height) > 1000;
+  });
+
+  const featured = shuffle(woodLargePool).slice(0, 2);
+  if (!featured.length) return;
+  let activeIndex = 0;
+  const setFeatured = () => {
+    const active = featured[activeIndex % featured.length];
+    featureImages.forEach((img) => {
+      img.src = active.image;
+      img.alt = `${active.title} (${categories[active.category]})`;
+    });
+    if (featureCaption) {
+      featureCaption.textContent = `${active.title}｜${withFallback(active.year)}`;
+    }
+    activeIndex += 1;
+  };
+
+  setFeatured();
+  if (featured.length >= 2) {
+    if (window.__featureIntervalId) window.clearInterval(window.__featureIntervalId);
+    window.__featureIntervalId = window.setInterval(setFeatured, 3000);
+  }
+}
+
+function renderGallery() {
+  const galleries = document.querySelectorAll("[data-gallery]");
+  if (!galleries.length) return;
+
+  const isCopperTechnique = (technique) => {
+    const text = String(technique ?? "");
+    return /エッチング|ドライポイント|アクアチント|銅版/.test(text);
+  };
+  const isFourPanelManga = (work) => {
+    const sub = String(work.subcategory ?? "");
+    if (sub) return /4koma|four|四コマ|4コマ/i.test(sub);
+    const text = `${work.title ?? ""} ${work.technique ?? ""} ${work.caption ?? ""}`;
+    return /4コマ|四コマ|４コマ|四齣/i.test(text);
+  };
+  galleries.forEach((gallery) => {
+    const category = gallery.dataset.gallery;
+    const galleryId = gallery.dataset.galleryId || category;
+    let list = [];
+
+    if (category === "all") {
+      list = works;
+    } else if (category === "hanga-wood") {
+      list = works.filter((work) => work.category === "hanga" && !isCopperTechnique(work.technique));
+    } else if (category === "hanga-copper") {
+      list = works.filter((work) => work.category === "hanga" && isCopperTechnique(work.technique));
+    } else if (category === "manga-4koma") {
+      list = works.filter((work) => work.category === "manga" && isFourPanelManga(work));
+    } else if (category === "manga-story") {
+      list = works.filter((work) => work.category === "manga" && !isFourPanelManga(work));
+    } else {
+      list = works.filter((work) => work.category === category);
+    }
+
+    const sortMode = gallery.dataset.sort;
+    const arranged = sortMode === "recent"
+      ? [...list].sort((a, b) => getYearScore(b.year) - getYearScore(a.year))
+      : sortMode === "random"
+        ? shuffle(list)
+        : arrangeBySimilarity(list);
+    const limit = Number.parseInt(gallery.dataset.limit || "", 10);
+    const defaultCount = Number.isFinite(limit) && limit > 0 ? limit : arranged.length;
+    const isLoadMore = gallery.dataset.loadMore === "true";
+    const prev = galleryState.get(galleryId);
+    const stableList = isLoadMore && prev?.arranged?.length === arranged.length ? prev.arranged : arranged;
+    const shownCount = isLoadMore
+      ? Math.min(prev?.shownCount || defaultCount, stableList.length)
+      : defaultCount;
+    const outputList = stableList.slice(0, shownCount);
+    const prevClicks = prev?.clicks || 0;
+    galleryState.set(galleryId, { arranged: stableList, shownCount, step: defaultCount, clicks: prevClicks });
+
+    gallery.innerHTML = outputList.map((work) => {
+      const firstImage = work.images?.[0] || work.image;
+      return `
+      <article class="${getWorkCardClass(work)}">
+        <a class="work-image-link" href="${escapeHtml(firstImage)}" data-work-id="${escapeHtml(work.id)}">
+          <img src="${escapeHtml(firstImage)}" alt="${escapeHtml(work.title)}" loading="lazy">
+        </a>
+        <div class="caption">
+          <h3 class="caption-title">${escapeHtml(work.title)}</h3>
+          <div class="caption-meta-list">
+            <p class="caption-meta"><span>${escapeHtml(uiT("cap_year", "制作年"))}</span><span>${escapeHtml(withFallback(work.year))}</span></p>
+            <p class="caption-meta"><span>${escapeHtml(uiT("cap_technique", "技法"))}</span><span>${escapeHtml(withFallback(work.technique))}</span></p>
+            <p class="caption-meta"><span>${escapeHtml(uiT("cap_size", "サイズ"))}</span><span>${escapeHtml(withFallback(work.size))}</span></p>
+          </div>
+          <p class="caption-text">${escapeHtml(withFallback(work.caption))}</p>
+          <button class="caption-toggle" type="button" hidden>${escapeHtml(uiT("caption_more", "続きを読む"))}</button>
+        </div>
+      </article>
+    `;
+    }).join("");
+  });
+
+  applyImageOrientationClasses();
+  attachCaptionToggles();
+  attachGalleryViewer();
+  attachLoadMoreHandlers();
+}
+
+function applyImageOrientationClasses() {
+  const images = document.querySelectorAll(".work img");
+  images.forEach((img) => {
+    const setClass = () => {
+      const work = img.closest(".work");
+      if (!work) return;
+      work.classList.remove("is-portrait", "is-landscape");
+      if (img.naturalHeight > img.naturalWidth) {
+        work.classList.add("is-portrait");
+      } else {
+        work.classList.add("is-landscape");
+      }
+    };
+
+    if (img.complete) {
+      setClass();
+    } else {
+      img.addEventListener("load", setClass, { once: true });
+    }
+  });
+}
+
+function attachGalleryViewer() {
+  const map = new Map(works.map((work) => [String(work.id), work]));
+  const links = document.querySelectorAll(".work-image-link[data-work-id]");
+  if (!links.length) return;
+
+  let viewer = document.querySelector(".image-viewer");
+  const isNewViewer = !viewer;
+  if (!viewer) {
+    viewer = document.createElement("div");
+    viewer.className = "image-viewer";
+    viewer.innerHTML = `
+      <button class="viewer-close" type="button" aria-label="close">×</button>
+      <button class="viewer-prev" type="button" aria-label="previous">‹</button>
+      <img class="viewer-image" alt="">
+      <div class="viewer-loading">${uiT("loading_updating", "更新中")}</div>
+      <button class="viewer-next" type="button" aria-label="next">›</button>
+      <div class="viewer-meta"></div>
+    `;
+    document.body.appendChild(viewer);
+  }
+
+  const image = viewer.querySelector(".viewer-image");
+  const meta = viewer.querySelector(".viewer-meta");
+  const loading = viewer.querySelector(".viewer-loading");
+  let loadingTimer = null;
+  const closeBtn = viewer.querySelector(".viewer-close");
+  const prevBtn = viewer.querySelector(".viewer-prev");
+  const nextBtn = viewer.querySelector(".viewer-next");
+  let currentImages = [];
+  let currentTitle = "";
+  let index = 0;
+  let isZoomed = false;
+  let panX = 0;
+  let panY = 0;
+  let isPanning = false;
+  let pointerDown = false;
+  let hasMoved = false;
+  let dragStartX = 0;
+  let dragStartY = 0;
+  let panStartX = 0;
+  let panStartY = 0;
+
+  const applyImageTransform = () => {
+    const tx = Math.round(panX);
+    const ty = Math.round(panY);
+    image.style.transform = isZoomed
+      ? `translate(${tx}px, ${ty}px) scale(2.5)`
+      : "";
+  };
+
+  const setZoom = (zoomed) => {
+    isZoomed = zoomed;
+    if (!isZoomed) {
+      panX = 0;
+      panY = 0;
+      isPanning = false;
+    }
+    image.classList.toggle("is-zoomed", isZoomed);
+    image.classList.toggle("is-panning", isPanning && isZoomed);
+    if (closeBtn) closeBtn.hidden = isZoomed;
+    applyImageTransform();
+  };
+
+  const draw = () => {
+    if (!currentImages.length) return;
+    setZoom(false);
+    if (loading) {
+      loading.textContent = uiT("loading_updating", "更新中");
+      loading.classList.remove("is-visible");
+    }
+    if (loadingTimer) window.clearTimeout(loadingTimer);
+    loadingTimer = window.setTimeout(() => {
+      if (loading) loading.classList.add("is-visible");
+    }, 500);
+    image.src = currentImages[index];
+    image.alt = currentTitle;
+    meta.textContent = `${currentTitle}  ${index + 1}/${currentImages.length}`;
+  };
+  const open = () => {
+    setZoom(false);
+    viewer.classList.add("is-open");
+    document.body.style.overflow = "hidden";
+    draw();
+  };
+  const close = () => {
+    setZoom(false);
+    viewer.classList.remove("is-open");
+    document.body.style.overflow = "";
+  };
+  const next = () => {
+    if (!currentImages.length) return;
+    index = (index + 1) % currentImages.length;
+    draw();
+  };
+  const prev = () => {
+    if (!currentImages.length) return;
+    index = (index - 1 + currentImages.length) % currentImages.length;
+    draw();
+  };
+
+  links.forEach((link) => {
+    link.addEventListener("click", (event) => {
+      event.preventDefault();
+      const work = map.get(link.dataset.workId);
+      if (!work) return;
+      currentImages = work.images?.length ? work.images : [work.image];
+      currentTitle = work.title || "";
+      index = 0;
+      open();
+    });
+  });
+
+  image.addEventListener("dblclick", (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setZoom(!isZoomed);
+  });
+  image.addEventListener("click", (event) => {
+    if (hasMoved) {
+      hasMoved = false;
+      return;
+    }
+    if (isZoomed) return;
+    event.preventDefault();
+    event.stopPropagation();
+    setZoom(true);
+  });
+  image.addEventListener("pointerdown", (event) => {
+    if (!isZoomed) return;
+    event.preventDefault();
+    event.stopPropagation();
+    pointerDown = true;
+    hasMoved = false;
+    isPanning = false;
+    dragStartX = event.clientX;
+    dragStartY = event.clientY;
+    panStartX = panX;
+    panStartY = panY;
+    image.setPointerCapture(event.pointerId);
+  });
+  image.addEventListener("pointermove", (event) => {
+    if (!pointerDown || !isZoomed) return;
+    const dx = event.clientX - dragStartX;
+    const dy = event.clientY - dragStartY;
+    if (!hasMoved && (Math.abs(dx) > 3 || Math.abs(dy) > 3)) {
+      hasMoved = true;
+      isPanning = true;
+      image.classList.add("is-panning");
+    }
+    if (!hasMoved) return;
+    panX = panStartX + dx;
+    panY = panStartY + dy;
+    applyImageTransform();
+  });
+  image.addEventListener("pointerup", (event) => {
+    if (!pointerDown) return;
+    if (image.hasPointerCapture(event.pointerId)) {
+      image.releasePointerCapture(event.pointerId);
+    }
+    pointerDown = false;
+    isPanning = false;
+    image.classList.remove("is-panning");
+  });
+  image.addEventListener("pointercancel", () => {
+    pointerDown = false;
+    isPanning = false;
+    hasMoved = false;
+    image.classList.remove("is-panning");
+  });
+  image.addEventListener("load", () => {
+    if (loadingTimer) window.clearTimeout(loadingTimer);
+    if (loading) loading.classList.remove("is-visible");
+  });
+  image.addEventListener("error", () => {
+    if (loadingTimer) window.clearTimeout(loadingTimer);
+    if (loading) loading.classList.add("is-visible");
+    if (loading) loading.textContent = uiT("loading_failed", "読み込み失敗");
+  });
+  nextBtn.onclick = next;
+  prevBtn.onclick = prev;
+  closeBtn.onclick = () => {
+    window.location.href = "index.html";
+  };
+  viewer.addEventListener("click", (event) => {
+    if (event.target !== viewer) return;
+    if (isZoomed) {
+      setZoom(false);
+      return;
+    }
+    close();
+  });
+  viewer.addEventListener("wheel", (event) => {
+    event.preventDefault();
+    if (event.deltaY > 0) next();
+    else prev();
+  }, { passive: false });
+  if (isNewViewer) {
+    window.addEventListener("keydown", (event) => {
+      if (!viewer.classList.contains("is-open")) return;
+      if (event.key === "Escape") close();
+      if (event.key === "ArrowRight") next();
+      if (event.key === "ArrowLeft") prev();
+    });
+  }
+}
+
+function attachLoadMoreHandlers() {
+  const buttons = document.querySelectorAll("[data-load-more-for]");
+  buttons.forEach((button) => {
+    const galleryId = button.dataset.loadMoreFor;
+    const state = galleryState.get(galleryId);
+    const categoryActions = document.querySelector("[data-after-all-categories]");
+    if (!state) {
+      button.style.display = "none";
+      if (categoryActions) categoryActions.hidden = true;
+      return;
+    }
+    const completed = state.shownCount >= state.arranged.length;
+    button.style.display = completed ? "none" : "";
+    if (categoryActions) categoryActions.hidden = !topCategoryButtonsVisible;
+    if (button.dataset.bound === "true") return;
+    button.dataset.bound = "true";
+    button.addEventListener("click", () => {
+      const latest = galleryState.get(galleryId);
+      if (!latest) return;
+      latest.clicks = (latest.clicks || 0) + 1;
+      if (latest.clicks >= 2) topCategoryButtonsVisible = true;
+      latest.shownCount = Math.min(latest.shownCount + latest.step, latest.arranged.length);
+      galleryState.set(galleryId, latest);
+      renderGallery();
+    });
+  });
+}
+
+function attachCaptionToggles() {
+  const captions = document.querySelectorAll(".caption");
+  captions.forEach((caption) => {
+    const text = caption.querySelector(".caption-text");
+    const button = caption.querySelector(".caption-toggle");
+    if (!text || !button) return;
+
+    const isLong = text.scrollHeight > text.clientHeight + 4 || text.textContent.length > 140;
+    if (!isLong) {
+      button.hidden = true;
+      text.classList.remove("is-collapsed");
+      return;
+    }
+
+    text.classList.add("is-collapsed");
+    button.hidden = false;
+    button.textContent = uiT("caption_more", "続きを読む");
+
+    if (button.dataset.bound === "true") return;
+    button.dataset.bound = "true";
+    button.addEventListener("click", () => {
+      const expanded = text.classList.toggle("is-collapsed");
+      button.textContent = expanded
+        ? uiT("caption_more", "続きを読む")
+        : uiT("caption_less", "閉じる");
+    });
+  });
+}
+
+renderFeatureImages();
+renderGallery();
