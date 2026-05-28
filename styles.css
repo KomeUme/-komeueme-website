@@ -1,0 +1,930 @@
+:root {
+  --ink: #101014;
+  --soft: #5f6168;
+  --line: #d9d9de;
+  --paper: #f4f4f2;
+  --pale: #ecece9;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: "Helvetica Neue", Arial, "Hiragino Sans", "Yu Gothic", sans-serif;
+  line-height: 1.7;
+  background-image:
+    radial-gradient(circle at 20% 12%, rgba(0, 0, 0, 0.03), transparent 38%),
+    radial-gradient(circle at 82% 90%, rgba(0, 0, 0, 0.025), transparent 42%);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.lang-switch {
+  position: fixed;
+  top: 14px;
+  right: 14px;
+  z-index: 3000;
+  min-width: 48px;
+  height: 34px;
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--ink);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.site-header {
+  padding: 28px 20px 14px;
+  text-align: center;
+}
+
+.brand {
+  display: inline-block;
+  font-family: "Didot", "Bodoni 72", "Times New Roman", "Hiragino Mincho ProN", "Yu Mincho", serif;
+  font-size: 54px;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1;
+  text-transform: none;
+}
+
+.nav {
+  display: flex;
+  justify-content: center;
+  gap: 28px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+  font-family: "Helvetica Neue", Arial, "Hiragino Sans", "Yu Gothic", sans-serif;
+  font-size: 13px;
+  letter-spacing: 0;
+}
+
+.nav a {
+  padding-bottom: 6px;
+  border-bottom: 1px solid transparent;
+}
+
+.nav a:hover,
+.nav .active {
+  border-color: var(--ink);
+}
+
+.nav-item {
+  position: relative;
+  padding-bottom: 6px;
+  margin-bottom: -6px;
+}
+
+.nav-trigger {
+  display: inline-block;
+}
+
+.nav-submenu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  display: none;
+  min-width: 98px;
+  background: #fff;
+  border: 1px solid var(--line);
+  z-index: 10;
+}
+
+.nav-submenu a {
+  display: block;
+  padding: 8px 10px;
+  font-size: 12px;
+  border-bottom: 1px solid var(--line);
+  border-top: 0;
+}
+
+.nav-submenu a:last-child {
+  border-bottom: 0;
+}
+
+.nav-dropdown:hover .nav-submenu,
+.nav-dropdown:focus-within .nav-submenu {
+  display: block;
+}
+
+.nav-submenu .active {
+  background: #f6f6f4;
+}
+
+.shop-link {
+  font-weight: 700;
+}
+
+main {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 20px 20px 86px;
+}
+
+.top-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(360px, 46%);
+  gap: 24px;
+  align-items: stretch;
+  margin-bottom: 30px;
+}
+
+.top-hero-copy {
+  border: 1px solid #cdced4;
+  background: rgba(255, 255, 255, 0.74);
+  padding: 34px 28px;
+  border-radius: 8px;
+}
+
+.top-eyebrow {
+  margin: 0;
+  font-size: 12px;
+  color: #42444a;
+  font-weight: 600;
+}
+
+.top-hero h1 {
+  margin: 12px 0 0;
+  font-family: "Didot", "Bodoni 72", "Times New Roman", "Hiragino Mincho ProN", "Yu Mincho", serif;
+  font-size: clamp(41px, 5.8vw, 67px);
+  font-weight: 400;
+  line-height: 1.08;
+  letter-spacing: 0;
+}
+
+.top-hero h1 .archive-line {
+  display: inline-block;
+  font-size: 1.26em;
+}
+
+.top-lead {
+  margin: 20px 0 0;
+  max-width: 34ch;
+  color: #2d2f35;
+  font-size: 24px;
+  line-height: 1.55;
+  font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
+}
+
+.top-actions {
+  justify-content: flex-start;
+}
+
+.top-hero-media {
+  display: grid;
+  place-items: center;
+  min-height: 620px;
+  padding: 20px;
+  border: 1px solid #cdced4;
+  background: rgba(255, 255, 255, 0.82);
+  margin: 0;
+  border-radius: 8px;
+}
+
+.top-hero-media img {
+  max-height: 560px;
+  max-width: 100%;
+  width: auto;
+  object-fit: contain;
+}
+
+.top-hero-caption {
+  width: 100%;
+  margin: 10px 0 0;
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+  color: #2d2f35;
+  font-size: 13px;
+  line-height: 1.5;
+  text-align: left;
+}
+
+.top-links {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0 0 46px;
+}
+
+.top-link-card {
+  border: 1px solid #cdced4;
+  background: rgba(255, 255, 255, 0.76);
+  padding: 16px 14px;
+  min-height: 118px;
+  border-radius: 8px;
+}
+
+.top-link-card h2 {
+  margin: 0;
+  font-family: "Didot", "Bodoni 72", "Times New Roman", "Hiragino Mincho ProN", "Yu Mincho", serif;
+  font-size: 26px;
+  font-weight: 400;
+}
+
+.top-link-card p {
+  margin: 6px 0 0;
+  color: var(--soft);
+  font-size: 12px;
+}
+
+.top-selected .section-title {
+  text-align: left;
+  margin-bottom: 18px;
+}
+
+.top-selected .gallery-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+  align-items: stretch;
+}
+
+.top-selected .work-image-link {
+  height: 572px;
+  min-height: 572px;
+  overflow: hidden;
+}
+
+.top-selected .work img {
+  max-height: 100%;
+}
+
+.top-selected .gallery-grid .work.is-portrait .work-image-link,
+.top-selected .gallery-grid .work.is-landscape .work-image-link {
+  min-height: 572px;
+}
+
+.top-selected .gallery-grid .work.is-portrait img,
+.top-selected .gallery-grid .work.is-landscape img {
+  max-height: 100%;
+}
+
+.top-selected .gallery-grid .work.is-portrait img {
+  max-height: 460px;
+}
+
+.top-selected .work {
+  display: grid;
+  grid-template-rows: 572px auto;
+  height: 100%;
+}
+
+.top-selected .caption {
+  min-height: 300px;
+  margin-top: 10px;
+}
+
+.intro {
+  max-width: 760px;
+  margin: 0 auto 52px;
+  text-align: center;
+}
+
+.intro h1 {
+  margin: 0;
+  font-family: "Didot", "Bodoni 72", "Times New Roman", "Hiragino Mincho ProN", "Yu Mincho", serif;
+  font-size: clamp(34px, 6vw, 68px);
+  font-weight: 400;
+  line-height: 1.12;
+  letter-spacing: -.045em;
+}
+
+.intro p {
+  margin: 18px auto 0;
+  max-width: 620px;
+  color: var(--soft);
+  font-size: 14px;
+  letter-spacing: -.01em;
+}
+
+.actions {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 26px;
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 46px;
+  padding: 10px 24px;
+  border: 1px solid var(--ink);
+  background: var(--ink);
+  color: #fff;
+  font-size: 14px;
+  border-radius: 999px;
+}
+
+.button.secondary {
+  background: #fff;
+  color: var(--ink);
+}
+
+.button.disabled {
+  border-color: var(--line);
+  background: var(--pale);
+  color: var(--soft);
+}
+
+.feature-grid {
+  display: grid;
+  grid-template-columns: 1.2fr .8fr;
+  gap: 28px;
+  align-items: start;
+  margin-bottom: 58px;
+}
+
+.feature-grid img {
+  background: var(--pale);
+}
+
+.category-strip {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  margin: 56px 0;
+}
+
+.category {
+  border-top: 1px solid var(--ink);
+  padding-top: 16px;
+}
+
+.category h2,
+.section-title,
+.card h2 {
+  margin: 0;
+  font-family: "Didot", "Bodoni 72", "Times New Roman", "Hiragino Mincho ProN", "Yu Mincho", serif;
+  font-size: 20px;
+  font-weight: 400;
+  letter-spacing: -.025em;
+}
+
+.category p,
+.card p,
+.meta {
+  color: var(--soft);
+  font-size: 13px;
+  letter-spacing: -.01em;
+}
+
+.gallery {
+  columns: 3 260px;
+  column-gap: 32px;
+}
+
+.gallery-grid {
+  columns: initial;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 28px;
+  margin-bottom: 56px;
+  align-items: start;
+}
+
+.work {
+  display: inline-block;
+  width: 100%;
+  margin: 0 0 36px;
+  break-inside: avoid;
+}
+
+.gallery-grid .work {
+  display: grid;
+  grid-template-rows: auto auto;
+  margin: 0;
+}
+
+.work-image-link {
+  display: grid;
+  place-items: center;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.84);
+  min-height: 440px;
+  border-radius: 8px;
+}
+
+.work img {
+  transition: opacity .18s ease, transform .18s ease;
+  max-width: 100%;
+  max-height: 560px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  margin: 0 auto;
+}
+
+.gallery-grid .work.is-portrait img {
+  max-height: 420px;
+}
+
+.gallery-grid .work.is-portrait .work-image-link {
+  min-height: 420px;
+}
+
+.gallery-grid .work.is-compact img {
+  max-height: 300px;
+}
+
+.work:hover img {
+  opacity: .88;
+  transform: translateY(-2px);
+}
+
+.caption {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+  min-height: 280px;
+  color: var(--soft);
+  font-size: 16px;
+  line-height: 1.55;
+  text-align: left;
+  padding-top: 2px;
+  border-top: 1px solid var(--line);
+}
+
+.caption-title {
+  margin: 0;
+  display: block;
+  font-family: "Helvetica Neue", Arial, "Hiragino Sans", "Yu Gothic", sans-serif;
+  font-size: 15px;
+  font-weight: 400;
+  letter-spacing: -.01em;
+  color: var(--ink);
+  margin-bottom: 6px;
+}
+
+.caption-meta-list {
+  display: grid;
+  gap: 2px;
+  margin-bottom: 8px;
+}
+
+.caption-meta-list::after {
+  content: "";
+  display: block;
+  width: 56px;
+  border-top: 1px solid #cfd2d9;
+  margin-top: 8px;
+}
+
+.caption-meta {
+  margin: 0;
+  display: grid;
+  grid-template-columns: 68px 1fr;
+  align-items: start;
+  gap: 0 8px;
+  font-family: "Helvetica Neue", Arial, "Hiragino Sans", "Yu Gothic", sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: -.01em;
+  color: var(--soft);
+  line-height: 1.35;
+  min-height: 1.35em;
+}
+
+.caption-meta span {
+  line-height: 1.35;
+}
+
+.caption-meta span:last-child {
+  color: #444;
+}
+
+.caption-text {
+  margin: 10px 0 0;
+  white-space: pre-line;
+  font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
+  font-size: 16px;
+  line-height: 1.55;
+  color: #333;
+}
+
+.caption-text.is-collapsed {
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  max-height: calc(1.55em * 4);
+  overflow: hidden;
+}
+
+.caption-toggle {
+  margin: 6px 0 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #2e3138;
+  font-size: 12px;
+  text-align: left;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.section-title {
+  margin: 0 0 26px;
+  text-align: center;
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.card {
+  border: 1px solid var(--line);
+  padding: 22px;
+  background: #fff;
+}
+
+.sales-band {
+  margin: 72px 0 0;
+  padding: 34px 20px;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  text-align: center;
+}
+
+.sales-band h2 {
+  margin: 0;
+  font-family: "Didot", "Bodoni 72", "Times New Roman", "Hiragino Mincho ProN", "Yu Mincho", serif;
+  font-size: 24px;
+  font-weight: 400;
+  letter-spacing: -.03em;
+}
+
+.profile {
+  display: grid;
+  grid-template-columns: minmax(260px, .75fr) minmax(0, 1fr);
+  gap: 38px;
+  align-items: start;
+}
+
+.profile-text {
+  font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
+  color: #333;
+}
+
+footer {
+  border-top: 1px solid var(--line);
+  padding: 28px 20px;
+  color: var(--soft);
+  font-size: 12px;
+  text-align: center;
+}
+
+.site-mini-contact {
+  margin: 56px 0 0;
+  padding: 16px 18px;
+  border: 1px solid var(--line);
+  background: #fafaf8;
+  color: #444;
+  font-size: 15px;
+  line-height: 1.75;
+  text-align: left;
+}
+
+.site-mini-contact strong {
+  display: inline-block;
+  min-width: 86px;
+  color: #111;
+  font-weight: 600;
+}
+
+.site-mini-contact .label-sns::before,
+.site-mini-contact .label-contact::before {
+  display: inline-block;
+  width: 14px;
+  margin-right: 6px;
+  text-align: center;
+}
+
+.site-mini-contact .label-sns::before {
+  content: "";
+  display: inline-block;
+  width: 15px;
+  height: 15px;
+  margin-right: 6px;
+  background: url("assets/icons/instagram-mono.svg") no-repeat center / contain;
+  vertical-align: -2px;
+}
+
+.site-mini-contact .label-contact::before {
+  content: "";
+  display: inline-block;
+  width: 15px;
+  height: 15px;
+  margin-right: 6px;
+  background: url("assets/icons/mail-mono.svg") no-repeat center / contain;
+  vertical-align: -2px;
+}
+
+.site-mini-contact a {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.sns-actions {
+  display: grid;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.sns-row {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.sns-label {
+  min-width: 92px;
+  font-size: 13px;
+  color: #444;
+  font-weight: 600;
+}
+
+.sns-label::before {
+  content: "↓ ";
+}
+
+.image-viewer {
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(15, 15, 18, 0.92);
+  z-index: 2000;
+  padding: 24px;
+}
+
+.image-viewer.is-open {
+  display: flex;
+}
+
+.viewer-image {
+  max-width: min(92vw, 1400px);
+  max-height: 82vh;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  cursor: zoom-in;
+  transition: transform 0.2s ease;
+  transform-origin: center center;
+  user-select: none;
+  will-change: transform;
+  image-rendering: auto;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.viewer-image.is-zoomed {
+  cursor: grab;
+}
+
+.viewer-image.is-zoomed.is-panning {
+  cursor: grabbing;
+  transition: none;
+}
+
+.viewer-meta {
+  position: absolute;
+  left: 50%;
+  bottom: 24px;
+  transform: translateX(-50%);
+  color: #f6f6f8;
+  font-size: 13px;
+  background: rgba(0, 0, 0, 0.45);
+  padding: 6px 10px;
+}
+
+.viewer-loading {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  display: none;
+  color: #f6f6f8;
+  font-size: 14px;
+  background: rgba(0, 0, 0, 0.55);
+  padding: 8px 12px;
+}
+
+.viewer-loading.is-visible {
+  display: block;
+}
+
+.viewer-close,
+.viewer-prev,
+.viewer-next {
+  position: absolute;
+  border: 1px solid rgba(255, 255, 255, 0.42);
+  background: rgba(0, 0, 0, 0.35);
+  color: #fff;
+  cursor: pointer;
+}
+
+.viewer-close {
+  top: 18px;
+  left: 18px;
+  width: 42px;
+  height: 42px;
+  font-size: 30px;
+  line-height: 1;
+}
+
+.viewer-prev,
+.viewer-next {
+  top: 50%;
+  transform: translateY(-50%);
+  width: 48px;
+  height: 64px;
+  font-size: 34px;
+}
+
+.viewer-prev { left: 18px; }
+.viewer-next { right: 18px; }
+
+.profile-accordion {
+  margin-bottom: 14px;
+}
+
+.profile-accordion summary {
+  list-style: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.profile-accordion summary::-webkit-details-marker {
+  display: none;
+}
+
+.profile-accordion summary h2 {
+  margin: 0;
+}
+
+.profile-accordion summary::after {
+  content: "+";
+  font-size: 26px;
+  line-height: 1;
+  color: #222;
+}
+
+.profile-accordion[open] summary::after {
+  content: "−";
+}
+
+.profile-accordion-body {
+  margin-top: 14px;
+}
+
+@media (max-width: 760px) {
+  .site-header {
+    padding-top: 24px;
+  }
+
+  .brand {
+    font-size: 42px;
+  }
+
+  .nav {
+    gap: 14px;
+  }
+
+  .feature-grid,
+  .category-strip,
+  .card-grid,
+  .profile {
+    grid-template-columns: 1fr;
+  }
+
+  .top-hero {
+    grid-template-columns: 1fr;
+  }
+
+  .top-hero-copy {
+    padding: 20px 16px;
+  }
+
+  .top-lead {
+    font-size: 16px;
+    line-height: 1.6;
+  }
+
+  .top-hero-media {
+    min-height: 280px;
+    padding: 12px;
+  }
+
+  .top-hero-media img {
+    max-height: 240px;
+  }
+
+  .top-links {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .gallery-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    margin-bottom: 40px;
+  }
+
+  main {
+    padding-top: 24px;
+  }
+
+  .work {
+    margin: 0 0 24px;
+  }
+
+  .work-image-link {
+    min-height: 320px;
+    padding: 8px;
+  }
+
+  .caption {
+    min-height: 0;
+    gap: 6px;
+    margin-top: 6px;
+  }
+
+  .caption-title {
+    font-size: 14px;
+    margin-bottom: 4px;
+  }
+
+  .caption-meta {
+    font-size: 12px;
+    line-height: 1.35;
+  }
+
+  .caption-text {
+    font-size: 15px;
+    line-height: 1.6;
+    margin-top: 8px;
+  }
+
+  .caption-toggle {
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 520px) {
+  .brand {
+    font-size: 34px;
+  }
+
+  .top-hero h1 {
+    font-size: clamp(24px, 6.8vw, 32px);
+  }
+
+  .top-hero h1 .archive-line {
+    font-size: 1.2em;
+  }
+
+  .top-lead {
+    font-size: 14px;
+    line-height: 1.55;
+  }
+
+  .top-links {
+    grid-template-columns: 1fr;
+  }
+
+  .top-selected .work-image-link,
+  .top-selected .gallery-grid .work.is-portrait .work-image-link,
+  .top-selected .gallery-grid .work.is-landscape .work-image-link {
+    min-height: 250px;
+    height: 250px;
+  }
+
+  .top-selected .work {
+    grid-template-rows: 250px auto;
+  }
+
+  .top-selected .caption {
+    min-height: 0;
+  }
+}
