@@ -23,6 +23,42 @@ function uiT(key, fallback) {
   return dict[key] || fallback;
 }
 
+function detectSiteBasePath() {
+  const pages = [
+    "index",
+    "hanga",
+    "hanga-wood",
+    "hanga-copper",
+    "digital",
+    "manga",
+    "profile",
+    "shop",
+  ];
+  const path = window.location.pathname;
+  for (const page of pages) {
+    const patterns = [`/${page}.html`, `/${page}/`, `/${page}`];
+    for (const suffix of patterns) {
+      if (path.endsWith(suffix)) {
+        const base = path.slice(0, -suffix.length);
+        return `${base}/`.replace(/\/+/g, "/");
+      }
+    }
+  }
+  return path.endsWith("/") ? path : `${path}/`;
+}
+
+function normalizeInternalPageLinks() {
+  const base = detectSiteBasePath();
+  const links = document.querySelectorAll('a[href$=".html"]');
+  links.forEach((link) => {
+    const href = link.getAttribute("href");
+    if (!href || href.startsWith("http") || href.startsWith("mailto:") || href.startsWith("#")) return;
+    const page = href.split("/").pop();
+    if (!page) return;
+    link.setAttribute("href", `${base}${page}`);
+  });
+}
+
 const galleryState = new Map();
 let topCategoryButtonsVisible = false;
 
@@ -435,9 +471,7 @@ function attachGalleryViewer() {
   });
   nextBtn.onclick = next;
   prevBtn.onclick = prev;
-  closeBtn.onclick = () => {
-    window.location.href = "index.html";
-  };
+  closeBtn.onclick = close;
   viewer.addEventListener("click", (event) => {
     if (event.target !== viewer) return;
     if (isZoomed) {
@@ -520,3 +554,4 @@ function attachCaptionToggles() {
 
 renderFeatureImages();
 renderGallery();
+normalizeInternalPageLinks();
