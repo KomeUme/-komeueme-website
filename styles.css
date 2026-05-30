@@ -681,6 +681,11 @@ main {
   background: #fff;
 }
 
+.card-grid .card > .actions {
+  margin-top: 14px;
+  justify-content: flex-start;
+}
+
 .sales-band {
   margin: 72px 0 0;
   padding: 34px 20px;
