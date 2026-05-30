@@ -12,3 +12,6 @@
 
 /i18n.js
   Cache-Control: no-cache
+
+/assets/works/*
+  Cache-Control: no-cache
