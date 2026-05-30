@@ -27,6 +27,7 @@
 - 作品画像を追加したら、公開前に `node scripts/prepare-work-images.js <画像パス...>` を実行し、長辺をWeb向け上限に自動調整する（拡大はしない）
 - 作品画像の原本は `/Users/IHEI1/展示関係/portfolio-img` を正本とし、Web側では原本を直接使わない
 - 作品画像をWebサイトへ取り込む時は、`node scripts/import-work-image.js <sourcePath> <destFileName>` を使い、`assets/works` へコピー・リネーム・最適化してから使用する
+- コピー元が `/Users/IHEI1/展示関係/portfolio-img` 配下の場合、原本は絶対に削除・移動・上書きしない（常に「コピーのみ」）
 - `data.js` で参照する画像パスは、`assets/works` 内に実ファイルが存在する名前のみを使う（`-v2` 等の枝番は、実ファイル作成後にのみ参照へ設定する）
 - 差し替えで不要になった画像は、完全削除せず `~/.Trash/` 配下へ移動して保管する（即時復旧できる状態を維持）
 - i18n 文言追加時は `data-i18n` / `data-i18n-html` を設定し、`i18n.js` の `ja/en` 両方に同一キーを追加する
