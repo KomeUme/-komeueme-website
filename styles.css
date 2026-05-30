@@ -349,6 +349,7 @@ main {
 
 .top-selected .gallery-grid.top-selected-row {
   display: grid;
+  grid-template-columns: none;
   grid-auto-flow: column;
   grid-auto-columns: minmax(220px, 1fr);
   overflow-x: auto;
