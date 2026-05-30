@@ -1,0 +1,14 @@
+/*.html
+  Cache-Control: no-cache
+
+/styles.css
+  Cache-Control: no-cache
+
+/app.js
+  Cache-Control: no-cache
+
+/data.js
+  Cache-Control: no-cache
+
+/i18n.js
+  Cache-Control: no-cache

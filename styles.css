@@ -54,11 +54,12 @@ img {
 .brand {
   display: inline-block;
   font-family: "Didot", "Bodoni 72", "Times New Roman", "Hiragino Mincho ProN", "Yu Mincho", serif;
-  font-size: 54px;
+  font-size: 46px;
   font-weight: 400;
   letter-spacing: 0;
   line-height: 1;
   text-transform: none;
+  color: #2a2c31;
 }
 
 .nav {
@@ -157,12 +158,31 @@ main {
 }
 
 .top-hero h1 {
-  margin: 12px 0 0;
+  margin: 14px 0 0;
   font-family: "Didot", "Bodoni 72", "Times New Roman", "Hiragino Mincho ProN", "Yu Mincho", serif;
   font-size: clamp(41px, 5.8vw, 67px);
   font-weight: 400;
   line-height: 1.08;
   letter-spacing: 0;
+}
+
+.name-stack {
+  display: inline-flex;
+  flex-direction: row;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+.name-ruby {
+  font-size: 0.28em;
+  line-height: 1.3;
+  letter-spacing: 0.06em;
+  text-transform: lowercase;
+  transform: translateY(-0.08em);
+}
+
+.name-main {
+  line-height: 1;
 }
 
 .top-hero h1 .archive-line {
@@ -179,8 +199,23 @@ main {
   font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
 }
 
-.top-actions {
+.top-intro-title {
+  margin-top: 34px;
+  font-size: 20px;
+  line-height: 1.45;
+}
+
+.top-hero-lead {
+  margin-top: 14px;
+  max-width: 38ch;
+  font-size: 16px;
+  line-height: 1.55;
+  white-space: pre-line;
+}
+
+.actions.top-actions {
   justify-content: flex-start;
+  margin-top: calc(1.55em * 4);
 }
 
 .top-hero-media {
@@ -593,7 +628,7 @@ footer {
 
 .site-mini-contact {
   margin: 56px 0 0;
-  padding: 16px 18px;
+  padding: 22px 22px;
   border: 1px solid var(--line);
   background: #fafaf8;
   color: #444;
@@ -602,9 +637,13 @@ footer {
   text-align: left;
 }
 
+.site-mini-contact > div + div {
+  margin-top: 12px;
+}
+
 .site-mini-contact strong {
   display: inline-block;
-  min-width: 86px;
+  min-width: 96px;
   color: #111;
   font-weight: 600;
 }
@@ -640,6 +679,7 @@ footer {
 .site-mini-contact a {
   text-decoration: underline;
   text-underline-offset: 2px;
+  word-break: break-word;
 }
 
 .sns-actions {
@@ -805,7 +845,7 @@ footer {
   }
 
   .brand {
-    font-size: 42px;
+    font-size: 36px;
   }
 
   .nav {
@@ -829,6 +869,11 @@ footer {
 
   .top-lead {
     font-size: 16px;
+    line-height: 1.6;
+  }
+
+  .top-hero-lead {
+    font-size: 15px;
     line-height: 1.6;
   }
 
@@ -893,7 +938,7 @@ footer {
 
 @media (max-width: 520px) {
   .brand {
-    font-size: 34px;
+    font-size: 30px;
   }
 
   .top-hero h1 {

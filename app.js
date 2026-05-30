@@ -73,7 +73,7 @@ function shuffle(items) {
 
 function parseSizeInfo(sizeText) {
   const text = String(sizeText ?? "");
-  const match = text.match(/(\d+(?:\.\d+)?)\s*mm\s*[×xX]\s*(\d+(?:\.\d+)?)\s*mm/);
+  const match = text.match(/(\d+(?:\.\d+)?)\s*(?:mm)?\s*[×xX]\s*(\d+(?:\.\d+)?)\s*(?:mm)?/i);
   if (!match) return { width: null, height: null, ratio: null, area: null };
   const w = Number(match[1]);
   const h = Number(match[2]);
@@ -161,6 +161,10 @@ function renderFeatureImages() {
   const featureCaption = document.querySelector("[data-feature-caption]");
 
   const isCopperTechnique = (technique) => /エッチング|ドライポイント|アクアチント|銅版/.test(String(technique ?? ""));
+  const pickRandomImage = (work) => {
+    const list = Array.isArray(work.images) && work.images.length ? work.images : [work.image];
+    return shuffle(list)[0] || work.image;
+  };
   const woodLargePool = works.filter((work) => {
     if (work.category !== "hanga") return false;
     if (isCopperTechnique(work.technique)) return false;
@@ -168,17 +172,29 @@ function renderFeatureImages() {
     return Number(width) > 1000 || Number(height) > 1000;
   });
 
-  const featured = shuffle(woodLargePool).slice(0, 2);
+  const targetCount = 5;
+  const minLargeWoodCount = 2;
+  const largeWoodSelected = shuffle(woodLargePool).slice(0, Math.min(minLargeWoodCount, woodLargePool.length));
+  const selectedIds = new Set(largeWoodSelected.map((work) => String(work.id)));
+  const otherPool = works.filter((work) => {
+    if (!work?.image) return false;
+    return !selectedIds.has(String(work.id));
+  });
+  const othersSelected = shuffle(otherPool).slice(0, Math.max(0, targetCount - largeWoodSelected.length));
+  const featured = shuffle([...largeWoodSelected, ...othersSelected]).slice(0, targetCount).map((work) => ({
+    work,
+    featureImage: pickRandomImage(work),
+  }));
   if (!featured.length) return;
   let activeIndex = 0;
   const setFeatured = () => {
     const active = featured[activeIndex % featured.length];
     featureImages.forEach((img) => {
-      img.src = active.image;
-      img.alt = `${active.title} (${categories[active.category]})`;
+      img.src = active.featureImage;
+      img.alt = `${active.work.title} (${categories[active.work.category]})`;
     });
     if (featureCaption) {
-      featureCaption.textContent = `${active.title}｜${withFallback(active.year)}`;
+      featureCaption.textContent = `${active.work.title}｜${withFallback(active.work.year)}`;
     }
     activeIndex += 1;
   };
