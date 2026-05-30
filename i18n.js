@@ -42,7 +42,7 @@ const I18N = {
     manga_story: "ストーリー漫画",
     intro_shop: "販売・問い合わせ",
     profile_title: "Profile",
-    profile_desc: "略歴情報。",
+    profile_desc: "略歴情報",
     profile_edu_title: "学歴",
     profile_award_title: "受賞歴",
     profile_exhibition_title: "展示歴",
@@ -116,7 +116,7 @@ const I18N = {
     manga_story: "Story Manga",
     intro_shop: "Shop / Contact",
     profile_title: "Profile",
-    profile_desc: "CV and awards.",
+    profile_desc: "CV and awards",
     profile_edu_title: "Education",
     profile_award_title: "Awards",
     profile_exhibition_title: "Exhibitions",
@@ -149,6 +149,79 @@ const I18N = {
   },
 };
 
+function formatDateLabel(value) {
+  const d = value instanceof Date ? value : new Date(value);
+  if (Number.isNaN(d.getTime())) return "";
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}.${m}.${day}`;
+}
+
+async function updateProfileNavDate() {
+  const profileTitle = document.querySelector('summary h2[data-i18n="card_profile_title"]');
+  const profileDesc = document.querySelector('p[data-i18n="profile_desc"]');
+  const introTitle = document.querySelector(".top-intro-title");
+  if (!profileTitle && !profileDesc && !introTitle) return;
+  let profileDateLabel = "";
+  if (profileTitle) {
+    const dateEl = profileTitle.querySelector(".profile-updated-date");
+    if (dateEl) dateEl.remove();
+  }
+  const isProfilePage = /\/profile(?:\.html)?$/.test(window.location.pathname || "");
+  if (isProfilePage) {
+    const own = formatDateLabel(document.lastModified);
+    if (own) profileDateLabel = `${own}更新`;
+  }
+  if (!profileDateLabel) {
+    try {
+      const head = await fetch("profile.html", { method: "HEAD", cache: "no-store" });
+      const lastModified = head.headers.get("Last-Modified");
+      const formatted = formatDateLabel(lastModified);
+      if (formatted) profileDateLabel = `${formatted}更新`;
+    } catch (_) {
+      profileDateLabel = "";
+    }
+  }
+  if (!profileDateLabel) profileDateLabel = "2026.05.30更新";
+  if (profileDesc) {
+    let dateEl = profileDesc.querySelector(".profile-updated-date");
+    if (!dateEl) {
+      dateEl = document.createElement("span");
+      dateEl.className = "profile-updated-date";
+      profileDesc.appendChild(dateEl);
+    }
+    dateEl.textContent = `（${profileDateLabel}）`;
+  }
+
+  if (introTitle) {
+    let introDateLabel = "";
+    const isTopPage = /\/(?:index(?:\.html)?)?$/.test(window.location.pathname || "");
+    if (isTopPage) {
+      const own = formatDateLabel(document.lastModified);
+      if (own) introDateLabel = `${own}更新`;
+    }
+    if (!introDateLabel) {
+      try {
+        const head = await fetch("index.html", { method: "HEAD", cache: "no-store" });
+        const lastModified = head.headers.get("Last-Modified");
+        const formatted = formatDateLabel(lastModified);
+        if (formatted) introDateLabel = `${formatted}更新`;
+      } catch (_) {
+        introDateLabel = "";
+      }
+    }
+    if (!introDateLabel) introDateLabel = profileDateLabel;
+    let dateEl = introTitle.querySelector(".profile-updated-date");
+    if (!dateEl) {
+      dateEl = document.createElement("span");
+      dateEl.className = "profile-updated-date";
+      introTitle.appendChild(dateEl);
+    }
+    dateEl.textContent = `（${introDateLabel}）`;
+  }
+}
+
 function applyLang(lang) {
   const dict = I18N[lang] || I18N.ja;
   document.documentElement.lang = lang === "en" ? "en" : "ja";
@@ -169,6 +242,7 @@ function applyLang(lang) {
   }
   if (typeof window.renderGallery === "function") window.renderGallery();
   if (typeof window.renderFeatureImages === "function") window.renderFeatureImages();
+  updateProfileNavDate();
 }
 
 document.addEventListener("DOMContentLoaded", () => {

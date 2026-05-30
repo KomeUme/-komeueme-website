@@ -129,6 +129,14 @@ img {
   font-weight: 400;
 }
 
+.profile-updated-date {
+  margin-left: 8px;
+  font-size: 12px;
+  font-weight: 400;
+  color: #5f6168;
+  white-space: nowrap;
+}
+
 main {
   max-width: 1180px;
   margin: 0 auto;
@@ -221,12 +229,18 @@ main {
 
 .top-intro-title {
   margin-top: 0;
-  font-size: 20px;
-  line-height: 1.45;
+  font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
+  font-size: 15px;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  line-height: 1.4;
+  color: #3f4249;
+  border-left: 2px solid #cfd2d8;
+  padding-left: 10px;
 }
 
 .top-hero-lead {
-  margin-top: 14px;
+  margin-top: 20px;
   margin-bottom: 24px;
   max-width: 38ch;
   font-size: 16px;
