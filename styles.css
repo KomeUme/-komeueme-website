@@ -311,9 +311,28 @@ main {
   font-size: 12px;
 }
 
+.top-selected-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
 .top-selected .section-title {
   text-align: left;
-  margin-bottom: 18px;
+  margin-bottom: 14px;
+}
+
+.button-load-more-inline {
+  min-height: auto;
+  padding: 2px 0;
+  border: 0;
+  border-bottom: 1px solid var(--ink);
+  border-radius: 0;
+  background: transparent;
+  color: var(--ink);
+  font-size: 12px;
+  letter-spacing: 0.02em;
 }
 
 .top-selected .gallery-grid {
@@ -1080,5 +1099,9 @@ footer {
 
   .top-selected-image-wrap {
     min-height: 220px;
+  }
+
+  .button-load-more-inline {
+    font-size: 11px;
   }
 }

@@ -64,8 +64,11 @@
     </section>
 
     <section class="top-selected">
-      <h2 class="section-title" data-i18n="selected_works">Selected Works</h2>
-      <section class="gallery gallery-grid" data-gallery="all" data-limit="4" data-sort="random" data-gallery-id="top-selected"></section>
+      <div class="top-selected-head">
+        <h2 class="section-title" data-i18n="selected_works">Selected Works</h2>
+        <button class="button button-load-more button-load-more-inline" type="button" data-load-more-for="top-selected">もっと見る</button>
+      </div>
+      <section class="gallery gallery-grid" data-gallery="all" data-limit="5" data-sort="recent" data-gallery-id="top-selected" data-load-more="true"></section>
     </section>
 
     <section class="site-mini-contact">

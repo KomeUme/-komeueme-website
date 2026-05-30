@@ -61,6 +61,18 @@ function normalizeInternalPageLinks() {
 
 const galleryState = new Map();
 let topCategoryButtonsVisible = false;
+let pendingOpenWorkId = null;
+let pendingOpenEnabled = false;
+
+try {
+  const params = new URLSearchParams(window.location.search);
+  const workId = params.get("work");
+  pendingOpenWorkId = workId ? String(workId) : null;
+  pendingOpenEnabled = params.get("open") === "1";
+} catch (_) {
+  pendingOpenWorkId = null;
+  pendingOpenEnabled = false;
+}
 
 function shuffle(items) {
   const arr = [...items];
@@ -257,13 +269,25 @@ function renderGallery() {
     const pageSize = Number.parseInt(gallery.dataset.pageSize || "", 10) || 12;
     const prev = galleryState.get(galleryId);
     const stableList = isLoadMore && prev?.arranged?.length === arranged.length ? prev.arranged : arranged;
-    const shownCount = isLoadMore
+    let shownCount = isLoadMore
       ? Math.min(prev?.shownCount || defaultCount, stableList.length)
       : defaultCount;
     const totalPages = Math.max(1, Math.ceil(stableList.length / pageSize));
-    const currentPage = isLoadMore
+    let currentPage = isLoadMore
       ? 1
       : Math.min(Math.max(prev?.currentPage || 1, 1), totalPages);
+
+    // If this page was opened from Selected Works, prioritize showing that work.
+    if (pendingOpenWorkId) {
+      const targetIndex = stableList.findIndex((work) => String(work.id) === pendingOpenWorkId);
+      if (targetIndex >= 0) {
+        if (isLoadMore) {
+          shownCount = Math.max(shownCount, targetIndex + 1);
+        } else {
+          currentPage = Math.floor(targetIndex / pageSize) + 1;
+        }
+      }
+    }
     const outputList = isLoadMore
       ? stableList.slice(0, shownCount)
       : stableList.slice((currentPage - 1) * pageSize, currentPage * pageSize);
@@ -276,16 +300,16 @@ function renderGallery() {
       pageSize,
       currentPage,
       totalPages,
+      revealFromIndex: prev?.revealFromIndex ?? null,
     });
 
     if (galleryId === "top-selected") {
       gallery.classList.add("top-selected-row");
       gallery.innerHTML = outputList.map((work) => {
         const firstImage = work.images?.[0] || work.image;
-        const page = getCategoryPage(work);
         return `
       <article class="${getWorkCardClass(work)} top-selected-item">
-        <a class="top-selected-link" href="${escapeHtml(page)}">
+        <a class="top-selected-link work-image-link" href="${escapeHtml(firstImage)}" data-work-id="${escapeHtml(work.id)}">
           <span class="top-selected-image-wrap">
             <img src="${escapeHtml(firstImage)}" alt="${escapeHtml(work.title)}" loading="lazy">
           </span>
@@ -294,6 +318,15 @@ function renderGallery() {
       </article>
     `;
       }).join("");
+      const currentState = galleryState.get(galleryId);
+      if (currentState && Number.isFinite(currentState.revealFromIndex)) {
+        const target = gallery.querySelector(`.top-selected-item:nth-child(${currentState.revealFromIndex + 1})`);
+        if (target) {
+          target.scrollIntoView({ behavior: "smooth", inline: "start", block: "nearest" });
+        }
+        currentState.revealFromIndex = null;
+        galleryState.set(galleryId, currentState);
+      }
       removePaginationControls(gallery, galleryId);
       return;
     }
@@ -331,6 +364,16 @@ function renderGallery() {
   attachGalleryViewer();
   attachLoadMoreHandlers();
   attachPaginationHandlers();
+  autoOpenWorkFromQuery();
+}
+
+function autoOpenWorkFromQuery() {
+  if (!pendingOpenEnabled || !pendingOpenWorkId) return;
+  const link = document.querySelector(`.work-image-link[data-work-id="${CSS.escape(pendingOpenWorkId)}"]`);
+  if (!link) return;
+  pendingOpenEnabled = false;
+  pendingOpenWorkId = null;
+  link.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true }));
 }
 
 function removePaginationControls(gallery, galleryId) {
@@ -441,6 +484,12 @@ function attachGalleryViewer() {
   let dragStartY = 0;
   let panStartX = 0;
   let panStartY = 0;
+  const savedViewerState = viewer.__viewerState;
+  if (savedViewerState && Array.isArray(savedViewerState.currentImages)) {
+    currentImages = savedViewerState.currentImages;
+    currentTitle = savedViewerState.currentTitle || "";
+    index = Number.isFinite(savedViewerState.index) ? savedViewerState.index : 0;
+  }
 
   const applyImageTransform = () => {
     const tx = Math.round(panX);
@@ -477,6 +526,7 @@ function attachGalleryViewer() {
     image.src = currentImages[index];
     image.alt = currentTitle;
     meta.textContent = `${currentTitle}  ${index + 1}/${currentImages.length}`;
+    viewer.__viewerState = { currentImages: [...currentImages], currentTitle, index };
   };
   const open = () => {
     setZoom(false);
@@ -508,6 +558,7 @@ function attachGalleryViewer() {
       currentImages = work.images?.length ? work.images : [work.image];
       currentTitle = work.title || "";
       index = 0;
+      viewer.__viewerState = { currentImages: [...currentImages], currentTitle, index };
       open();
     });
   });
@@ -625,7 +676,9 @@ function attachLoadMoreHandlers() {
       if (!latest) return;
       latest.clicks = (latest.clicks || 0) + 1;
       if (latest.clicks >= 2) topCategoryButtonsVisible = true;
+      const prevShownCount = latest.shownCount;
       latest.shownCount = Math.min(latest.shownCount + latest.step, latest.arranged.length);
+      latest.revealFromIndex = latest.shownCount > prevShownCount ? prevShownCount : null;
       galleryState.set(galleryId, latest);
       renderGallery();
     });
