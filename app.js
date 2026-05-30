@@ -570,4 +570,3 @@ function attachCaptionToggles() {
 
 renderFeatureImages();
 renderGallery();
-normalizeInternalPageLinks();
