@@ -238,10 +238,10 @@ const works = [
     "technique": "ドライポイント / ハーネミューレ",
     "size": "99mm×74mm",
     "caption": "小学生の頃の帰り道、飽きるほどに見た私の原風景。",
-    "image": "assets/works/work-19-01.jpg",
+    "image": "assets/works/work-19-02.jpg",
     "images": [
-      "assets/works/work-19-01.jpg",
-      "assets/works/work-19-02.jpg"
+      "assets/works/work-19-02.jpg",
+      "assets/works/work-19-01.jpg"
     ]
   },
   {

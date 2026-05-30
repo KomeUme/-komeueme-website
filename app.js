@@ -149,6 +149,10 @@ function arrangeBySimilarity(list) {
 function getWorkCardClass(work) {
   const classes = ["work"];
   const { ratio, area } = parseSizeInfo(work.size);
+  if (ratio === null || area === null) {
+    classes.push("is-compact");
+    return classes.join(" ");
+  }
   if (ratio !== null && area !== null && area <= 12000 && ratio >= 0.9 && ratio <= 1.1) {
     classes.push("is-compact");
   }
@@ -161,10 +165,6 @@ function renderFeatureImages() {
   const featureCaption = document.querySelector("[data-feature-caption]");
 
   const isCopperTechnique = (technique) => /エッチング|ドライポイント|アクアチント|銅版/.test(String(technique ?? ""));
-  const pickRandomImage = (work) => {
-    const list = Array.isArray(work.images) && work.images.length ? work.images : [work.image];
-    return shuffle(list)[0] || work.image;
-  };
   const woodLargePool = works.filter((work) => {
     if (work.category !== "hanga") return false;
     if (isCopperTechnique(work.technique)) return false;
@@ -183,7 +183,7 @@ function renderFeatureImages() {
   const othersSelected = shuffle(otherPool).slice(0, Math.max(0, targetCount - largeWoodSelected.length));
   const featured = shuffle([...largeWoodSelected, ...othersSelected]).slice(0, targetCount).map((work) => ({
     work,
-    featureImage: pickRandomImage(work),
+    featureImage: work.image || work.images?.[0] || "",
   }));
   if (!featured.length) return;
   let activeIndex = 0;
@@ -248,14 +248,29 @@ function renderGallery() {
     const limit = Number.parseInt(gallery.dataset.limit || "", 10);
     const defaultCount = Number.isFinite(limit) && limit > 0 ? limit : arranged.length;
     const isLoadMore = gallery.dataset.loadMore === "true";
+    const pageSize = Number.parseInt(gallery.dataset.pageSize || "", 10) || 12;
     const prev = galleryState.get(galleryId);
     const stableList = isLoadMore && prev?.arranged?.length === arranged.length ? prev.arranged : arranged;
     const shownCount = isLoadMore
       ? Math.min(prev?.shownCount || defaultCount, stableList.length)
       : defaultCount;
-    const outputList = stableList.slice(0, shownCount);
+    const totalPages = Math.max(1, Math.ceil(stableList.length / pageSize));
+    const currentPage = isLoadMore
+      ? 1
+      : Math.min(Math.max(prev?.currentPage || 1, 1), totalPages);
+    const outputList = isLoadMore
+      ? stableList.slice(0, shownCount)
+      : stableList.slice((currentPage - 1) * pageSize, currentPage * pageSize);
     const prevClicks = prev?.clicks || 0;
-    galleryState.set(galleryId, { arranged: stableList, shownCount, step: defaultCount, clicks: prevClicks });
+    galleryState.set(galleryId, {
+      arranged: stableList,
+      shownCount,
+      step: defaultCount,
+      clicks: prevClicks,
+      pageSize,
+      currentPage,
+      totalPages,
+    });
 
     gallery.innerHTML = outputList.map((work) => {
       const firstImage = work.images?.[0] || work.image;
@@ -277,12 +292,64 @@ function renderGallery() {
       </article>
     `;
     }).join("");
+
+    if (!isLoadMore && stableList.length > pageSize) {
+      renderPaginationControls(gallery, galleryId, currentPage, totalPages);
+    } else {
+      removePaginationControls(gallery, galleryId);
+    }
   });
 
   applyImageOrientationClasses();
   attachCaptionToggles();
   attachGalleryViewer();
   attachLoadMoreHandlers();
+  attachPaginationHandlers();
+}
+
+function removePaginationControls(gallery, galleryId) {
+  const existing = document.querySelector(`.gallery-pagination[data-pagination-for="${galleryId}"]`);
+  if (existing) existing.remove();
+}
+
+function renderPaginationControls(gallery, galleryId, currentPage, totalPages) {
+  removePaginationControls(gallery, galleryId);
+  const nav = document.createElement("nav");
+  nav.className = "gallery-pagination";
+  nav.dataset.paginationFor = galleryId;
+  nav.setAttribute("aria-label", "pagination");
+  nav.innerHTML = Array.from({ length: totalPages }, (_, i) => {
+    const page = i + 1;
+    const isActive = page === currentPage;
+    return `<button class="page-dot${isActive ? " is-active" : ""}" type="button" data-page-for="${escapeHtml(galleryId)}" data-page="${page}">${page}</button>`;
+  }).join("");
+  gallery.insertAdjacentElement("afterend", nav);
+}
+
+function attachPaginationHandlers() {
+  const pagers = document.querySelectorAll(".gallery-pagination");
+  pagers.forEach((pager) => {
+    if (pager.dataset.bound === "true") return;
+    pager.dataset.bound = "true";
+    pager.addEventListener("click", (event) => {
+      const button = event.target.closest("button[data-page-for][data-page]");
+      if (!button) return;
+      const galleryId = button.dataset.pageFor;
+      const page = Number.parseInt(button.dataset.page || "", 10);
+      if (!galleryId || !Number.isFinite(page) || page < 1) return;
+      const state = galleryState.get(galleryId);
+      if (!state) return;
+      state.currentPage = Math.min(page, state.totalPages || page);
+      galleryState.set(galleryId, state);
+      renderGallery();
+      const targetGallery = document.querySelector(
+        `[data-gallery-id="${CSS.escape(galleryId)}"], [data-gallery="${CSS.escape(galleryId)}"]`
+      );
+      if (targetGallery) {
+        targetGallery.scrollIntoView({ block: "start", behavior: "auto" });
+      }
+    });
+  });
 }
 
 function applyImageOrientationClasses() {
