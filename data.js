@@ -185,7 +185,8 @@ const works = [
     "caption": "夜道をテーマとし、精神的に不安定な時に陥った、自身の内側ばかりに意識が向き、思考の海に沈んで行く様を表現した。",
     "image": "assets/works/work-10-01.jpg",
     "images": [
-      "assets/works/work-10-01.jpg"
+      "assets/works/work-10-01.jpg",
+      "assets/works/work-10-02.jpg"
     ]
   },
   {
@@ -268,7 +269,7 @@ const works = [
     "image": "assets/works/work-15-01.jpg",
     "images": [
       "assets/works/work-15-01.jpg",
-      "assets/works/work-15-02.jpg"
+      "assets/works/work-15-02-v2.jpg"
     ]
   },
   {
