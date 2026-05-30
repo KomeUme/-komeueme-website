@@ -763,9 +763,11 @@ footer {
   padding: 22px 22px;
   border: 1px solid var(--line);
   background: #fafaf8;
-  color: #383c44;
-  font-size: 15px;
-  line-height: 1.75;
+  color: #2e333b;
+  font-family: "Hiragino Mincho ProN", "Yu Mincho", "Times New Roman", serif;
+  font-size: 14px;
+  line-height: 1.85;
+  letter-spacing: 0.02em;
   text-align: left;
 }
 
@@ -776,8 +778,8 @@ footer {
 .site-mini-contact strong {
   display: inline-block;
   min-width: 96px;
-  color: #111;
-  font-weight: 600;
+  color: #1d2128;
+  font-weight: 400;
 }
 
 .site-mini-contact .label-sns::before,
@@ -810,7 +812,8 @@ footer {
 
 .site-mini-contact a {
   text-decoration: underline;
-  text-underline-offset: 2px;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
   word-break: break-word;
 }
 
