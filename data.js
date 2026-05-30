@@ -269,7 +269,7 @@ const works = [
     "image": "assets/works/work-15-01.jpg",
     "images": [
       "assets/works/work-15-01.jpg",
-      "assets/works/work-15-02-v2.jpg"
+      "assets/works/work-15-02.jpg"
     ]
   },
   {
