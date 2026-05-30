@@ -144,6 +144,7 @@ main {
 }
 
 .top-hero {
+  position: relative;
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(360px, 46%);
   gap: 24px;
