@@ -366,6 +366,15 @@ main {
   gap: 10px;
 }
 
+/* Prevent generic gallery card styles from collapsing Selected Works cards. */
+.top-selected-link.work-image-link {
+  min-height: 0;
+  padding: 0;
+  place-items: initial;
+  background: transparent;
+  border-radius: 0;
+}
+
 .top-selected-image-wrap {
   display: grid;
   place-items: center;
