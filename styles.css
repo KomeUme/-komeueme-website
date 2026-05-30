@@ -317,44 +317,49 @@ main {
 }
 
 .top-selected .gallery-grid {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 24px;
-  align-items: stretch;
+  gap: 20px;
 }
 
-.top-selected .work-image-link {
-  height: 572px;
-  min-height: 572px;
-  overflow: hidden;
-}
-
-.top-selected .work img {
-  max-height: 100%;
-}
-
-.top-selected .gallery-grid .work.is-portrait .work-image-link,
-.top-selected .gallery-grid .work.is-landscape .work-image-link {
-  min-height: 572px;
-}
-
-.top-selected .gallery-grid .work.is-portrait img,
-.top-selected .gallery-grid .work.is-landscape img {
-  max-height: 100%;
-}
-
-.top-selected .gallery-grid .work.is-portrait img {
-  max-height: 460px;
-}
-
-.top-selected .work {
+.top-selected .gallery-grid.top-selected-row {
   display: grid;
-  grid-template-rows: 572px auto;
-  height: 100%;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(220px, 1fr);
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  padding-bottom: 8px;
 }
 
-.top-selected .caption {
-  min-height: 300px;
-  margin-top: 10px;
+.top-selected-item {
+  margin: 0;
+}
+
+.top-selected-link {
+  display: grid;
+  gap: 10px;
+}
+
+.top-selected-image-wrap {
+  display: grid;
+  place-items: center;
+  min-height: 260px;
+  padding: 8px;
+  background: rgba(255, 255, 255, 0.84);
+  border-radius: 8px;
+}
+
+.top-selected-link img {
+  max-width: 100%;
+  max-height: 240px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
+
+.top-selected-title {
+  display: block;
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.4;
 }
 
 .intro {
@@ -1068,18 +1073,12 @@ footer {
     grid-template-columns: 1fr;
   }
 
-  .top-selected .work-image-link,
-  .top-selected .gallery-grid .work.is-portrait .work-image-link,
-  .top-selected .gallery-grid .work.is-landscape .work-image-link {
-    min-height: 250px;
-    height: 250px;
+  .top-selected .gallery-grid.top-selected-row {
+    grid-auto-columns: minmax(180px, 78vw);
+    gap: 14px;
   }
 
-  .top-selected .work {
-    grid-template-rows: 250px auto;
-  }
-
-  .top-selected .caption {
-    min-height: 0;
+  .top-selected-image-wrap {
+    min-height: 220px;
   }
 }

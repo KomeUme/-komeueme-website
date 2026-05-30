@@ -220,6 +220,12 @@ function renderGallery() {
     const text = `${work.title ?? ""} ${work.technique ?? ""} ${work.caption ?? ""}`;
     return /4コマ|四コマ|４コマ|四齣/i.test(text);
   };
+  const getCategoryPage = (work) => {
+    if (work.category === "digital") return "digital.html";
+    if (work.category === "manga") return "manga.html";
+    if (work.category === "hanga") return isCopperTechnique(work.technique) ? "hanga-copper.html" : "hanga-wood.html";
+    return "index.html";
+  };
   galleries.forEach((gallery) => {
     const category = gallery.dataset.gallery;
     const galleryId = gallery.dataset.galleryId || category;
@@ -271,6 +277,26 @@ function renderGallery() {
       currentPage,
       totalPages,
     });
+
+    if (galleryId === "top-selected") {
+      gallery.classList.add("top-selected-row");
+      gallery.innerHTML = outputList.map((work) => {
+        const firstImage = work.images?.[0] || work.image;
+        const page = getCategoryPage(work);
+        return `
+      <article class="${getWorkCardClass(work)} top-selected-item">
+        <a class="top-selected-link" href="${escapeHtml(page)}">
+          <span class="top-selected-image-wrap">
+            <img src="${escapeHtml(firstImage)}" alt="${escapeHtml(work.title)}" loading="lazy">
+          </span>
+          <span class="top-selected-title">${escapeHtml(work.title)}</span>
+        </a>
+      </article>
+    `;
+      }).join("");
+      removePaginationControls(gallery, galleryId);
+      return;
+    }
 
     gallery.innerHTML = outputList.map((work) => {
       const firstImage = work.images?.[0] || work.image;
