@@ -24,6 +24,9 @@
 - 画像を追加・差し替えたら `image` と `images[0]` の整合を必ず確認する
 - 作品サイズの `size` は `NNNmm×NNNmm` 形式で統一する（`mm` 省略を禁止）
 - 作品画像を追加したら、公開前に `node scripts/prepare-work-images.js <画像パス...>` を実行し、長辺をWeb向け上限に自動調整する（拡大はしない）
+- 作品画像の原本は `/Users/IHEI1/展示関係/portfolio-img` を正本とし、Web側では原本を直接使わない
+- 作品画像をWebサイトへ取り込む時は、`node scripts/import-work-image.js <sourcePath> <destFileName>` を使い、`assets/works` へコピー・リネーム・最適化してから使用する
+- 差し替えで不要になった画像は、完全削除せず `~/.Trash/` 配下へ移動して保管する（即時復旧できる状態を維持）
 - i18n 文言追加時は `data-i18n` / `data-i18n-html` を設定し、`i18n.js` の `ja/en` 両方に同一キーを追加する
 - ページ追加時は `<title data-i18n="page_title_*">` と `<h1>` を必須とする
 - styles のブレークポイントは `760px` と `520px` を基準とし、既存の余白・文字スケールを優先して拡張する
