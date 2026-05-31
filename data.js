@@ -1,18 +1,5 @@
 const works = [
   {
-    "id": "40",
-    "category": "digital",
-    "title": "止まれ",
-    "year": "2024年",
-    "technique": "",
-    "size": "",
-    "caption": "",
-    "image": "assets/works/work-40-01.png",
-    "images": [
-      "assets/works/work-40-01.png"
-    ]
-  },
-  {
     "id": "39",
     "category": "digital",
     "title": "あの夏が飽和する",
@@ -61,7 +48,8 @@ const works = [
     "caption": "学生時代に感じた、学生という縛られた身分に対する息苦しさと、大人へなることへの反発感を閉じ込めた。",
     "image": "assets/works/work-23-01.jpg",
     "images": [
-      "assets/works/work-23-01.jpg"
+      "assets/works/work-23-01.jpg",
+      "assets/works/work-40-01.png"
     ]
   },
   {
