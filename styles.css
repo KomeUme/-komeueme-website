@@ -357,6 +357,35 @@ main {
   opacity: 1;
 }
 
+.contact-actions-inline {
+  align-items: center;
+  gap: 12px;
+}
+
+.button-copy-inline {
+  appearance: none;
+  cursor: pointer;
+  display: inline-block;
+  min-height: 0;
+  padding: 0 0 1px;
+  border: 0;
+  border-bottom: 1px solid #7f8590;
+  border-radius: 0;
+  background: transparent;
+  color: #5f6672;
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1.1;
+  opacity: 0.86;
+}
+
+.button-copy-inline:hover {
+  color: #4e5460;
+  border-bottom-color: #727985;
+  opacity: 1;
+}
+
 .top-selected .gallery-grid {
   gap: 20px;
 }

@@ -68,6 +68,8 @@ const I18N = {
     cap_year: "制作年",
     cap_technique: "技法",
     cap_size: "サイズ",
+    copy_email: "コピー",
+    copy_done: "コピー済み",
     caption_more: "続きを読む",
     caption_less: "閉じる",
     loading_updating: "更新中",
@@ -142,6 +144,8 @@ const I18N = {
     cap_year: "Year",
     cap_technique: "Technique",
     cap_size: "Size",
+    copy_email: "Copy",
+    copy_done: "Copied",
     caption_more: "Read more",
     caption_less: "Close",
     loading_updating: "Updating...",
@@ -248,20 +252,56 @@ function applyLang(lang) {
 function setupContactLinks() {
   const email = "komeume1121@gmail.com";
   const subject = "web-siteから。";
-  const encodedTo = encodeURIComponent(email);
   const encodedSubject = encodeURIComponent(subject);
   const mailtoUrl = `mailto:${email}?subject=${encodedSubject}`;
-  const gmailComposeUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodedTo}&su=${encodedSubject}`;
 
   document.querySelectorAll('a[href^="mailto:"]').forEach((link) => {
     link.setAttribute("href", mailtoUrl);
-    if (link.dataset.gmailReady === "true") return;
-    link.dataset.gmailReady = "true";
+  });
+}
 
-    link.addEventListener("click", (event) => {
-      event.preventDefault();
-      const win = window.open(gmailComposeUrl, "_blank", "noopener,noreferrer");
-      if (!win) window.location.href = mailtoUrl;
+async function copyTextToClipboard(text) {
+  if (navigator.clipboard && window.isSecureContext) {
+    await navigator.clipboard.writeText(text);
+    return;
+  }
+  const ta = document.createElement("textarea");
+  ta.value = text;
+  ta.style.position = "fixed";
+  ta.style.left = "-9999px";
+  document.body.appendChild(ta);
+  ta.focus();
+  ta.select();
+  document.execCommand("copy");
+  ta.remove();
+}
+
+function setupCopyEmailButtons() {
+  document.querySelectorAll("[data-copy-email]").forEach((button) => {
+    if (button.dataset.copyBound === "true") return;
+    button.dataset.copyBound = "true";
+
+    button.addEventListener("click", async () => {
+      const email = button.dataset.copyEmail || "";
+      if (!email) return;
+      try {
+        await copyTextToClipboard(email);
+        const lang = (() => {
+          try {
+            return localStorage.getItem("site-lang") || "ja";
+          } catch (_) {
+            return "ja";
+          }
+        })();
+        const doneText = (I18N[lang] || I18N.ja).copy_done || "コピー済み";
+        const defaultText = (I18N[lang] || I18N.ja).copy_email || "コピー";
+        button.textContent = doneText;
+        window.setTimeout(() => {
+          button.textContent = defaultText;
+        }, 1200);
+      } catch (_) {
+        // no-op
+      }
     });
   });
 }
@@ -275,6 +315,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   applyLang(initial);
   setupContactLinks();
+  setupCopyEmailButtons();
   const btn = document.querySelector("[data-lang-switch]");
   if (btn) {
     btn.addEventListener("click", () => {
