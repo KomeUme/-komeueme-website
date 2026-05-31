@@ -317,8 +317,8 @@ function renderGallery() {
       gallery.innerHTML = outputList.map((work) => {
         const firstImage = work.images?.[0] || work.image;
         return `
-      <article class="${getWorkCardClass(work)} top-selected-item" data-work-id="${escapeHtml(work.id)}">
-        <a class="top-selected-link work-image-link" href="${escapeHtml(firstImage)}" data-work-id="${escapeHtml(work.id)}">
+      <article class="top-selected-item" data-work-id="${escapeHtml(work.id)}">
+        <a class="top-selected-link js-work-link" href="${escapeHtml(firstImage)}" data-work-id="${escapeHtml(work.id)}">
           <span class="top-selected-image-wrap">
             <img src="${escapeHtml(firstImage)}" alt="${escapeHtml(work.title)}" loading="lazy">
           </span>
@@ -344,7 +344,7 @@ function renderGallery() {
       const firstImage = work.images?.[0] || work.image;
       return `
       <article class="${getWorkCardClass(work)}">
-        <a class="work-image-link" href="${escapeHtml(firstImage)}" data-work-id="${escapeHtml(work.id)}">
+        <a class="work-image-link js-work-link" href="${escapeHtml(firstImage)}" data-work-id="${escapeHtml(work.id)}">
           <img src="${escapeHtml(firstImage)}" alt="${escapeHtml(work.title)}" loading="lazy">
         </a>
         <div class="caption">
@@ -378,7 +378,7 @@ function renderGallery() {
 
 function autoOpenWorkFromQuery() {
   if (!pendingOpenEnabled || !pendingOpenWorkId) return;
-  const link = document.querySelector(`.work-image-link[data-work-id="${CSS.escape(pendingOpenWorkId)}"]`);
+  const link = document.querySelector(`.js-work-link[data-work-id="${CSS.escape(pendingOpenWorkId)}"]`);
   if (!link) return;
   pendingOpenEnabled = false;
   pendingOpenWorkId = null;
@@ -454,7 +454,7 @@ function applyImageOrientationClasses() {
 
 function attachGalleryViewer() {
   const map = new Map(works.map((work) => [String(work.id), work]));
-  const links = document.querySelectorAll(".work-image-link[data-work-id]");
+  const links = document.querySelectorAll(".js-work-link[data-work-id]");
   if (!links.length) return;
 
   let viewer = document.querySelector(".image-viewer");
