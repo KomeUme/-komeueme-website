@@ -637,6 +637,11 @@ main {
   min-height: 440px;
 }
 
+.gallery-grid[data-gallery="hanga-copper"] .work-image-link,
+.gallery-grid[data-gallery="hanga-copper"] .work.is-portrait .work-image-link {
+  min-height: 440px;
+}
+
 .work:hover img {
   opacity: .88;
   transform: translateY(-2px);
