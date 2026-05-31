@@ -1,5 +1,44 @@
 const works = [
   {
+    "id": "40",
+    "category": "digital",
+    "title": "止まれ",
+    "year": "2024年",
+    "technique": "",
+    "size": "",
+    "caption": "",
+    "image": "assets/works/work-40-01.png",
+    "images": [
+      "assets/works/work-40-01.png"
+    ]
+  },
+  {
+    "id": "39",
+    "category": "digital",
+    "title": "あの夏が飽和する",
+    "year": "2023年",
+    "technique": "",
+    "size": "",
+    "caption": "",
+    "image": "assets/works/work-39-01.png",
+    "images": [
+      "assets/works/work-39-01.png"
+    ]
+  },
+  {
+    "id": "38",
+    "category": "digital",
+    "title": "頭ねこ",
+    "year": "2023年",
+    "technique": "",
+    "size": "",
+    "caption": "",
+    "image": "assets/works/work-38-01.jpeg",
+    "images": [
+      "assets/works/work-38-01.jpeg"
+    ]
+  },
+  {
     "id": "24",
     "category": "digital",
     "title": "赤べこランチャー",

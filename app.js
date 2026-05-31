@@ -167,7 +167,8 @@ function getWorkCardClass(work) {
   const classes = ["work"];
   const { ratio, area } = parseSizeInfo(work.size);
   if (ratio === null || area === null) {
-    classes.push("is-compact");
+    // Unknown size should not be forced into compact mode.
+    if (work.category !== "digital") classes.push("is-compact");
     return classes.join(" ");
   }
   if (ratio !== null && area !== null && area <= 12000 && ratio >= 0.9 && ratio <= 1.1) {
@@ -343,7 +344,7 @@ function renderGallery() {
     gallery.innerHTML = outputList.map((work) => {
       const firstImage = work.images?.[0] || work.image;
       return `
-      <article class="${getWorkCardClass(work)}">
+      <article class="${getWorkCardClass(work)}" data-work-id="${escapeHtml(work.id)}">
         <a class="work-image-link js-work-link" href="${escapeHtml(firstImage)}" data-work-id="${escapeHtml(work.id)}">
           <img src="${escapeHtml(firstImage)}" alt="${escapeHtml(work.title)}" loading="lazy">
         </a>

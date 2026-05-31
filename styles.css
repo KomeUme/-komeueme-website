@@ -633,6 +633,10 @@ main {
   max-height: 300px;
 }
 
+.gallery-grid[data-gallery="digital"] .work-image-link {
+  min-height: 440px;
+}
+
 .work:hover img {
   opacity: .88;
   transform: translateY(-2px);
