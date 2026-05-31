@@ -63,6 +63,7 @@ const galleryState = new Map();
 let topCategoryButtonsVisible = false;
 let pendingOpenWorkId = null;
 let pendingOpenEnabled = false;
+let topSelectedResizeBound = false;
 
 try {
   const params = new URLSearchParams(window.location.search);
@@ -327,6 +328,7 @@ function renderGallery() {
       </article>
     `;
       }).join("");
+      syncTopSelectedLayout(gallery);
       const currentState = galleryState.get(galleryId);
       if (currentState && Number.isFinite(currentState.revealFromIndex)) {
         const target = gallery.querySelector(`.top-selected-item:nth-child(${currentState.revealFromIndex + 1})`);
@@ -374,6 +376,40 @@ function renderGallery() {
   attachLoadMoreHandlers();
   attachPaginationHandlers();
   autoOpenWorkFromQuery();
+}
+
+function syncTopSelectedLayout(gallery) {
+  if (!gallery || !gallery.classList.contains("top-selected-row")) return;
+  const wraps = gallery.querySelectorAll(".top-selected-image-wrap");
+  const images = gallery.querySelectorAll(".top-selected-link img");
+  if (!wraps.length || !images.length) return;
+
+  const apply = () => {
+    let maxImageHeight = 0;
+    images.forEach((img) => {
+      const height = img.getBoundingClientRect().height;
+      if (height > maxImageHeight) maxImageHeight = height;
+    });
+    if (!maxImageHeight) return;
+    const sampleWrap = wraps[0];
+    const wrapStyle = window.getComputedStyle(sampleWrap);
+    const padTop = Number.parseFloat(wrapStyle.paddingTop) || 0;
+    const padBottom = Number.parseFloat(wrapStyle.paddingBottom) || 0;
+    const mediaHeight = Math.ceil(maxImageHeight + padTop + padBottom);
+    gallery.style.setProperty("--top-selected-media-height", `${mediaHeight}px`);
+  };
+
+  apply();
+  images.forEach((img) => {
+    if (!img.complete) img.addEventListener("load", apply, { once: true });
+  });
+
+  if (!topSelectedResizeBound) {
+    topSelectedResizeBound = true;
+    window.addEventListener("resize", () => {
+      document.querySelectorAll(".top-selected-row").forEach((target) => syncTopSelectedLayout(target));
+    });
+  }
 }
 
 function autoOpenWorkFromQuery() {
