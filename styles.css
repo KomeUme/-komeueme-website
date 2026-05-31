@@ -377,7 +377,7 @@ main {
 
 .top-selected-link {
   display: grid;
-  grid-template-rows: minmax(260px, auto) 2.9em;
+  grid-template-rows: 260px 2.9em;
   gap: 10px;
 }
 
@@ -394,6 +394,7 @@ main {
   display: grid;
   place-items: center;
   min-height: 260px;
+  height: 260px;
   padding: 8px;
   background: rgba(255, 255, 255, 0.84);
   border-radius: 8px;
@@ -405,6 +406,12 @@ main {
   width: auto;
   height: auto;
   object-fit: contain;
+  margin: 0 auto;
+  place-self: center;
+}
+
+.top-selected .gallery-grid .top-selected-item.work.is-compact img {
+  max-height: 240px;
 }
 
 .top-selected-title {
@@ -1154,15 +1161,20 @@ footer {
 
   .top-selected-image-wrap {
     min-height: 172px;
+    height: 172px;
     padding: 6px;
   }
 
   .top-selected-link {
-    grid-template-rows: minmax(172px, auto) 2.7em;
+    grid-template-rows: 172px 2.7em;
     gap: 8px;
   }
 
   .top-selected-link img {
+    max-height: 160px;
+  }
+
+  .top-selected .gallery-grid .top-selected-item.work.is-compact img {
     max-height: 160px;
   }
 

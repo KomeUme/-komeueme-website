@@ -109,6 +109,11 @@ function getYearScore(value) {
   return Math.max(...nums.map(Number));
 }
 
+function getIdScore(value) {
+  const num = Number.parseInt(String(value ?? ""), 10);
+  return Number.isFinite(num) ? num : 0;
+}
+
 function arrangementKey(work) {
   const ratio = getWorkRatio(work);
   if (ratio < 0.85) return 0;
@@ -259,7 +264,11 @@ function renderGallery() {
 
     const sortMode = gallery.dataset.sort;
     const arranged = sortMode === "recent"
-      ? [...list].sort((a, b) => getYearScore(b.year) - getYearScore(a.year))
+      ? [...list].sort((a, b) => {
+        const yearDiff = getYearScore(b.year) - getYearScore(a.year);
+        if (yearDiff) return yearDiff;
+        return getIdScore(b.id) - getIdScore(a.id);
+      })
       : sortMode === "random"
         ? shuffle(list)
         : arrangeBySimilarity(list);
