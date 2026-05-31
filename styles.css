@@ -1150,8 +1150,6 @@ footer {
     padding-right: 18px;
     position: relative;
     overflow-x: auto;
-    -webkit-mask-image: linear-gradient(to right, #000 0, #000 calc(100% - 40px), rgba(0, 0, 0, 0) 100%);
-    mask-image: linear-gradient(to right, #000 0, #000 calc(100% - 40px), rgba(0, 0, 0, 0) 100%);
   }
 
   .top-selected-image-wrap {
