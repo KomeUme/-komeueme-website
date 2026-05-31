@@ -245,6 +245,27 @@ function applyLang(lang) {
   updateProfileNavDate();
 }
 
+function setupContactLinks() {
+  const email = "komeume1121@gmail.com";
+  const subject = "web-siteから。";
+  const encodedTo = encodeURIComponent(email);
+  const encodedSubject = encodeURIComponent(subject);
+  const mailtoUrl = `mailto:${email}?subject=${encodedSubject}`;
+  const gmailComposeUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodedTo}&su=${encodedSubject}`;
+
+  document.querySelectorAll('a[href^="mailto:"]').forEach((link) => {
+    link.setAttribute("href", mailtoUrl);
+    if (link.dataset.gmailReady === "true") return;
+    link.dataset.gmailReady = "true";
+
+    link.addEventListener("click", (event) => {
+      event.preventDefault();
+      const win = window.open(gmailComposeUrl, "_blank", "noopener,noreferrer");
+      if (!win) window.location.href = mailtoUrl;
+    });
+  });
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   let initial = "ja";
   try {
@@ -253,6 +274,7 @@ document.addEventListener("DOMContentLoaded", () => {
     initial = "ja";
   }
   applyLang(initial);
+  setupContactLinks();
   const btn = document.querySelector("[data-lang-switch]");
   if (btn) {
     btn.addEventListener("click", () => {
