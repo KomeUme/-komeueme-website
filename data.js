@@ -1,7 +1,38 @@
 const works = [
   {
+    "id": "45",
+    "category": "digital",
+    "subcategory": "mini-chara",
+    "title": "みけ",
+    "year": "",
+    "technique": "",
+    "size": "",
+    "caption": "",
+    "image": "assets/works/work-45-01.png",
+    "images": [
+      "assets/works/work-45-01.png",
+      "assets/works/work-45-02.png"
+    ]
+  },
+  {
+    "id": "44",
+    "category": "digital",
+    "subcategory": "mini-chara",
+    "title": "タレ目くま",
+    "year": "",
+    "technique": "",
+    "size": "",
+    "caption": "",
+    "image": "assets/works/work-44-01.png",
+    "images": [
+      "assets/works/work-44-01.png",
+      "assets/works/work-44-02.png"
+    ]
+  },
+  {
     "id": "43",
     "category": "digital",
+    "subcategory": "illustration",
     "title": "ぺんぎん",
     "year": "2023年",
     "technique": "",
@@ -15,6 +46,7 @@ const works = [
   {
     "id": "42",
     "category": "digital",
+    "subcategory": "illustration",
     "title": "さぼてん",
     "year": "2023年",
     "technique": "",
@@ -28,6 +60,7 @@ const works = [
   {
     "id": "41",
     "category": "digital",
+    "subcategory": "illustration",
     "title": "止まれ",
     "year": "2023年",
     "technique": "",
@@ -41,6 +74,7 @@ const works = [
   {
     "id": "39",
     "category": "digital",
+    "subcategory": "illustration",
     "title": "あの夏が飽和する",
     "year": "2025年",
     "technique": "",
@@ -54,6 +88,7 @@ const works = [
   {
     "id": "38",
     "category": "digital",
+    "subcategory": "illustration",
     "title": "頭ねこ",
     "year": "2023年",
     "technique": "",
@@ -67,6 +102,7 @@ const works = [
   {
     "id": "24",
     "category": "digital",
+    "subcategory": "illustration",
     "title": "赤べこランチャー",
     "year": "2023年",
     "technique": "シャドーボックス / インクジェットプリント",
@@ -81,6 +117,7 @@ const works = [
   {
     "id": "23",
     "category": "digital",
+    "subcategory": "illustration",
     "title": "茶髪ちゃん",
     "year": "2023年",
     "technique": "シャドーボックス / インクジェットプリント",
@@ -95,6 +132,7 @@ const works = [
   {
     "id": "22",
     "category": "digital",
+    "subcategory": "illustration",
     "title": "無題",
     "year": "2023年",
     "technique": "シャドーボックス / インクジェットプリント",

@@ -54,7 +54,7 @@ img {
 .brand {
   display: inline-block;
   font-family: "Didot", "Bodoni 72", "Times New Roman", "Hiragino Mincho ProN", "Yu Mincho", serif;
-  font-size: 46px;
+  font-size: 40px;
   font-weight: 400;
   letter-spacing: 0;
   line-height: 1;
@@ -153,9 +153,10 @@ main {
 }
 
 .top-hero-copy {
+  position: relative;
   border: 1px solid #cdced4;
   background: rgba(255, 255, 255, 0.74);
-  padding: 34px 28px;
+  padding: 28px 28px 24px;
   border-radius: 8px;
 }
 
@@ -173,8 +174,8 @@ main {
 
 .top-intro-block {
   position: relative;
-  margin-top: 30px;
-  padding-top: 24px;
+  margin-top: 22px;
+  padding-top: 18px;
 }
 
 .top-intro-block::before {
@@ -189,7 +190,7 @@ main {
 .top-hero h1 {
   margin: 14px 0 0;
   font-family: "Didot", "Bodoni 72", "Times New Roman", "Hiragino Mincho ProN", "Yu Mincho", serif;
-  font-size: clamp(41px, 5.8vw, 67px);
+  font-size: clamp(41px, 4.5vw, 52px);
   font-weight: 400;
   line-height: 1.08;
   letter-spacing: 0;
@@ -241,13 +242,18 @@ main {
 }
 
 .top-hero-lead {
-  margin-top: 20px;
-  margin-bottom: 24px;
-  max-width: 38ch;
+  margin-top: 14px;
+  margin-bottom: 14px;
+  max-width: 46ch;
   font-size: 16px;
-  line-height: 1.55;
+  line-height: 1.5;
   white-space: pre-line;
   color: #252a33;
+}
+
+.top-name-block,
+.top-intro-block {
+  padding-right: 0;
 }
 
 .actions.top-actions {
@@ -1067,7 +1073,7 @@ footer {
   }
 
   .brand {
-    font-size: 36px;
+    font-size: 32px;
   }
 
   .nav {
@@ -1087,6 +1093,11 @@ footer {
 
   .top-hero-copy {
     padding: 20px 16px;
+  }
+
+  .top-name-block,
+  .top-intro-block {
+    padding-right: 0;
   }
 
   .top-intro-block {
@@ -1169,7 +1180,7 @@ footer {
 
 @media (max-width: 520px) {
   .brand {
-    font-size: 30px;
+    font-size: 27px;
   }
 
   .top-hero h1 {
