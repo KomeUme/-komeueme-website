@@ -967,6 +967,8 @@ footer {
   image-rendering: auto;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
+  position: relative;
+  z-index: 1;
 }
 
 .viewer-image.is-zoomed {
@@ -1009,6 +1011,7 @@ footer {
 .viewer-prev,
 .viewer-next {
   position: absolute;
+  z-index: 3;
   border: 1px solid rgba(255, 255, 255, 0.42);
   background: rgba(0, 0, 0, 0.35);
   color: #fff;

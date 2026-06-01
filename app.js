@@ -116,6 +116,12 @@ function getIdScore(value) {
   return Number.isFinite(num) ? num : 0;
 }
 
+function getMiniCharaCatPriority(work) {
+  if (work?.subcategory !== "mini-chara") return 0;
+  const title = String(work?.title ?? "");
+  return /猫|ねこ|ネコ|とら|トラ|きじ|キジ|みけ|ミケ|鯖|さば/.test(title) ? 1 : 0;
+}
+
 function arrangementKey(work) {
   const ratio = getWorkRatio(work);
   if (ratio < 0.85) return 0;
@@ -274,6 +280,10 @@ function renderGallery() {
     const sortMode = gallery.dataset.sort;
     const arranged = sortMode === "recent"
       ? [...list].sort((a, b) => {
+        if (category === "digital-mini-chara") {
+          const catDiff = getMiniCharaCatPriority(b) - getMiniCharaCatPriority(a);
+          if (catDiff) return catDiff;
+        }
         const yearDiff = getYearScore(b.year) - getYearScore(a.year);
         if (yearDiff) return yearDiff;
         return getIdScore(b.id) - getIdScore(a.id);

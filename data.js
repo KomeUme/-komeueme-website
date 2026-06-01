@@ -1,5 +1,110 @@
 const works = [
   {
+    "id": "52",
+    "category": "digital",
+    "subcategory": "mini-chara",
+    "title": "マグロ",
+    "year": "",
+    "technique": "",
+    "size": "",
+    "caption": "",
+    "image": "assets/works/work-52-01.png",
+    "images": [
+      "assets/works/work-52-01.png",
+      "assets/works/work-52-02.png"
+    ]
+  },
+  {
+    "id": "51",
+    "category": "digital",
+    "subcategory": "mini-chara",
+    "title": "こじき雀",
+    "year": "",
+    "technique": "",
+    "size": "",
+    "caption": "",
+    "image": "assets/works/work-51-01.png",
+    "images": [
+      "assets/works/work-51-01.png",
+      "assets/works/work-51-02.png"
+    ]
+  },
+  {
+    "id": "50",
+    "category": "digital",
+    "subcategory": "mini-chara",
+    "title": "キツネ",
+    "year": "",
+    "technique": "",
+    "size": "",
+    "caption": "",
+    "image": "assets/works/work-50-01.png",
+    "images": [
+      "assets/works/work-50-01.png",
+      "assets/works/work-50-02.png"
+    ]
+  },
+  {
+    "id": "49",
+    "category": "digital",
+    "subcategory": "mini-chara",
+    "title": "鯖トラ（梅吉）",
+    "year": "",
+    "technique": "",
+    "size": "",
+    "caption": "",
+    "image": "assets/works/work-49-01.png",
+    "images": [
+      "assets/works/work-49-01.png",
+      "assets/works/work-49-02.png"
+    ]
+  },
+  {
+    "id": "48",
+    "category": "digital",
+    "subcategory": "mini-chara",
+    "title": "茶トラ猫",
+    "year": "",
+    "technique": "",
+    "size": "",
+    "caption": "",
+    "image": "assets/works/work-48-01.png",
+    "images": [
+      "assets/works/work-48-01.png",
+      "assets/works/work-48-02.png"
+    ]
+  },
+  {
+    "id": "47",
+    "category": "digital",
+    "subcategory": "mini-chara",
+    "title": "黒猫",
+    "year": "",
+    "technique": "",
+    "size": "",
+    "caption": "",
+    "image": "assets/works/work-47-01.png",
+    "images": [
+      "assets/works/work-47-01.png",
+      "assets/works/work-47-02.png"
+    ]
+  },
+  {
+    "id": "46",
+    "category": "digital",
+    "subcategory": "mini-chara",
+    "title": "きじとら（つーちゃん）",
+    "year": "",
+    "technique": "",
+    "size": "",
+    "caption": "",
+    "image": "assets/works/work-46-01.png",
+    "images": [
+      "assets/works/work-46-01.png",
+      "assets/works/work-46-02.png"
+    ]
+  },
+  {
     "id": "45",
     "category": "digital",
     "subcategory": "mini-chara",
