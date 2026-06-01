@@ -1355,24 +1355,24 @@ footer {
 
   .gallery-grid[data-gallery-layout="compact"] .work {
     height: 100%;
-    grid-template-rows: 190px 34px;
+    grid-template-rows: 230px 40px;
   }
 
   .gallery-grid[data-gallery-layout="compact"] .work-image-link {
-    min-height: 190px;
-    height: 190px;
+    min-height: 230px;
+    height: 230px;
     padding: 6px;
   }
 
   .gallery-grid[data-gallery-layout="compact"] .work.is-portrait .work-image-link {
-    min-height: 190px;
+    min-height: 230px;
   }
 
   .gallery-grid[data-gallery-layout="compact"] .caption {
     min-height: 0;
-    height: 34px;
+    height: 40px;
     gap: 4px;
-    margin-top: 6px;
+    margin-top: 0;
     padding-top: 0;
     border-top: 0;
   }
@@ -1381,7 +1381,7 @@ footer {
     font-size: 12px;
     margin-bottom: 0;
     line-height: 1.35;
-    height: 34px;
+    height: 40px;
     overflow: hidden;
     display: -webkit-box;
     -webkit-line-clamp: 2;
