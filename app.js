@@ -457,9 +457,19 @@ function attachGalleryLayoutControls() {
   if (!main) return;
   const galleries = Array.from(main.querySelectorAll(".gallery-grid[data-gallery]"));
   if (!galleries.length) return;
+  const isMobile = window.matchMedia("(max-width: 760px)").matches;
+
+  if (isMobile) {
+    buttons.forEach((btn) => {
+      if (btn.dataset.galleryLayout === "large") {
+        btn.textContent = uiT("mini_chara_layout_standard", "標準");
+      }
+    });
+  }
 
   const applyLayout = (layout) => {
-    const next = ["compact", "standard", "large"].includes(layout) ? layout : "compact";
+    let next = ["compact", "standard", "large"].includes(layout) ? layout : "compact";
+    if (isMobile && next === "standard") next = "large";
     galleries.forEach((gallery) => {
       gallery.dataset.galleryLayout = next;
     });

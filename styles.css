@@ -1339,6 +1339,10 @@ footer {
     padding: 0 8px;
   }
 
+  .mini-chara-layout-btn[data-gallery-layout="standard"] {
+    display: none;
+  }
+
   .top-selected-head {
     align-items: baseline;
   }
