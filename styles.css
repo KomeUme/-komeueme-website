@@ -1406,6 +1406,11 @@ footer {
   .gallery-grid[data-gallery="manga-4koma"][data-gallery-layout="compact"] .work.is-portrait .work-image-link {
     min-height: 280px;
     height: 280px;
+    overflow: hidden;
+  }
+
+  .gallery-grid[data-gallery="manga-4koma"][data-gallery-layout="compact"] .work img {
+    max-height: 264px;
   }
 
   main {
