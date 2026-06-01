@@ -30,6 +30,8 @@ function detectSiteBasePath() {
     "hanga-wood",
     "hanga-copper",
     "digital",
+    "digital-illustration",
+    "digital-mini-chara",
     "manga",
     "profile",
     "shop",
@@ -239,7 +241,9 @@ function renderGallery() {
     return /4コマ|四コマ|４コマ|四齣/i.test(text);
   };
   const getCategoryPage = (work) => {
-    if (work.category === "digital") return "digital.html";
+    if (work.category === "digital") {
+      return work.subcategory === "mini-chara" ? "digital-mini-chara.html" : "digital-illustration.html";
+    }
     if (work.category === "manga") return "manga.html";
     if (work.category === "hanga") return isCopperTechnique(work.technique) ? "hanga-copper.html" : "hanga-wood.html";
     return "index.html";
@@ -259,6 +263,10 @@ function renderGallery() {
       list = works.filter((work) => work.category === "manga" && isFourPanelManga(work));
     } else if (category === "manga-story") {
       list = works.filter((work) => work.category === "manga" && !isFourPanelManga(work));
+    } else if (category === "digital-illustration") {
+      list = works.filter((work) => work.category === "digital" && work.subcategory !== "mini-chara");
+    } else if (category === "digital-mini-chara") {
+      list = works.filter((work) => work.category === "digital" && work.subcategory === "mini-chara");
     } else {
       list = works.filter((work) => work.category === category);
     }
