@@ -576,6 +576,7 @@ function attachGalleryViewer() {
       currentImages = work.images?.length ? work.images : [work.image];
       currentTitle = work.title || "";
       index = 0;
+      viewer.classList.toggle("is-mini-chara", work.subcategory === "mini-chara");
       viewer.__viewerState = { currentImages: [...currentImages], currentTitle, index };
       open();
     });

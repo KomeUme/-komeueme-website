@@ -945,6 +945,10 @@ footer {
   padding: 24px;
 }
 
+.image-viewer.is-mini-chara {
+  background: #fff;
+}
+
 .image-viewer.is-open {
   display: flex;
 }
@@ -1031,6 +1035,19 @@ footer {
 
 .viewer-prev { left: 18px; }
 .viewer-next { right: 18px; }
+
+.image-viewer.is-mini-chara .viewer-meta {
+  color: #1b1d22;
+  background: rgba(255, 255, 255, 0.82);
+}
+
+.image-viewer.is-mini-chara .viewer-close,
+.image-viewer.is-mini-chara .viewer-prev,
+.image-viewer.is-mini-chara .viewer-next {
+  border-color: rgba(24, 27, 34, 0.45);
+  background: rgba(255, 255, 255, 0.78);
+  color: #1b1d22;
+}
 
 .profile-accordion {
   margin-bottom: 14px;
