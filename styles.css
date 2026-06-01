@@ -1397,6 +1397,17 @@ footer {
     display: none !important;
   }
 
+  /* 4コマは縦長比率が大きい作品があるため、一覧時の画像枠を拡張して重なりを防ぐ */
+  .gallery-grid[data-gallery="manga-4koma"][data-gallery-layout="compact"] .work {
+    grid-template-rows: 280px 40px;
+  }
+
+  .gallery-grid[data-gallery="manga-4koma"][data-gallery-layout="compact"] .work-image-link,
+  .gallery-grid[data-gallery="manga-4koma"][data-gallery-layout="compact"] .work.is-portrait .work-image-link {
+    min-height: 280px;
+    height: 280px;
+  }
+
   main {
     padding-top: 24px;
   }
