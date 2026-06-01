@@ -44,6 +44,20 @@
 - 内部リンク（`*.html`）はHTMLの相対リンクを正とし、JSで一括書き換えしない
 - `_redirects` は公開環境での実挙動を確認しない限り拡張しない（不要なrewrite追加を禁止）
 
+## PC / モバイル構成差分ルール（維持必須）
+- レイアウト分岐の基準は `760px` / `520px` とし、`app.js` の `isMobile: (max-width: 760px)` 判定と `styles.css` のメディアクエリを一致させる
+- `760px` 以下（モバイル）では、全体レイアウトを1カラム基調に切り替える（`gallery-grid`・`top-hero`・`card-grid` 等）
+- `760px` 以下の一覧（`data-gallery-layout="compact"`）は、作品カード高さを固定運用する（画像枠/タイトル枠の固定）ことで、作品位置のバラつきと重なりを防ぐ
+- `760px` 以下では一覧（`compact`）の詳細情報を抑制する（`caption-meta-list` / `caption-text` / `caption-toggle` 非表示）
+- `520px` 以下では表示サイズUIを簡略化し、`standard` ボタンを非表示にして `large` を「標準」文言として扱う（`app.js` の文言差し替えと整合させる）
+- 表示サイズの種類差を維持する
+- PC（`761px` 以上）: `compact` / `standard` / `large` の3種類を選択可能にする
+- モバイル（`760px` 以下）: 実質 `compact` / `large` の2種類運用とし、`standard` は内部的に `large` へ寄せる
+- モバイル極小幅（`520px` 以下）: `standard` ボタン自体を非表示にし、ユーザー操作上も2種類のみを提示する
+- PC（`761px` 以上）では一覧（`compact`）のみ説明文を非表示にし、`standard` / `large` では説明文を表示する
+- 画像ビューア表示中は言語切替ボタンを非表示にする（重なり防止のため `body.viewer-open .lang-switch` を維持）
+- 一覧から詳細導線で `?layout=large` を付与した場合でも、初期適用後に `pendingLayout` を破棄し、ページネーションや再描画で表示サイズが勝手に戻らない状態を維持する
+
 ## トップヒーロー運用ルール（再現性必須）
 - ヒーロータイトルは `data-i18n-html="top_hero_title"` を使う（HTML入り文言のため `data-i18n` は使わない）
 - トップの切替画像は常に5枚で運用する

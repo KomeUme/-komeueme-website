@@ -33,6 +33,8 @@ function detectSiteBasePath() {
     "digital-illustration",
     "digital-mini-chara",
     "manga",
+    "manga-4koma",
+    "manga-story",
     "profile",
     "shop",
   ];
@@ -144,11 +146,18 @@ function isMainScaleWork(work) {
   return Number(width) > 1000 || Number(height) > 1000;
 }
 
+function isFourPanelMangaWork(work) {
+  const sub = String(work?.subcategory ?? "");
+  if (sub) return /4koma|four|四コマ|4コマ/i.test(sub);
+  const text = `${work?.title ?? ""} ${work?.technique ?? ""} ${work?.caption ?? ""}`;
+  return /4コマ|四コマ|４コマ|四齣/i.test(text);
+}
+
 function getWorkPagePath(work) {
   if (work.category === "digital") {
     return work.subcategory === "mini-chara" ? "digital-mini-chara.html" : "digital-illustration.html";
   }
-  if (work.category === "manga") return "manga.html";
+  if (work.category === "manga") return isFourPanelMangaWork(work) ? "manga-4koma.html" : "manga-story.html";
   if (work.category === "hanga") {
     const isCopper = /エッチング|ドライポイント|アクアチント|銅版/.test(String(work.technique ?? ""));
     return isCopper ? "hanga-copper.html" : "hanga-wood.html";
