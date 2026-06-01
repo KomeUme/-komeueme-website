@@ -490,7 +490,9 @@ function attachGalleryLayoutControls() {
     });
   };
 
-  applyLayout(pendingLayout || galleries[0].dataset.galleryLayout || "large");
+  const initialLayout = pendingLayout || galleries[0].dataset.galleryLayout || "large";
+  applyLayout(initialLayout);
+  pendingLayout = null;
   buttons.forEach((button) => {
     if (button.dataset.bound === "true") return;
     button.dataset.bound = "true";

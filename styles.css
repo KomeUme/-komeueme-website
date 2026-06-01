@@ -502,6 +502,9 @@ main {
   font-size: 14px;
   line-height: 1.8;
   letter-spacing: -.01em;
+  display: inline-block;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #cfd2d9;
 }
 
 .actions {
