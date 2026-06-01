@@ -392,6 +392,7 @@ function renderGallery() {
   attachGalleryViewer();
   attachLoadMoreHandlers();
   attachPaginationHandlers();
+  attachGalleryLayoutControls();
   autoOpenWorkFromQuery();
 }
 
@@ -445,6 +446,34 @@ function attachPaginationHandlers() {
       if (targetGallery) {
         targetGallery.scrollIntoView({ block: "start", behavior: "auto" });
       }
+    });
+  });
+}
+
+function attachGalleryLayoutControls() {
+  const buttons = document.querySelectorAll("button[data-gallery-layout]");
+  if (!buttons.length) return;
+  const main = document.querySelector("main");
+  if (!main) return;
+  const galleries = Array.from(main.querySelectorAll(".gallery-grid[data-gallery]"));
+  if (!galleries.length) return;
+
+  const applyLayout = (layout) => {
+    const next = ["compact", "standard", "large"].includes(layout) ? layout : "compact";
+    galleries.forEach((gallery) => {
+      gallery.dataset.galleryLayout = next;
+    });
+    buttons.forEach((btn) => {
+      btn.classList.toggle("is-active", btn.dataset.galleryLayout === next);
+    });
+  };
+
+  applyLayout(galleries[0].dataset.galleryLayout || "large");
+  buttons.forEach((button) => {
+    if (button.dataset.bound === "true") return;
+    button.dataset.bound = "true";
+    button.addEventListener("click", () => {
+      applyLayout(button.dataset.galleryLayout || "large");
     });
   });
 }

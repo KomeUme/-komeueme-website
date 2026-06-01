@@ -244,7 +244,7 @@ main {
 .top-hero-lead {
   margin-top: 14px;
   margin-bottom: 14px;
-  max-width: 46ch;
+  max-width: 42ch;
   font-size: 16px;
   line-height: 1.5;
   white-space: pre-line;
@@ -478,7 +478,7 @@ main {
 
 .intro {
   max-width: 760px;
-  margin: 0 auto 52px;
+  margin: 0 auto 64px;
   text-align: center;
 }
 
@@ -492,10 +492,11 @@ main {
 }
 
 .intro p {
-  margin: 18px auto 0;
+  margin: 24px auto 0;
   max-width: 620px;
   color: var(--soft);
   font-size: 14px;
+  line-height: 1.8;
   letter-spacing: -.01em;
 }
 
@@ -505,6 +506,39 @@ main {
   gap: 10px;
   flex-wrap: wrap;
   margin-top: 26px;
+}
+
+.mini-chara-layout-control {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 24px;
+  flex-wrap: wrap;
+}
+
+.mini-chara-layout-control span {
+  font-size: 12px;
+  color: #6d727c;
+  letter-spacing: 0.02em;
+}
+
+.mini-chara-layout-btn {
+  min-width: 62px;
+  height: 30px;
+  padding: 0 9px;
+  border: 1px solid var(--line);
+  background: #fcfcfb;
+  color: #4a4e56;
+  font-size: 12px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.mini-chara-layout-btn.is-active {
+  background: #f0f1ed;
+  color: #232730;
+  border: 2px solid #bfc3cb;
 }
 
 .button {
@@ -691,6 +725,19 @@ main {
 
 .gallery-grid[data-gallery="digital"] .work-image-link {
   min-height: 440px;
+}
+
+.gallery-grid[data-gallery-layout="compact"] {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 22px;
+}
+
+.gallery-grid[data-gallery-layout="standard"] {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.gallery-grid[data-gallery-layout="large"] {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .gallery-grid[data-gallery="hanga-copper"] .work-image-link,
@@ -1162,6 +1209,16 @@ footer {
     margin-bottom: 40px;
   }
 
+  .gallery-grid[data-gallery-layout="compact"],
+  .gallery-grid[data-gallery-layout="standard"] {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+  }
+
+  .gallery-grid[data-gallery-layout="large"] {
+    grid-template-columns: 1fr;
+  }
+
   main {
     padding-top: 24px;
   }
@@ -1235,6 +1292,17 @@ footer {
 
   .top-links {
     grid-template-columns: 1fr;
+  }
+
+  .mini-chara-layout-control {
+    gap: 6px;
+  }
+
+  .mini-chara-layout-btn {
+    min-width: 58px;
+    height: 32px;
+    font-size: 12px;
+    padding: 0 8px;
   }
 
   .top-selected-head {

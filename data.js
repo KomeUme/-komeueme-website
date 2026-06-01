@@ -3,7 +3,7 @@ const works = [
     "id": "52",
     "category": "digital",
     "subcategory": "mini-chara",
-    "title": "マグロ",
+    "title": "レオパード・ゲッコー（マグロ）",
     "year": "",
     "technique": "",
     "size": "",
