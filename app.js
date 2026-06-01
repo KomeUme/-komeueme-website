@@ -243,6 +243,10 @@ function renderFeatureImages() {
     featureImages.forEach((img) => {
       img.src = active.featureImage;
       img.alt = `${active.work.title} (${categories[active.work.category]})`;
+      img.classList.add("js-work-link");
+      img.dataset.workId = String(active.work.id ?? "");
+      img.dataset.workPage = getWorkPagePath(active.work);
+      img.dataset.workSource = "top-hero";
     });
     if (featureCaption) {
       featureCaption.textContent = `${active.work.title}｜${withFallback(active.work.year)}`;
@@ -354,7 +358,7 @@ function renderGallery() {
         const firstImage = work.images?.[0] || work.image;
         return `
       <article class="top-selected-item" data-work-id="${escapeHtml(work.id)}">
-          <a class="top-selected-link js-work-link" href="${escapeHtml(firstImage)}" data-work-id="${escapeHtml(work.id)}">
+          <a class="top-selected-link js-work-link" href="${escapeHtml(firstImage)}" data-work-id="${escapeHtml(work.id)}" data-work-page="${escapeHtml(getWorkPagePath(work))}" data-work-source="top-selected">
           <span class="top-selected-image-wrap">
             <img src="${escapeHtml(firstImage)}" alt="${escapeHtml(work.title)}" loading="lazy">
           </span>
@@ -666,7 +670,9 @@ function attachGalleryViewer() {
       viewer.classList.toggle("is-mini-chara", work.subcategory === "mini-chara");
       const layout = link.closest(".gallery-grid[data-gallery]")?.dataset.galleryLayout || "";
       if (detailBtn) {
-        detailBtn.hidden = layout !== "compact";
+        const workSource = link.dataset.workSource || "";
+        const isTopContext = workSource === "top-selected" || workSource === "top-hero";
+        detailBtn.hidden = layout !== "compact" && !isTopContext;
         detailBtn.textContent = uiT("viewer_detail", "詳細を見る");
       }
       viewer.__viewerState = { currentImages: [...currentImages], currentTitle, index };
@@ -863,6 +869,18 @@ function attachImageProtection() {
   });
 }
 
+function attachBackToTopButtons() {
+  const buttons = document.querySelectorAll("[data-back-to-top]");
+  buttons.forEach((button) => {
+    if (button.dataset.bound === "true") return;
+    button.dataset.bound = "true";
+    button.addEventListener("click", () => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+  });
+}
+
 attachImageProtection();
 renderFeatureImages();
 renderGallery();
+attachBackToTopButtons();

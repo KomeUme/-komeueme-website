@@ -58,7 +58,7 @@ body.viewer-open .lang-switch {
 .brand {
   display: inline-block;
   font-family: "Didot", "Bodoni 72", "Times New Roman", "Hiragino Mincho ProN", "Yu Mincho", serif;
-  font-size: 40px;
+  font-size: 36px;
   font-weight: 400;
   letter-spacing: 0;
   line-height: 1;
@@ -194,7 +194,7 @@ main {
 .top-hero h1 {
   margin: 14px 0 0;
   font-family: "Didot", "Bodoni 72", "Times New Roman", "Hiragino Mincho ProN", "Yu Mincho", serif;
-  font-size: clamp(41px, 4.5vw, 52px);
+  font-size: clamp(43px, 4.7vw, 54px);
   font-weight: 400;
   line-height: 1.08;
   letter-spacing: 0;
@@ -365,6 +365,12 @@ main {
   color: #4e5460;
   border-bottom-color: #727985;
   opacity: 1;
+}
+
+.back-to-top-wrap {
+  margin: 24px 0 18px;
+  display: flex;
+  justify-content: flex-end;
 }
 
 .contact-actions-inline {
@@ -1276,7 +1282,7 @@ footer {
   }
 
   .brand {
-    font-size: 32px;
+    font-size: 29px;
   }
 
   .nav {
@@ -1465,11 +1471,11 @@ footer {
 
 @media (max-width: 520px) {
   .brand {
-    font-size: 27px;
+    font-size: 24px;
   }
 
   .top-hero h1 {
-    font-size: clamp(24px, 6.8vw, 32px);
+    font-size: clamp(25px, 7vw, 34px);
   }
 
   .top-hero h1 .archive-line {
