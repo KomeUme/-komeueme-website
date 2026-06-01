@@ -398,6 +398,25 @@ main {
   overflow-x: auto;
   overscroll-behavior-x: contain;
   padding-bottom: 8px;
+  scrollbar-width: thin;
+  scrollbar-color: #c8ccd3 transparent;
+}
+
+.top-selected .gallery-grid.top-selected-row::-webkit-scrollbar {
+  height: 8px;
+}
+
+.top-selected .gallery-grid.top-selected-row::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.top-selected .gallery-grid.top-selected-row::-webkit-scrollbar-thumb {
+  background: #c8ccd3;
+  border-radius: 999px;
+}
+
+.top-selected .gallery-grid.top-selected-row::-webkit-scrollbar-thumb:hover {
+  background: #bcc2cb;
 }
 
 .top-selected-item {

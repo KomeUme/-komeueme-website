@@ -1,9 +1,48 @@
 const works = [
   {
+    "id": "43",
+    "category": "digital",
+    "title": "ぺんぎん",
+    "year": "2023年",
+    "technique": "",
+    "size": "",
+    "caption": "",
+    "image": "assets/works/work-43-01.jpg",
+    "images": [
+      "assets/works/work-43-01.jpg"
+    ]
+  },
+  {
+    "id": "42",
+    "category": "digital",
+    "title": "さぼてん",
+    "year": "2023年",
+    "technique": "",
+    "size": "",
+    "caption": "",
+    "image": "assets/works/work-42-01.png",
+    "images": [
+      "assets/works/work-42-01.png"
+    ]
+  },
+  {
+    "id": "41",
+    "category": "digital",
+    "title": "止まれ",
+    "year": "2023年",
+    "technique": "",
+    "size": "",
+    "caption": "",
+    "image": "assets/works/work-41-01.jpg",
+    "images": [
+      "assets/works/work-41-01.jpg"
+    ]
+  },
+  {
     "id": "39",
     "category": "digital",
     "title": "あの夏が飽和する",
-    "year": "2023年",
+    "year": "2025年",
     "technique": "",
     "size": "",
     "caption": "",
@@ -35,7 +74,8 @@ const works = [
     "caption": "赤べこは、赤色にペイントされた首が動く牛。どうにも奇妙である。そんな珍妙な赤べこに、私は無性に惹きつけられる。",
     "image": "assets/works/work-24-01.jpg",
     "images": [
-      "assets/works/work-24-01.jpg"
+      "assets/works/work-24-01.jpg",
+      "assets/works/work-24-02.jpg"
     ]
   },
   {
@@ -56,7 +96,7 @@ const works = [
     "id": "22",
     "category": "digital",
     "title": "無題",
-    "year": "2021年",
+    "year": "2023年",
     "technique": "シャドーボックス / インクジェットプリント",
     "size": "500mm×500mm",
     "caption": "ひとりひとり、それぞれ無数の物語が画面から溢れだす様を表現しようとした。",
