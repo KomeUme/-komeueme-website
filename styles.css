@@ -669,6 +669,8 @@ main {
   height: auto;
   object-fit: contain;
   margin: 0 auto;
+  -webkit-touch-callout: none;
+  -webkit-user-drag: none;
 }
 
 .gallery-grid .work.is-portrait img {
@@ -963,6 +965,8 @@ footer {
   transition: transform 0.2s ease;
   transform-origin: center center;
   user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-user-drag: none;
   will-change: transform;
   image-rendering: auto;
   backface-visibility: hidden;

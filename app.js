@@ -743,5 +743,24 @@ function attachCaptionToggles() {
   });
 }
 
+function attachImageProtection() {
+  document.addEventListener("contextmenu", (event) => {
+    const target = event.target;
+    if (!(target instanceof HTMLElement)) return;
+    if (target.closest(".work-image-link img, .viewer-image")) {
+      event.preventDefault();
+    }
+  });
+
+  document.addEventListener("dragstart", (event) => {
+    const target = event.target;
+    if (!(target instanceof HTMLElement)) return;
+    if (target.closest(".work-image-link img, .viewer-image")) {
+      event.preventDefault();
+    }
+  });
+}
+
+attachImageProtection();
 renderFeatureImages();
 renderGallery();
