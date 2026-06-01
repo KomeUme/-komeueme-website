@@ -19,7 +19,13 @@
           <a href="hanga-copper.html" data-i18n="nav_copper">銅版画</a>
         </div>
       </div>
-      <a class="active" href="digital.html" data-i18n="nav_digital">デジタル</a>
+      <div class="nav-item nav-dropdown">
+        <a class="active nav-trigger" href="digital.html" data-i18n="nav_digital">デジタル</a>
+        <div class="nav-submenu">
+          <a href="digital-illustration.html" data-i18n="nav_digital_illustration">イラスト</a>
+          <a href="digital-mini-chara.html" data-i18n="nav_digital_mini_chara">ミニキャラ</a>
+        </div>
+      </div>
       <a href="manga.html" data-i18n="nav_manga">漫画</a>
       <a href="profile.html" data-i18n="nav_profile">Profile</a>
       <a class="shop-link" href="shop.html" data-i18n="nav_shop">販売</a>
@@ -29,10 +35,16 @@
   <main>
     <section class="intro">
       <h1 data-i18n="intro_digital">デジタル</h1>
-      <p data-i18n="intro_digital_desc">デジタルイラスト関連作品</p>
-      <div class="actions"><a class="button secondary" href="shop.html" data-i18n="shop_contact">販売・問い合わせ</a></div>
+      <p data-i18n="intro_digital_desc">デジタル作品をイラストとミニキャラに分けて掲載。</p>
+      <div class="actions">
+        <a class="button secondary" href="digital-illustration.html" data-i18n="nav_digital_illustration">イラスト</a>
+        <a class="button secondary" href="digital-mini-chara.html" data-i18n="nav_digital_mini_chara">ミニキャラ</a>
+      </div>
     </section>
-    <section class="gallery gallery-grid" data-gallery="digital"></section>
+    <h2 class="section-title" data-i18n="section_digital_illustration">イラスト</h2>
+    <section class="gallery gallery-grid" data-gallery="digital-illustration" data-sort="recent"></section>
+    <h2 class="section-title" data-i18n="section_digital_mini_chara">ミニキャラ</h2>
+    <section class="gallery gallery-grid" data-gallery="digital-mini-chara" data-sort="recent"></section>
 
     <section class="site-mini-contact">
       <div><strong class="label-sns" data-i18n="label_sns">SNS</strong> <a href="https://www.instagram.com/komeume1121/" target="_blank" rel="noopener noreferrer">@komeume1121</a></div>

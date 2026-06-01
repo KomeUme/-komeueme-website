@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title data-i18n="page_title_manga">漫画 | Kome Ume</title>
+  <title data-i18n="page_title_digital_mini_chara">デジタル（ミニキャラ） | Kome Ume</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -20,13 +20,13 @@
         </div>
       </div>
       <div class="nav-item nav-dropdown">
-        <a class="nav-trigger" href="digital.html" data-i18n="nav_digital">デジタル</a>
+        <a class="active nav-trigger" href="digital.html" data-i18n="nav_digital">デジタル</a>
         <div class="nav-submenu">
           <a href="digital-illustration.html" data-i18n="nav_digital_illustration">イラスト</a>
-          <a href="digital-mini-chara.html" data-i18n="nav_digital_mini_chara">ミニキャラ</a>
+          <a class="active" href="digital-mini-chara.html" data-i18n="nav_digital_mini_chara">ミニキャラ</a>
         </div>
       </div>
-      <a class="active" href="manga.html" data-i18n="nav_manga">漫画</a>
+      <a href="manga.html" data-i18n="nav_manga">漫画</a>
       <a href="profile.html" data-i18n="nav_profile">Profile</a>
       <a class="shop-link" href="shop.html" data-i18n="nav_shop">販売</a>
     </nav>
@@ -34,14 +34,11 @@
 
   <main>
     <section class="intro">
-      <h1 data-i18n="intro_manga">漫画</h1>
-      <p data-i18n="intro_manga_desc">４コマ漫画、ストーリー漫画を掲載</p>
+      <h1 data-i18n="section_digital_mini_chara">ミニキャラ</h1>
+      <p data-i18n="intro_digital_mini_chara_desc">デジタルのミニキャラ作品一覧</p>
       <div class="actions"><a class="button secondary" href="shop.html" data-i18n="shop_contact">販売・問い合わせ</a></div>
     </section>
-    <h2 class="section-title" data-i18n="manga_4koma">四コマ漫画</h2>
-    <section class="gallery gallery-grid" data-gallery="manga-4koma"></section>
-    <h2 class="section-title" data-i18n="manga_story">ストーリー漫画</h2>
-    <section class="gallery gallery-grid" data-gallery="manga-story"></section>
+    <section class="gallery gallery-grid" data-gallery="digital-mini-chara" data-sort="recent"></section>
 
     <section class="site-mini-contact">
       <div><strong class="label-sns" data-i18n="label_sns">SNS</strong> <a href="https://www.instagram.com/komeume1121/" target="_blank" rel="noopener noreferrer">@komeume1121</a></div>
