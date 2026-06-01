@@ -65,15 +65,19 @@ const galleryState = new Map();
 let topCategoryButtonsVisible = false;
 let pendingOpenWorkId = null;
 let pendingOpenEnabled = false;
+let pendingLayout = null;
 
 try {
   const params = new URLSearchParams(window.location.search);
   const workId = params.get("work");
   pendingOpenWorkId = workId ? String(workId) : null;
   pendingOpenEnabled = params.get("open") === "1";
+  const layout = params.get("layout");
+  pendingLayout = ["compact", "standard", "large"].includes(layout || "") ? layout : null;
 } catch (_) {
   pendingOpenWorkId = null;
   pendingOpenEnabled = false;
+  pendingLayout = null;
 }
 
 function shuffle(items) {
@@ -138,6 +142,18 @@ function similarityScore(a, b) {
 function isMainScaleWork(work) {
   const { width, height } = parseSizeInfo(work.size);
   return Number(width) > 1000 || Number(height) > 1000;
+}
+
+function getWorkPagePath(work) {
+  if (work.category === "digital") {
+    return work.subcategory === "mini-chara" ? "digital-mini-chara.html" : "digital-illustration.html";
+  }
+  if (work.category === "manga") return "manga.html";
+  if (work.category === "hanga") {
+    const isCopper = /エッチング|ドライポイント|アクアチント|銅版/.test(String(work.technique ?? ""));
+    return isCopper ? "hanga-copper.html" : "hanga-wood.html";
+  }
+  return "index.html";
 }
 
 function arrangeBySimilarityInGroup(list) {
@@ -246,14 +262,6 @@ function renderGallery() {
     const text = `${work.title ?? ""} ${work.technique ?? ""} ${work.caption ?? ""}`;
     return /4コマ|四コマ|４コマ|四齣/i.test(text);
   };
-  const getCategoryPage = (work) => {
-    if (work.category === "digital") {
-      return work.subcategory === "mini-chara" ? "digital-mini-chara.html" : "digital-illustration.html";
-    }
-    if (work.category === "manga") return "manga.html";
-    if (work.category === "hanga") return isCopperTechnique(work.technique) ? "hanga-copper.html" : "hanga-wood.html";
-    return "index.html";
-  };
   galleries.forEach((gallery) => {
     const category = gallery.dataset.gallery;
     const galleryId = gallery.dataset.galleryId || category;
@@ -337,7 +345,7 @@ function renderGallery() {
         const firstImage = work.images?.[0] || work.image;
         return `
       <article class="top-selected-item" data-work-id="${escapeHtml(work.id)}">
-        <a class="top-selected-link js-work-link" href="${escapeHtml(firstImage)}" data-work-id="${escapeHtml(work.id)}">
+          <a class="top-selected-link js-work-link" href="${escapeHtml(firstImage)}" data-work-id="${escapeHtml(work.id)}">
           <span class="top-selected-image-wrap">
             <img src="${escapeHtml(firstImage)}" alt="${escapeHtml(work.title)}" loading="lazy">
           </span>
@@ -363,7 +371,7 @@ function renderGallery() {
       const firstImage = work.images?.[0] || work.image;
       return `
       <article class="${getWorkCardClass(work)}" data-work-id="${escapeHtml(work.id)}">
-        <a class="work-image-link js-work-link" href="${escapeHtml(firstImage)}" data-work-id="${escapeHtml(work.id)}">
+        <a class="work-image-link js-work-link" href="${escapeHtml(firstImage)}" data-work-id="${escapeHtml(work.id)}" data-work-page="${escapeHtml(getWorkPagePath(work))}">
           <img src="${escapeHtml(firstImage)}" alt="${escapeHtml(work.title)}" loading="lazy">
         </a>
         <div class="caption">
@@ -400,6 +408,10 @@ function autoOpenWorkFromQuery() {
   if (!pendingOpenEnabled || !pendingOpenWorkId) return;
   const link = document.querySelector(`.js-work-link[data-work-id="${CSS.escape(pendingOpenWorkId)}"]`);
   if (!link) return;
+  const card = link.closest(".work, .top-selected-item");
+  if (card) {
+    card.scrollIntoView({ block: "center", behavior: "auto" });
+  }
   pendingOpenEnabled = false;
   pendingOpenWorkId = null;
   link.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true }));
@@ -478,7 +490,7 @@ function attachGalleryLayoutControls() {
     });
   };
 
-  applyLayout(galleries[0].dataset.galleryLayout || "large");
+  applyLayout(pendingLayout || galleries[0].dataset.galleryLayout || "large");
   buttons.forEach((button) => {
     if (button.dataset.bound === "true") return;
     button.dataset.bound = "true";
@@ -522,6 +534,7 @@ function attachGalleryViewer() {
     viewer.className = "image-viewer";
     viewer.innerHTML = `
       <button class="viewer-close" type="button" aria-label="close">×</button>
+      <button class="viewer-detail" type="button" hidden>${uiT("viewer_detail", "詳細を見る")}</button>
       <button class="viewer-prev" type="button" aria-label="previous">‹</button>
       <img class="viewer-image" alt="">
       <div class="viewer-loading">${uiT("loading_updating", "更新中")}</div>
@@ -534,6 +547,7 @@ function attachGalleryViewer() {
   const image = viewer.querySelector(".viewer-image");
   const meta = viewer.querySelector(".viewer-meta");
   const loading = viewer.querySelector(".viewer-loading");
+  const detailBtn = viewer.querySelector(".viewer-detail");
   let loadingTimer = null;
   const closeBtn = viewer.querySelector(".viewer-close");
   const prevBtn = viewer.querySelector(".viewer-prev");
@@ -551,6 +565,8 @@ function attachGalleryViewer() {
   let dragStartY = 0;
   let panStartX = 0;
   let panStartY = 0;
+  let currentWorkId = "";
+  let currentWorkPage = "";
   const savedViewerState = viewer.__viewerState;
   if (savedViewerState && Array.isArray(savedViewerState.currentImages)) {
     currentImages = savedViewerState.currentImages;
@@ -598,13 +614,22 @@ function attachGalleryViewer() {
   const open = () => {
     setZoom(false);
     viewer.classList.add("is-open");
+    document.body.classList.add("viewer-open");
     document.body.style.overflow = "hidden";
     draw();
   };
   const close = () => {
     setZoom(false);
     viewer.classList.remove("is-open");
+    document.body.classList.remove("viewer-open");
     document.body.style.overflow = "";
+    if (currentWorkId) {
+      const activeLink = document.querySelector(`.js-work-link[data-work-id="${CSS.escape(currentWorkId)}"]`);
+      const card = activeLink?.closest(".work, .top-selected-item");
+      if (card) {
+        card.scrollIntoView({ block: "center", behavior: "smooth" });
+      }
+    }
   };
   const next = () => {
     if (!currentImages.length) return;
@@ -622,14 +647,33 @@ function attachGalleryViewer() {
       event.preventDefault();
       const work = map.get(link.dataset.workId);
       if (!work) return;
+      currentWorkId = String(work.id ?? "");
+      currentWorkPage = link.dataset.workPage || getWorkPagePath(work);
       currentImages = work.images?.length ? work.images : [work.image];
       currentTitle = work.title || "";
       index = 0;
       viewer.classList.toggle("is-mini-chara", work.subcategory === "mini-chara");
+      const layout = link.closest(".gallery-grid[data-gallery]")?.dataset.galleryLayout || "";
+      if (detailBtn) {
+        detailBtn.hidden = layout !== "compact";
+        detailBtn.textContent = uiT("viewer_detail", "詳細を見る");
+      }
       viewer.__viewerState = { currentImages: [...currentImages], currentTitle, index };
       open();
     });
   });
+
+  if (detailBtn) {
+    detailBtn.addEventListener("click", () => {
+      if (!currentWorkId || !currentWorkPage) return;
+      const params = new URLSearchParams({
+        work: currentWorkId,
+        open: "1",
+        layout: "large",
+      });
+      window.location.href = `${currentWorkPage}?${params.toString()}`;
+    });
+  }
 
   image.addEventListener("dblclick", (event) => {
     event.preventDefault();
