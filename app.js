@@ -750,14 +750,17 @@ function attachCaptionToggles() {
     const button = caption.querySelector(".caption-toggle");
     if (!text || !button) return;
 
-    const isLong = text.scrollHeight > text.clientHeight + 4 || text.textContent.length > 140;
+    const compactThreshold = 80;
+    const isLong = text.scrollHeight > text.clientHeight + 4 || text.textContent.length > compactThreshold;
     if (!isLong) {
       button.hidden = true;
       text.classList.remove("is-collapsed");
+      text.classList.remove("is-collapsed-mobile-standard");
       return;
     }
 
     text.classList.add("is-collapsed");
+      text.classList.add("is-collapsed-mobile-standard");
     button.hidden = false;
     button.textContent = uiT("caption_more", "続きを読む");
 
@@ -765,6 +768,11 @@ function attachCaptionToggles() {
     button.dataset.bound = "true";
     button.addEventListener("click", () => {
       const expanded = text.classList.toggle("is-collapsed");
+      if (expanded) {
+        text.classList.add("is-collapsed-mobile-standard");
+      } else {
+        text.classList.remove("is-collapsed-mobile-standard");
+      }
       button.textContent = expanded
         ? uiT("caption_more", "続きを読む")
         : uiT("caption_less", "閉じる");
