@@ -131,58 +131,6 @@ function setupMobileMenu() {
   });
 }
 
-function syncTopSelectedScrollbar(gallery) {
-  let indicator = gallery.nextElementSibling;
-  if (!indicator || !indicator.classList.contains("top-selected-scrollbar-custom")) {
-    indicator = document.createElement("div");
-    indicator.className = "top-selected-scrollbar-custom";
-    indicator.setAttribute("aria-hidden", "true");
-    indicator.innerHTML = '<span class="top-selected-scrollbar-custom-thumb"></span>';
-    gallery.insertAdjacentElement("afterend", indicator);
-  }
-
-  const thumb = indicator.querySelector(".top-selected-scrollbar-custom-thumb");
-  const update = () => {
-    const maxScroll = gallery.scrollWidth - gallery.clientWidth;
-    if (!thumb || maxScroll <= 1) {
-      indicator.hidden = true;
-      return;
-    }
-
-    indicator.hidden = false;
-    const thumbWidth = Math.max(18, (gallery.clientWidth / gallery.scrollWidth) * 100);
-    const thumbOffset = (gallery.scrollLeft / maxScroll) * (100 - thumbWidth);
-    indicator.style.setProperty("--scrollbar-thumb-width", `${thumbWidth}%`);
-    indicator.style.setProperty("--scrollbar-thumb-offset", `${thumbOffset}%`);
-  };
-
-  const scrollToClientX = (clientX) => {
-    const maxScroll = gallery.scrollWidth - gallery.clientWidth;
-    if (maxScroll <= 1) return;
-    const rect = indicator.getBoundingClientRect();
-    const ratio = Math.min(1, Math.max(0, (clientX - rect.left) / rect.width));
-    gallery.scrollLeft = ratio * maxScroll;
-    update();
-  };
-
-  if (gallery.dataset.scrollbarCustomBound !== "true") {
-    gallery.dataset.scrollbarCustomBound = "true";
-    gallery.addEventListener("scroll", update, { passive: true });
-    window.addEventListener("resize", update);
-    indicator.addEventListener("pointerdown", (event) => {
-      indicator.setPointerCapture?.(event.pointerId);
-      scrollToClientX(event.clientX);
-    });
-    indicator.addEventListener("pointermove", (event) => {
-      if (!event.buttons) return;
-      scrollToClientX(event.clientX);
-    });
-  }
-
-  requestAnimationFrame(update);
-  setTimeout(update, 300);
-}
-
 const galleryState = new Map();
 let topCategoryButtonsVisible = false;
 let pendingOpenWorkId = null;
@@ -497,7 +445,6 @@ function renderGallery() {
         galleryState.set(galleryId, currentState);
       }
       removePaginationControls(gallery, galleryId);
-      syncTopSelectedScrollbar(gallery);
       return;
     }
 
