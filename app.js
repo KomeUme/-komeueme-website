@@ -63,6 +63,39 @@ function normalizeInternalPageLinks() {
   });
 }
 
+function ensureTopSelectedScrollbar(gallery) {
+  let scrollbar = gallery.nextElementSibling;
+  if (!scrollbar || !scrollbar.classList.contains("top-selected-scrollbar")) {
+    scrollbar = document.createElement("div");
+    scrollbar.className = "top-selected-scrollbar";
+    scrollbar.setAttribute("aria-hidden", "true");
+    gallery.insertAdjacentElement("afterend", scrollbar);
+  }
+
+  const update = () => {
+    const maxScroll = gallery.scrollWidth - gallery.clientWidth;
+    if (maxScroll <= 1) {
+      scrollbar.hidden = true;
+      return;
+    }
+
+    scrollbar.hidden = false;
+    const thumbWidth = Math.max(24, (gallery.clientWidth / gallery.scrollWidth) * 100);
+    const thumbOffset = (gallery.scrollLeft / maxScroll) * (100 - thumbWidth);
+    scrollbar.style.setProperty("--scrollbar-thumb-width", `${thumbWidth}%`);
+    scrollbar.style.setProperty("--scrollbar-thumb-offset", `${thumbOffset}%`);
+  };
+
+  if (gallery.dataset.scrollbarBound !== "true") {
+    gallery.dataset.scrollbarBound = "true";
+    gallery.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", update);
+  }
+
+  requestAnimationFrame(update);
+  setTimeout(update, 300);
+}
+
 const galleryState = new Map();
 let topCategoryButtonsVisible = false;
 let pendingOpenWorkId = null;
@@ -377,6 +410,7 @@ function renderGallery() {
         galleryState.set(galleryId, currentState);
       }
       removePaginationControls(gallery, galleryId);
+      ensureTopSelectedScrollbar(gallery);
       return;
     }
 

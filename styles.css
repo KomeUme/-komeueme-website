@@ -435,6 +435,10 @@ main {
   background: #bcc2cb;
 }
 
+.top-selected-scrollbar {
+  display: none;
+}
+
 .top-selected-item {
   margin: 0;
   width: 100%;
@@ -1342,6 +1346,31 @@ footer {
   }
 
   .top-selected .gallery-grid.top-selected-row::-webkit-scrollbar-thumb:hover {
+    background: #a8b0bb;
+  }
+
+  .top-selected-scrollbar {
+    display: block;
+    position: relative;
+    height: 8px;
+    margin: 6px 8px 0;
+    border-radius: 999px;
+    background: rgba(150, 157, 168, 0.22);
+    overflow: hidden;
+  }
+
+  .top-selected-scrollbar[hidden] {
+    display: none;
+  }
+
+  .top-selected-scrollbar::before {
+    content: "";
+    position: absolute;
+    top: 2px;
+    bottom: 2px;
+    left: var(--scrollbar-thumb-offset, 0%);
+    width: var(--scrollbar-thumb-width, 34%);
+    border-radius: 999px;
     background: #a8b0bb;
   }
 
