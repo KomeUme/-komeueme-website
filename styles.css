@@ -444,6 +444,10 @@ main {
   background: #9fa7b2;
 }
 
+.top-selected-scrollbar {
+  display: none;
+}
+
 .top-selected-item {
   margin: 0;
   width: 100%;
@@ -1334,6 +1338,46 @@ footer {
     gap: 14px;
   }
 
+  .intro {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 44px;
+  }
+
+  .intro h1 {
+    order: 1;
+  }
+
+  .intro p {
+    order: 2;
+    margin-top: 18px;
+    font-size: 15px;
+    line-height: 1.65;
+  }
+
+  .subcategory-links {
+    order: 3;
+    justify-content: center;
+    margin-top: 14px;
+    gap: 14px;
+  }
+
+  .subcategory-link {
+    font-size: 11px;
+    opacity: 0.64;
+  }
+
+  .subcategory-link.is-current {
+    opacity: 0.86;
+  }
+
+  .mini-chara-layout-control {
+    order: 4;
+    margin-top: 18px;
+    opacity: 0.82;
+  }
+
   .feature-grid,
   .category-strip,
   .card-grid,
@@ -1380,14 +1424,39 @@ footer {
 
   .top-selected .gallery-grid.top-selected-row {
     scrollbar-color: #aeb5bf transparent;
+    scrollbar-width: none;
   }
 
-  .top-selected .gallery-grid.top-selected-row::-webkit-scrollbar-thumb {
-    background: #aeb5bf;
+  .top-selected .gallery-grid.top-selected-row::-webkit-scrollbar {
+    display: none;
+    height: 0;
   }
 
-  .top-selected .gallery-grid.top-selected-row::-webkit-scrollbar-thumb:hover {
+  .top-selected-scrollbar {
+    display: block;
+    position: relative;
+    height: 8px;
+    margin: 6px 8px 0;
+    border-radius: 999px;
+    background: rgba(174, 181, 191, 0.26);
+    overflow: hidden;
+    cursor: pointer;
+    touch-action: none;
+  }
+
+  .top-selected-scrollbar[hidden] {
+    display: none;
+  }
+
+  .top-selected-scrollbar-thumb {
+    position: absolute;
+    top: 2px;
+    bottom: 2px;
+    left: var(--scrollbar-thumb-offset, 0%);
+    width: var(--scrollbar-thumb-width, 34%);
+    border-radius: 999px;
     background: #9fa7b2;
+    pointer-events: none;
   }
 
   .name-ruby {
@@ -1548,6 +1617,24 @@ footer {
     line-height: 1.55;
   }
 
+  .intro {
+    margin-bottom: 38px;
+  }
+
+  .intro p {
+    margin-top: 14px;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  .subcategory-links {
+    margin-top: 12px;
+  }
+
+  .subcategory-link {
+    font-size: 11px;
+  }
+
   .top-hero-media {
     min-height: 440px;
     padding: 10px;
@@ -1578,10 +1665,6 @@ footer {
 
   .top-selected-head {
     align-items: baseline;
-  }
-
-  .subcategory-links {
-    justify-content: center;
   }
 
   .top-selected .gallery-grid.top-selected-row {

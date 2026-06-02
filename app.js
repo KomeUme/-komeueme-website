@@ -62,6 +62,75 @@ function normalizeInternalPageLinks() {
   });
 }
 
+function ensureTopSelectedScrollbar(gallery) {
+  let scrollbar = gallery.nextElementSibling;
+  if (!scrollbar || !scrollbar.classList.contains("top-selected-scrollbar")) {
+    scrollbar = document.createElement("div");
+    scrollbar.className = "top-selected-scrollbar";
+    scrollbar.setAttribute("role", "scrollbar");
+    scrollbar.setAttribute("aria-orientation", "horizontal");
+    scrollbar.tabIndex = 0;
+    scrollbar.innerHTML = '<span class="top-selected-scrollbar-thumb"></span>';
+    gallery.insertAdjacentElement("afterend", scrollbar);
+  }
+
+  const thumb = scrollbar.querySelector(".top-selected-scrollbar-thumb");
+  const update = () => {
+    const maxScroll = gallery.scrollWidth - gallery.clientWidth;
+    if (!thumb || maxScroll <= 1) {
+      scrollbar.hidden = true;
+      return;
+    }
+
+    scrollbar.hidden = false;
+    const thumbWidth = Math.max(24, (gallery.clientWidth / gallery.scrollWidth) * 100);
+    const thumbOffset = (gallery.scrollLeft / maxScroll) * (100 - thumbWidth);
+    scrollbar.style.setProperty("--scrollbar-thumb-width", `${thumbWidth}%`);
+    scrollbar.style.setProperty("--scrollbar-thumb-offset", `${thumbOffset}%`);
+    scrollbar.setAttribute("aria-valuemin", "0");
+    scrollbar.setAttribute("aria-valuemax", String(Math.round(maxScroll)));
+    scrollbar.setAttribute("aria-valuenow", String(Math.round(gallery.scrollLeft)));
+  };
+
+  const scrollToClientX = (clientX) => {
+    const maxScroll = gallery.scrollWidth - gallery.clientWidth;
+    if (maxScroll <= 1) return;
+    const rect = scrollbar.getBoundingClientRect();
+    const ratio = Math.min(1, Math.max(0, (clientX - rect.left) / rect.width));
+    gallery.scrollLeft = ratio * maxScroll;
+    update();
+  };
+
+  if (gallery.dataset.scrollbarBound !== "true") {
+    gallery.dataset.scrollbarBound = "true";
+    gallery.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", update);
+
+    scrollbar.addEventListener("pointerdown", (event) => {
+      scrollbar.setPointerCapture?.(event.pointerId);
+      scrollToClientX(event.clientX);
+    });
+    scrollbar.addEventListener("pointermove", (event) => {
+      if (!event.buttons) return;
+      scrollToClientX(event.clientX);
+    });
+    scrollbar.addEventListener("keydown", (event) => {
+      const step = gallery.clientWidth * 0.35;
+      if (event.key === "ArrowLeft") {
+        event.preventDefault();
+        gallery.scrollLeft -= step;
+      } else if (event.key === "ArrowRight") {
+        event.preventDefault();
+        gallery.scrollLeft += step;
+      }
+      update();
+    });
+  }
+
+  requestAnimationFrame(update);
+  setTimeout(update, 300);
+}
+
 const galleryState = new Map();
 let topCategoryButtonsVisible = false;
 let pendingOpenWorkId = null;
@@ -376,6 +445,7 @@ function renderGallery() {
         galleryState.set(galleryId, currentState);
       }
       removePaginationControls(gallery, galleryId);
+      ensureTopSelectedScrollbar(gallery);
       return;
     }
 
