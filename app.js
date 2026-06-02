@@ -66,6 +66,7 @@ function setupMobileMenu() {
   const header = document.querySelector(".site-header");
   const brand = header?.querySelector(".brand");
   const nav = header?.querySelector(".nav");
+  const langSwitch = document.querySelector(".lang-switch");
   const mobileQuery = window.matchMedia("(max-width: 768px)");
   if (!header || !brand || !nav) return;
 
@@ -78,24 +79,40 @@ function setupMobileMenu() {
   const button = document.createElement("button");
   button.className = "nav-menu-toggle";
   button.type = "button";
-  button.textContent = "Menu";
+  button.innerHTML = '<span class="nav-menu-icon" aria-hidden="true"><span></span><span></span></span><span class="sr-only">Menu</span>';
+  button.setAttribute("aria-label", "メニュー");
   button.setAttribute("aria-expanded", "false");
   nav.id = nav.id || "site-nav";
   button.setAttribute("aria-controls", nav.id);
   brand.insertAdjacentElement("afterend", button);
 
+  const placeLangSwitch = (isMobile) => {
+    if (!langSwitch) return;
+    if (isMobile) {
+      if (nav.firstElementChild !== langSwitch) {
+        nav.prepend(langSwitch);
+      }
+    } else if (langSwitch.parentElement !== document.body) {
+      document.body.insertBefore(langSwitch, header);
+    }
+  };
+
+  placeLangSwitch(mobileQuery.matches);
+
   const closeMenu = () => {
     document.body.classList.remove("menu-open");
     button.setAttribute("aria-expanded", "false");
+    button.setAttribute("aria-label", "メニュー");
   };
 
   button.addEventListener("click", () => {
-    document.body.classList.toggle("menu-open");
-    button.setAttribute("aria-expanded", document.body.classList.contains("menu-open") ? "true" : "false");
+    const isOpen = document.body.classList.toggle("menu-open");
+    button.setAttribute("aria-expanded", isOpen ? "true" : "false");
+    button.setAttribute("aria-label", isOpen ? "閉じる" : "メニュー");
   });
 
   nav.addEventListener("click", (event) => {
-    if (event.target.closest("a")) closeMenu();
+    if (event.target.closest("a, button[data-lang-switch]")) closeMenu();
   });
 
   document.addEventListener("click", (event) => {
@@ -105,6 +122,7 @@ function setupMobileMenu() {
   });
 
   mobileQuery.addEventListener("change", (event) => {
+    placeLangSwitch(event.matches);
     if (!event.matches) closeMenu();
   });
 }
