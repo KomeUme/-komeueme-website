@@ -1356,7 +1356,7 @@ footer {
   align-items: center;
   justify-content: center;
   background: rgba(15, 15, 18, 0.92);
-  z-index: 2000;
+  z-index: 4000;
   padding: 24px;
   touch-action: none;
 }
