@@ -440,7 +440,7 @@ main {
   overscroll-behavior-x: contain;
   padding-bottom: 8px;
   scrollbar-width: thin;
-  scrollbar-color: #aeb5bf transparent;
+  scrollbar-color: #8f98a4 transparent;
 }
 
 .top-selected .gallery-grid.top-selected-row::-webkit-scrollbar {
@@ -452,12 +452,12 @@ main {
 }
 
 .top-selected .gallery-grid.top-selected-row::-webkit-scrollbar-thumb {
-  background: #aeb5bf;
+  background: #8f98a4;
   border-radius: 999px;
 }
 
 .top-selected .gallery-grid.top-selected-row::-webkit-scrollbar-thumb:hover {
-  background: #9fa7b2;
+  background: #7f8994;
 }
 
 .top-selected-item {
@@ -1754,7 +1754,7 @@ footer {
   }
 
   .top-selected .gallery-grid.top-selected-row {
-    scrollbar-color: #aeb5bf transparent;
+    scrollbar-color: #8f98a4 transparent;
     scrollbar-width: thin;
   }
 
@@ -1767,12 +1767,12 @@ footer {
   }
 
   .top-selected .gallery-grid.top-selected-row::-webkit-scrollbar-thumb {
-    background: #aeb5bf;
+    background: #8f98a4;
     border-radius: 999px;
   }
 
   .top-selected .gallery-grid.top-selected-row::-webkit-scrollbar-thumb:hover {
-    background: #9fa7b2;
+    background: #7f8994;
   }
 
   .name-ruby {
