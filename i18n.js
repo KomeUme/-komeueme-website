@@ -87,6 +87,7 @@ const I18N = {
     copy_done: "コピー完了！",
     caption_more: "続きを読む",
     caption_less: "閉じる",
+    load_more: "もっと見る",
     back_to_top: "ページ先頭へ",
     viewer_detail: "詳細を見る",
     auto_translation_notice: "作品キャプションは自動翻訳です",
@@ -181,6 +182,7 @@ const I18N = {
     copy_done: "Copied!",
     caption_more: "Read more",
     caption_less: "Close",
+    load_more: "More",
     back_to_top: "Back to top",
     viewer_detail: "View details",
     auto_translation_notice: "Work captions are automatically translated.",
@@ -202,6 +204,14 @@ function updateProfileNavDate() {
     lang = "ja";
   }
   const dict = I18N[lang] || I18N.ja;
+  const formatUpdatedLabel = (date) => {
+    if (!date) return "";
+    return lang === "en" ? `Updated ${date}` : `${date}更新`;
+  };
+  const wrapUpdatedLabel = (label) => {
+    if (!label) return "";
+    return lang === "en" ? ` (${label})` : `（${label}）`;
+  };
 
   if (profileTitle) {
     const dateEl = profileTitle.querySelector(".profile-updated-date");
@@ -209,7 +219,7 @@ function updateProfileNavDate() {
   }
 
   const profileUpdated = dict.profile_history_body_updated || I18N.ja.profile_history_body_updated || "";
-  const profileDateLabel = profileUpdated ? `${profileUpdated}更新` : "";
+  const profileDateLabel = formatUpdatedLabel(profileUpdated);
   if (profileDesc) {
     let dateEl = profileDesc.querySelector(".profile-updated-date");
     if (!dateEl) {
@@ -217,19 +227,19 @@ function updateProfileNavDate() {
       dateEl.className = "profile-updated-date";
       profileDesc.appendChild(dateEl);
     }
-    dateEl.textContent = profileDateLabel ? `（${profileDateLabel}）` : "";
+    dateEl.textContent = wrapUpdatedLabel(profileDateLabel);
   }
 
   if (introTitle) {
     const introUpdated = dict.intro_block_updated || I18N.ja.intro_block_updated || "";
-    const introDateLabel = introUpdated ? `${introUpdated}更新` : "";
+    const introDateLabel = formatUpdatedLabel(introUpdated);
     let dateEl = introTitle.querySelector(".profile-updated-date");
     if (!dateEl) {
       dateEl = document.createElement("span");
       dateEl.className = "profile-updated-date";
       introTitle.appendChild(dateEl);
     }
-    dateEl.textContent = introDateLabel ? `（${introDateLabel}）` : "";
+    dateEl.textContent = wrapUpdatedLabel(introDateLabel);
   }
 }
 
