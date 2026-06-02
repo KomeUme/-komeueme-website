@@ -1358,6 +1358,7 @@ footer {
   background: rgba(15, 15, 18, 0.92);
   z-index: 2000;
   padding: 24px;
+  touch-action: none;
 }
 
 .image-viewer.is-mini-chara {
@@ -1521,6 +1522,19 @@ footer {
 }
 
 @media (max-width: 768px) {
+  .image-viewer {
+    padding: 58px 18px 72px;
+  }
+
+  .image-viewer .viewer-image {
+    max-height: calc(100vh - 150px);
+  }
+
+  .image-viewer .viewer-prev,
+  .image-viewer .viewer-next {
+    display: none;
+  }
+
   .site-header {
     display: flex;
     flex-wrap: wrap;

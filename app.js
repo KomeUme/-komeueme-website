@@ -672,6 +672,10 @@ function attachGalleryViewer() {
   let dragStartY = 0;
   let panStartX = 0;
   let panStartY = 0;
+  let swipePointerId = null;
+  let swipeStartX = 0;
+  let swipeStartY = 0;
+  let swipeMoved = false;
   let currentWorkId = "";
   let currentWorkPage = "";
   const savedViewerState = viewer.__viewerState;
@@ -840,6 +844,42 @@ function attachGalleryViewer() {
     isPanning = false;
     hasMoved = false;
     image.classList.remove("is-panning");
+  });
+  viewer.addEventListener("pointerdown", (event) => {
+    if (isZoomed || event.pointerType !== "touch") return;
+    if (event.target.closest("button")) return;
+    swipePointerId = event.pointerId;
+    swipeStartX = event.clientX;
+    swipeStartY = event.clientY;
+    swipeMoved = false;
+    if (viewer.setPointerCapture) viewer.setPointerCapture(event.pointerId);
+  });
+  viewer.addEventListener("pointermove", (event) => {
+    if (swipePointerId !== event.pointerId || isZoomed) return;
+    const dx = event.clientX - swipeStartX;
+    const dy = event.clientY - swipeStartY;
+    if (Math.abs(dx) > 8 || Math.abs(dy) > 8) swipeMoved = true;
+  });
+  viewer.addEventListener("pointerup", (event) => {
+    if (swipePointerId !== event.pointerId) return;
+    if (viewer.hasPointerCapture?.(event.pointerId)) {
+      viewer.releasePointerCapture(event.pointerId);
+    }
+    const dx = event.clientX - swipeStartX;
+    const dy = event.clientY - swipeStartY;
+    const isHorizontalSwipe = Math.abs(dx) > 54 && Math.abs(dx) > Math.abs(dy) * 1.35;
+    if (swipeMoved && isHorizontalSwipe && currentImages.length > 1) {
+      hasMoved = true;
+      if (dx < 0) next();
+      else prev();
+    }
+    swipePointerId = null;
+    swipeMoved = false;
+  });
+  viewer.addEventListener("pointercancel", (event) => {
+    if (swipePointerId !== event.pointerId) return;
+    swipePointerId = null;
+    swipeMoved = false;
   });
   image.addEventListener("load", () => {
     if (loadingTimer) window.clearTimeout(loadingTimer);
