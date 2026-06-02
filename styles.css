@@ -1522,6 +1522,12 @@ footer {
 }
 
 @media (max-width: 768px) {
+  .auto-translation-notice {
+    top: 74px;
+    right: 16px;
+    max-width: min(260px, calc(100vw - 32px));
+  }
+
   .image-viewer {
     padding: 58px 18px 72px;
   }
