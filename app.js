@@ -13,14 +13,28 @@ function withFallback(value) {
 }
 
 function uiT(key, fallback) {
+  const lang = getCurrentLang();
+  const dict = window.I18N?.[lang] || window.I18N?.ja || {};
+  return dict[key] || fallback;
+}
+
+function getCurrentLang() {
   let lang = "ja";
   try {
     lang = localStorage.getItem("site-lang") || "ja";
   } catch (_) {
     lang = "ja";
   }
-  const dict = window.I18N?.[lang] || window.I18N?.ja || {};
-  return dict[key] || fallback;
+  return lang;
+}
+
+function workText(work, field) {
+  const lang = getCurrentLang();
+  if (lang === "en") {
+    const translatedKey = `${field}_en`;
+    if (Object.prototype.hasOwnProperty.call(work || {}, translatedKey)) return work[translatedKey];
+  }
+  return work?.[field];
 }
 
 function detectSiteBasePath() {
@@ -308,16 +322,18 @@ function renderFeatureImages() {
   let activeIndex = 0;
   const setFeatured = () => {
     const active = featured[activeIndex % featured.length];
+    const title = workText(active.work, "title");
+    const year = workText(active.work, "year");
     featureImages.forEach((img) => {
       img.src = active.featureImage;
-      img.alt = `${active.work.title} (${categories[active.work.category]})`;
+      img.alt = `${title} (${categories[active.work.category]})`;
       img.classList.add("js-work-link");
       img.dataset.workId = String(active.work.id ?? "");
       img.dataset.workPage = getWorkPagePath(active.work);
       img.dataset.workSource = "top-hero";
     });
     if (featureCaption) {
-      featureCaption.textContent = `${active.work.title}｜${withFallback(active.work.year)}`;
+      featureCaption.textContent = `${title}｜${withFallback(year)}`;
     }
     activeIndex += 1;
   };
@@ -422,15 +438,16 @@ function renderGallery() {
 
     if (galleryId === "top-selected") {
       gallery.classList.add("top-selected-row");
-      gallery.innerHTML = outputList.map((work) => {
-        const firstImage = work.images?.[0] || work.image;
-        return `
+    gallery.innerHTML = outputList.map((work) => {
+      const firstImage = work.images?.[0] || work.image;
+      const title = workText(work, "title");
+      return `
       <article class="top-selected-item" data-work-id="${escapeHtml(work.id)}">
-          <a class="top-selected-link js-work-link" href="${escapeHtml(firstImage)}" data-work-id="${escapeHtml(work.id)}" data-work-page="${escapeHtml(getWorkPagePath(work))}" data-work-source="top-selected">
+        <a class="top-selected-link js-work-link" href="${escapeHtml(firstImage)}" data-work-id="${escapeHtml(work.id)}" data-work-page="${escapeHtml(getWorkPagePath(work))}" data-work-source="top-selected">
           <span class="top-selected-image-wrap">
-            <img src="${escapeHtml(firstImage)}" alt="${escapeHtml(work.title)}" loading="lazy">
+            <img src="${escapeHtml(firstImage)}" alt="${escapeHtml(title)}" loading="lazy">
           </span>
-          <span class="top-selected-title">${escapeHtml(work.title)}</span>
+          <span class="top-selected-title">${escapeHtml(title)}</span>
         </a>
       </article>
     `;
@@ -450,19 +467,24 @@ function renderGallery() {
 
     gallery.innerHTML = outputList.map((work) => {
       const firstImage = work.images?.[0] || work.image;
+      const title = workText(work, "title");
+      const year = workText(work, "year");
+      const technique = workText(work, "technique");
+      const size = workText(work, "size");
+      const caption = workText(work, "caption");
       return `
       <article class="${getWorkCardClass(work)}" data-work-id="${escapeHtml(work.id)}">
         <a class="work-image-link js-work-link" href="${escapeHtml(firstImage)}" data-work-id="${escapeHtml(work.id)}" data-work-page="${escapeHtml(getWorkPagePath(work))}">
-          <img src="${escapeHtml(firstImage)}" alt="${escapeHtml(work.title)}" loading="lazy">
+          <img src="${escapeHtml(firstImage)}" alt="${escapeHtml(title)}" loading="lazy">
         </a>
         <div class="caption">
-          <h3 class="caption-title">${escapeHtml(work.title)}</h3>
+          <h3 class="caption-title">${escapeHtml(title)}</h3>
           <div class="caption-meta-list">
-            <p class="caption-meta"><span>${escapeHtml(uiT("cap_year", "制作年"))}</span><span>${escapeHtml(withFallback(work.year))}</span></p>
-            <p class="caption-meta"><span>${escapeHtml(uiT("cap_technique", "技法"))}</span><span>${escapeHtml(withFallback(work.technique))}</span></p>
-            <p class="caption-meta"><span>${escapeHtml(uiT("cap_size", "サイズ"))}</span><span>${escapeHtml(withFallback(work.size))}</span></p>
+            <p class="caption-meta"><span>${escapeHtml(uiT("cap_year", "制作年"))}</span><span>${escapeHtml(withFallback(year))}</span></p>
+            <p class="caption-meta"><span>${escapeHtml(uiT("cap_technique", "技法"))}</span><span>${escapeHtml(withFallback(technique))}</span></p>
+            <p class="caption-meta"><span>${escapeHtml(uiT("cap_size", "サイズ"))}</span><span>${escapeHtml(withFallback(size))}</span></p>
           </div>
-          <p class="caption-text">${escapeHtml(withFallback(work.caption))}</p>
+          <p class="caption-text">${escapeHtml(withFallback(caption))}</p>
           <button class="caption-toggle" type="button" hidden>${escapeHtml(uiT("caption_more", "続きを読む"))}</button>
         </div>
       </article>
@@ -735,7 +757,7 @@ function attachGalleryViewer() {
       currentWorkId = String(work.id ?? "");
       currentWorkPage = link.dataset.workPage || getWorkPagePath(work);
       currentImages = work.images?.length ? work.images : [work.image];
-      currentTitle = work.title || "";
+      currentTitle = workText(work, "title") || "";
       index = 0;
       viewer.classList.toggle("is-mini-chara", work.subcategory === "mini-chara");
       const layout = link.closest(".gallery-grid[data-gallery]")?.dataset.galleryLayout || "";

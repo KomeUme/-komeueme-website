@@ -73,6 +73,30 @@ body.viewer-open .lang-switch {
   display: none;
 }
 
+.auto-translation-notice {
+  position: fixed;
+  top: 56px;
+  right: 14px;
+  z-index: 3003;
+  max-width: min(300px, calc(100vw - 28px));
+  padding: 8px 12px;
+  border: 1px solid rgba(16, 16, 20, 0.1);
+  background: rgba(255, 255, 255, 0.94);
+  color: #4e5460;
+  font-size: 12px;
+  line-height: 1.45;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-4px);
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+
+.auto-translation-notice.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
 .site-header {
   padding: 28px 20px 14px;
   text-align: center;
@@ -1495,6 +1519,19 @@ footer {
 }
 
 @media (max-width: 768px) {
+  .auto-translation-notice {
+    top: auto;
+    right: auto;
+    bottom: 18px;
+    left: 50%;
+    max-width: calc(100vw - 32px);
+    transform: translate(-50%, 4px);
+  }
+
+  .auto-translation-notice.is-visible {
+    transform: translate(-50%, 0);
+  }
+
   .site-header {
     display: flex;
     flex-wrap: wrap;

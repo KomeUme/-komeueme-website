@@ -89,6 +89,7 @@ const I18N = {
     caption_less: "閉じる",
     back_to_top: "ページ先頭へ",
     viewer_detail: "詳細を見る",
+    auto_translation_notice: "作品キャプションは自動翻訳です",
     loading_updating: "更新中",
     loading_failed: "読み込み失敗",
   },
@@ -182,6 +183,7 @@ const I18N = {
     caption_less: "Close",
     back_to_top: "Back to top",
     viewer_detail: "View details",
+    auto_translation_notice: "Work captions are automatically translated.",
     loading_updating: "Updating...",
     loading_failed: "Load failed",
   },
@@ -304,6 +306,32 @@ function setupCopyEmailButtons() {
   });
 }
 
+let translationNoticeTimer = null;
+
+function showAutoTranslationNotice(lang) {
+  let notice = document.querySelector("[data-auto-translation-notice]");
+  if (lang !== "en") {
+    if (notice) notice.classList.remove("is-visible");
+    window.clearTimeout(translationNoticeTimer);
+    return;
+  }
+  const dict = I18N[lang] || I18N.ja;
+  if (!notice) {
+    notice = document.createElement("div");
+    notice.className = "auto-translation-notice";
+    notice.dataset.autoTranslationNotice = "true";
+    notice.setAttribute("role", "status");
+    notice.setAttribute("aria-live", "polite");
+    document.body.appendChild(notice);
+  }
+  notice.textContent = dict.auto_translation_notice || I18N.ja.auto_translation_notice;
+  notice.classList.add("is-visible");
+  window.clearTimeout(translationNoticeTimer);
+  translationNoticeTimer = window.setTimeout(() => {
+    notice.classList.remove("is-visible");
+  }, 3000);
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   let initial = "ja";
   try {
@@ -323,7 +351,9 @@ document.addEventListener("DOMContentLoaded", () => {
       } catch (_) {
         current = "ja";
       }
-      applyLang(current === "ja" ? "en" : "ja");
+      const next = current === "ja" ? "en" : "ja";
+      applyLang(next);
+      showAutoTranslationNotice(next);
     });
   }
 });
