@@ -112,6 +112,10 @@ function setupMobileMenu() {
   });
 
   nav.addEventListener("click", (event) => {
+    if (event.target === nav) {
+      closeMenu();
+      return;
+    }
     if (event.target.closest("a, button[data-lang-switch]")) closeMenu();
   });
 
