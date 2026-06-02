@@ -719,6 +719,35 @@ function attachGalleryViewer() {
     applyImageTransform();
   };
 
+  const trackTouchPointer = (event) => {
+    if (event.pointerType !== "touch") return false;
+    touchPointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+    if (touchPointers.size === 2) {
+      const points = Array.from(touchPointers.values());
+      pinchStartDistance = Math.hypot(points[0].x - points[1].x, points[0].y - points[1].y);
+      pinchStartScale = zoomScale;
+      isPinching = pinchStartDistance > 0;
+      image.classList.toggle("is-pinching", isPinching);
+      pointerDown = false;
+      isPanning = false;
+      image.classList.remove("is-panning");
+      return true;
+    }
+    return isPinching;
+  };
+
+  const releaseTouchPointer = (event) => {
+    if (event.pointerType !== "touch") return false;
+    touchPointers.delete(event.pointerId);
+    if (isPinching && touchPointers.size < 2) {
+      isPinching = false;
+      image.classList.remove("is-pinching");
+      if (zoomScale <= 1.01) setZoom(false);
+      return true;
+    }
+    return false;
+  };
+
   const draw = () => {
     if (!currentImages.length) return;
     setZoom(false);
@@ -817,6 +846,7 @@ function attachGalleryViewer() {
     setZoom(true);
   });
   image.addEventListener("pointerdown", (event) => {
+    if (trackTouchPointer(event)) return;
     if (!isZoomed || isPinching) return;
     event.preventDefault();
     event.stopPropagation();
@@ -844,6 +874,7 @@ function attachGalleryViewer() {
     applyImageTransform();
   });
   image.addEventListener("pointerup", (event) => {
+    releaseTouchPointer(event);
     if (!pointerDown) return;
     if (image.hasPointerCapture(event.pointerId)) {
       image.releasePointerCapture(event.pointerId);
@@ -852,27 +883,15 @@ function attachGalleryViewer() {
     isPanning = false;
     image.classList.remove("is-panning");
   });
-  image.addEventListener("pointercancel", () => {
+  image.addEventListener("pointercancel", (event) => {
+    releaseTouchPointer(event);
     pointerDown = false;
     isPanning = false;
     hasMoved = false;
     image.classList.remove("is-panning");
   });
   viewer.addEventListener("pointerdown", (event) => {
-    if (event.pointerType === "touch") {
-      touchPointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
-      if (touchPointers.size === 2) {
-        const points = Array.from(touchPointers.values());
-        pinchStartDistance = Math.hypot(points[0].x - points[1].x, points[0].y - points[1].y);
-        pinchStartScale = zoomScale;
-        isPinching = pinchStartDistance > 0;
-        image.classList.toggle("is-pinching", isPinching);
-        pointerDown = false;
-        isPanning = false;
-        image.classList.remove("is-panning");
-        return;
-      }
-    }
+    if (trackTouchPointer(event)) return;
     if (isPinching) return;
     if (isZoomed || event.pointerType !== "touch") return;
     if (event.target.closest("button")) return;
@@ -909,13 +928,7 @@ function attachGalleryViewer() {
   });
   viewer.addEventListener("pointerup", (event) => {
     if (event.pointerType === "touch") {
-      touchPointers.delete(event.pointerId);
-      if (isPinching) {
-        if (touchPointers.size < 2) {
-          isPinching = false;
-          image.classList.remove("is-pinching");
-          if (zoomScale <= 1.01) setZoom(false);
-        }
+      if (releaseTouchPointer(event)) {
         swipePointerId = null;
         swipeMoved = false;
         hasMoved = true;
@@ -952,13 +965,7 @@ function attachGalleryViewer() {
     swipeMoved = false;
   });
   viewer.addEventListener("pointercancel", (event) => {
-    if (event.pointerType === "touch") {
-      touchPointers.delete(event.pointerId);
-      if (touchPointers.size < 2) {
-        isPinching = false;
-        image.classList.remove("is-pinching");
-      }
-    }
+    releaseTouchPointer(event);
     if (swipePointerId !== event.pointerId) return;
     swipePointerId = null;
     swipeMoved = false;
