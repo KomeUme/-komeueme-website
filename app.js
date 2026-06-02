@@ -62,6 +62,52 @@ function normalizeInternalPageLinks() {
   });
 }
 
+function setupMobileMenu() {
+  const header = document.querySelector(".site-header");
+  const brand = header?.querySelector(".brand");
+  const nav = header?.querySelector(".nav");
+  if (!header || !brand || !nav) return;
+
+  if (/\/manga(?:-4koma|-story)?\.html$/.test(window.location.pathname)) {
+    document.body.classList.add("page-manga");
+  }
+
+  if (header.querySelector(".nav-menu-toggle")) return;
+
+  const button = document.createElement("button");
+  button.className = "nav-menu-toggle";
+  button.type = "button";
+  button.textContent = "Menu";
+  button.setAttribute("aria-expanded", "false");
+  nav.id = nav.id || "site-nav";
+  button.setAttribute("aria-controls", nav.id);
+  brand.insertAdjacentElement("afterend", button);
+
+  const closeMenu = () => {
+    document.body.classList.remove("menu-open");
+    button.setAttribute("aria-expanded", "false");
+  };
+
+  button.addEventListener("click", () => {
+    document.body.classList.toggle("menu-open");
+    button.setAttribute("aria-expanded", document.body.classList.contains("menu-open") ? "true" : "false");
+  });
+
+  nav.addEventListener("click", (event) => {
+    if (event.target.closest("a")) closeMenu();
+  });
+
+  document.addEventListener("click", (event) => {
+    if (window.matchMedia("(max-width: 768px)").matches && document.body.classList.contains("menu-open")) {
+      if (!header.contains(event.target)) closeMenu();
+    }
+  });
+
+  window.addEventListener("resize", () => {
+    if (!window.matchMedia("(max-width: 768px)").matches) closeMenu();
+  });
+}
+
 function ensureTopSelectedScrollbar(gallery) {
   let scrollbar = gallery.nextElementSibling;
   if (!scrollbar || !scrollbar.classList.contains("top-selected-scrollbar")) {
@@ -949,6 +995,8 @@ function attachBackToTopButtons() {
   });
 }
 
+normalizeInternalPageLinks();
+setupMobileMenu();
 attachImageProtection();
 renderFeatureImages();
 renderGallery();
