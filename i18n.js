@@ -291,18 +291,11 @@ function setupCopyEmailButtons() {
       if (!email) return;
       try {
         await copyTextToClipboard(email);
-        const lang = (() => {
-          try {
-            return localStorage.getItem("site-lang") || "ja";
-          } catch (_) {
-            return "ja";
-          }
-        })();
-        const doneText = (I18N[lang] || I18N.ja).copy_done || "コピー済み";
-        const defaultText = (I18N[lang] || I18N.ja).copy_email || "コピー";
-        button.textContent = doneText;
+        button.classList.add("is-copied");
+        button.setAttribute("aria-label", "コピー済み");
         window.setTimeout(() => {
-          button.textContent = defaultText;
+          button.classList.remove("is-copied");
+          button.setAttribute("aria-label", "メールアドレスをコピー");
         }, 1200);
       } catch (_) {
         // no-op
