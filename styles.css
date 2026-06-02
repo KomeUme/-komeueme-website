@@ -1615,6 +1615,71 @@ footer {
     opacity: 0.82;
   }
 
+  .mini-chara-layout-control span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .mini-chara-layout-btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 34px;
+    width: 34px;
+    height: 30px;
+    padding: 0;
+    color: transparent;
+    font-size: 0;
+  }
+
+  .mini-chara-layout-btn[data-gallery-layout="standard"] {
+    display: none;
+  }
+
+  .mini-chara-layout-btn::before {
+    content: "";
+    display: block;
+    box-sizing: border-box;
+  }
+
+  .mini-chara-layout-btn[data-gallery-layout="large"]::before {
+    width: 16px;
+    height: 16px;
+    border: 1.5px solid #6f7680;
+    background: transparent;
+  }
+
+  .mini-chara-layout-btn[data-gallery-layout="compact"]::before {
+    width: 6px;
+    height: 6px;
+    background: #6f7680;
+    box-shadow: 10px 0 0 #6f7680, 0 10px 0 #6f7680, 10px 10px 0 #6f7680;
+    transform: translate(-5px, -5px);
+  }
+
+  .mini-chara-layout-btn.is-active::before {
+    border-color: #2f343b;
+    background-color: #2f343b;
+    box-shadow: none;
+  }
+
+  .mini-chara-layout-btn.is-active[data-gallery-layout="large"]::before {
+    background: transparent;
+  }
+
+  .mini-chara-layout-btn.is-active[data-gallery-layout="compact"]::before {
+    background: #2f343b;
+    box-shadow: 10px 0 0 #2f343b, 0 10px 0 #2f343b, 10px 10px 0 #2f343b;
+  }
+
   body.page-manga .intro {
     margin-bottom: 18px;
   }
@@ -1938,10 +2003,11 @@ footer {
   }
 
   .mini-chara-layout-btn {
-    min-width: 58px;
-    height: 32px;
-    font-size: 12px;
-    padding: 0 8px;
+    min-width: 34px;
+    width: 34px;
+    height: 30px;
+    font-size: 0;
+    padding: 0;
   }
 
   .mini-chara-layout-btn[data-gallery-layout="standard"] {

@@ -626,6 +626,11 @@ function attachGalleryLayoutControls() {
     buttons.forEach((btn) => {
       if (btn.dataset.galleryLayout === "large") {
         btn.textContent = uiT("mini_chara_layout_standard", "標準");
+        btn.setAttribute("aria-label", uiT("mini_chara_layout_standard", "標準"));
+        btn.title = uiT("mini_chara_layout_standard", "標準");
+      } else if (btn.dataset.galleryLayout === "compact") {
+        btn.setAttribute("aria-label", uiT("mini_chara_layout_compact", "一覧"));
+        btn.title = uiT("mini_chara_layout_compact", "一覧");
       }
     });
   }
