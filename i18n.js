@@ -84,7 +84,7 @@ const I18N = {
     cap_technique: "技法",
     cap_size: "サイズ",
     copy_email: "コピー",
-    copy_done: "コピー済み",
+    copy_done: "コピー完了！",
     caption_more: "続きを読む",
     caption_less: "閉じる",
     back_to_top: "ページ先頭へ",
@@ -178,7 +178,7 @@ const I18N = {
     cap_technique: "Technique",
     cap_size: "Size",
     copy_email: "Copy",
-    copy_done: "Copied",
+    copy_done: "Copied!",
     caption_more: "Read more",
     caption_less: "Close",
     back_to_top: "Back to top",
@@ -244,6 +244,9 @@ function applyLang(lang) {
     const key = el.dataset.i18nHtml;
     if (dict[key]) el.innerHTML = dict[key];
   });
+  document.querySelectorAll(".copy-done-label").forEach((el) => {
+    el.textContent = dict.copy_done || I18N.ja.copy_done;
+  });
   const btn = document.querySelector("[data-lang-switch]");
   if (btn) btn.textContent = lang === "ja" ? "EN" : "JP";
   try {
@@ -293,12 +296,22 @@ function setupCopyEmailButtons() {
       if (!email) return;
       try {
         await copyTextToClipboard(email);
+        const lang = (() => {
+          try {
+            return localStorage.getItem("site-lang") || "ja";
+          } catch (_) {
+            return "ja";
+          }
+        })();
+        const dict = I18N[lang] || I18N.ja;
+        const doneLabel = button.querySelector(".copy-done-label");
+        if (doneLabel) doneLabel.textContent = dict.copy_done || I18N.ja.copy_done;
         button.classList.add("is-copied");
-        button.setAttribute("aria-label", "コピー済み");
+        button.setAttribute("aria-label", dict.copy_done || I18N.ja.copy_done);
         window.setTimeout(() => {
           button.classList.remove("is-copied");
           button.setAttribute("aria-label", "メールアドレスをコピー");
-        }, 1200);
+        }, 2000);
       } catch (_) {
         // no-op
       }
