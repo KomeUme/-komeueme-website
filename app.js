@@ -550,24 +550,21 @@ function attachGalleryLayoutControls() {
   if (!main) return;
   const galleries = Array.from(main.querySelectorAll(".gallery-grid[data-gallery]"));
   if (!galleries.length) return;
-  const isMobile = window.matchMedia("(max-width: 760px)").matches;
 
-  if (isMobile) {
-    buttons.forEach((btn) => {
-      if (btn.dataset.galleryLayout === "large") {
-        btn.textContent = uiT("mini_chara_layout_standard", "標準");
-        btn.setAttribute("aria-label", uiT("mini_chara_layout_standard", "標準"));
-        btn.title = uiT("mini_chara_layout_standard", "標準");
-      } else if (btn.dataset.galleryLayout === "compact") {
-        btn.setAttribute("aria-label", uiT("mini_chara_layout_compact", "一覧"));
-        btn.title = uiT("mini_chara_layout_compact", "一覧");
-      }
-    });
-  }
+  buttons.forEach((btn) => {
+    if (btn.dataset.galleryLayout === "large") {
+      btn.textContent = uiT("mini_chara_layout_large", "拡大");
+      btn.setAttribute("aria-label", uiT("mini_chara_layout_large", "拡大"));
+      btn.title = uiT("mini_chara_layout_large", "拡大");
+    } else if (btn.dataset.galleryLayout === "compact") {
+      btn.setAttribute("aria-label", uiT("mini_chara_layout_compact", "一覧"));
+      btn.title = uiT("mini_chara_layout_compact", "一覧");
+    }
+  });
 
   const applyLayout = (layout) => {
     let next = ["compact", "standard", "large"].includes(layout) ? layout : "compact";
-    if (isMobile && next === "standard") next = "large";
+    if (next === "standard") next = "large";
     galleries.forEach((gallery) => {
       gallery.dataset.galleryLayout = next;
     });
