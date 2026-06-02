@@ -1523,9 +1523,11 @@ footer {
 
 @media (max-width: 768px) {
   .auto-translation-notice {
-    top: 74px;
-    right: 16px;
-    max-width: min(260px, calc(100vw - 32px));
+    top: 42px;
+    right: 14px;
+    padding: 5px 10px;
+    font-size: 11.5px;
+    line-height: 1.35;
   }
 
   .image-viewer {
