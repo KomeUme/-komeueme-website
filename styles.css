@@ -1519,19 +1519,6 @@ footer {
 }
 
 @media (max-width: 768px) {
-  .auto-translation-notice {
-    top: auto;
-    right: auto;
-    bottom: 18px;
-    left: 50%;
-    max-width: calc(100vw - 32px);
-    transform: translate(-50%, 4px);
-  }
-
-  .auto-translation-notice.is-visible {
-    transform: translate(-50%, 0);
-  }
-
   .site-header {
     display: flex;
     flex-wrap: wrap;
