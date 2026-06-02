@@ -1,9 +1,11 @@
 # portfolio_rules.md
 
 ## ページ構造の共通規約
-- 共通ヘッダー: `brand + nav + dropdown(版画)`
+- 共通ヘッダー: `brand + nav + dropdown(版画/デジタル/漫画)`
 - 共通メイン: `intro` セクションを先頭に置く（TOPのみ `top-hero` あり）
 - 共通フッター直前: `site-mini-contact`（SNS/Contact）を配置
+- 下位カテゴリを持つカテゴリページでは、`intro` 内に下位カテゴリへの控えめな導線を置く
+- デジタルは親ページを持たず、ヘッダーとTOP導線は `digital-illustration.html` を既定リンク先にする
 
 ## ギャラリー構造
 - 作品一覧は `section[data-gallery]` を使用し、`app.js` でカードを自動生成する

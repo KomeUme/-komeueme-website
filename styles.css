@@ -80,10 +80,19 @@ body.viewer-open .lang-switch {
 .nav a {
   padding-bottom: 6px;
   border-bottom: 1px solid transparent;
+  color: #747b86;
+  opacity: 0.76;
 }
 
-.nav a:hover,
+.nav a:hover {
+  color: #4e5460;
+  opacity: 1;
+  border-color: #aeb4bd;
+}
+
 .nav .active {
+  color: var(--ink);
+  opacity: 1;
   border-color: var(--ink);
 }
 
@@ -415,7 +424,7 @@ main {
   overscroll-behavior-x: contain;
   padding-bottom: 8px;
   scrollbar-width: thin;
-  scrollbar-color: #c8ccd3 transparent;
+  scrollbar-color: #aeb5bf transparent;
 }
 
 .top-selected .gallery-grid.top-selected-row::-webkit-scrollbar {
@@ -427,16 +436,12 @@ main {
 }
 
 .top-selected .gallery-grid.top-selected-row::-webkit-scrollbar-thumb {
-  background: #c8ccd3;
+  background: #aeb5bf;
   border-radius: 999px;
 }
 
 .top-selected .gallery-grid.top-selected-row::-webkit-scrollbar-thumb:hover {
-  background: #bcc2cb;
-}
-
-.top-selected-scrollbar {
-  display: none;
+  background: #9fa7b2;
 }
 
 .top-selected-item {
@@ -515,6 +520,46 @@ main {
   display: inline-block;
   padding-bottom: 3px;
   border-bottom: 1px solid #cfd2d9;
+}
+
+.subcategory-links {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin: 12px auto 0;
+  max-width: 620px;
+  font-family: "Helvetica Neue", Arial, "Hiragino Sans", "Yu Gothic", sans-serif;
+}
+
+.subcategory-link {
+  display: inline-block;
+  padding: 0 0 1px;
+  border: 0;
+  border-bottom: 1px solid transparent;
+  border-radius: 0;
+  background: transparent;
+  color: #747b86;
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1.1;
+  opacity: 0.76;
+}
+
+.subcategory-link:hover {
+  color: #4e5460;
+  border-bottom-color: #aeb4bd;
+  opacity: 1;
+}
+
+.subcategory-link.is-current {
+  color: #3f4650;
+  border-bottom-color: #4f5660;
+  opacity: 0.92;
+}
+
+.subcategory-links + p {
+  margin-top: 20px;
 }
 
 .actions {
@@ -738,10 +783,6 @@ main {
 
 .gallery-grid .work.is-compact img {
   max-height: 300px;
-}
-
-.gallery-grid[data-gallery="digital"] .work-image-link {
-  min-height: 440px;
 }
 
 .gallery-grid[data-gallery-layout="compact"] {
@@ -1338,40 +1379,15 @@ footer {
   }
 
   .top-selected .gallery-grid.top-selected-row {
-    scrollbar-color: #b4bac4 transparent;
+    scrollbar-color: #aeb5bf transparent;
   }
 
   .top-selected .gallery-grid.top-selected-row::-webkit-scrollbar-thumb {
-    background: #b4bac4;
+    background: #aeb5bf;
   }
 
   .top-selected .gallery-grid.top-selected-row::-webkit-scrollbar-thumb:hover {
-    background: #a8b0bb;
-  }
-
-  .top-selected-scrollbar {
-    display: block;
-    position: relative;
-    height: 8px;
-    margin: 6px 8px 0;
-    border-radius: 999px;
-    background: rgba(150, 157, 168, 0.22);
-    overflow: hidden;
-  }
-
-  .top-selected-scrollbar[hidden] {
-    display: none;
-  }
-
-  .top-selected-scrollbar::before {
-    content: "";
-    position: absolute;
-    top: 2px;
-    bottom: 2px;
-    left: var(--scrollbar-thumb-offset, 0%);
-    width: var(--scrollbar-thumb-width, 34%);
-    border-radius: 999px;
-    background: #a8b0bb;
+    background: #9fa7b2;
   }
 
   .name-ruby {
@@ -1562,6 +1578,10 @@ footer {
 
   .top-selected-head {
     align-items: baseline;
+  }
+
+  .subcategory-links {
+    justify-content: center;
   }
 
   .top-selected .gallery-grid.top-selected-row {
