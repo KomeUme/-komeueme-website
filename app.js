@@ -66,6 +66,7 @@ function setupMobileMenu() {
   const header = document.querySelector(".site-header");
   const brand = header?.querySelector(".brand");
   const nav = header?.querySelector(".nav");
+  const mobileQuery = window.matchMedia("(max-width: 768px)");
   if (!header || !brand || !nav) return;
 
   if (/\/manga(?:-4koma|-story)?\.html$/.test(window.location.pathname)) {
@@ -98,13 +99,13 @@ function setupMobileMenu() {
   });
 
   document.addEventListener("click", (event) => {
-    if (window.matchMedia("(max-width: 768px)").matches && document.body.classList.contains("menu-open")) {
+    if (mobileQuery.matches && document.body.classList.contains("menu-open")) {
       if (!header.contains(event.target)) closeMenu();
     }
   });
 
-  window.addEventListener("resize", () => {
-    if (!window.matchMedia("(max-width: 768px)").matches) closeMenu();
+  mobileQuery.addEventListener("change", (event) => {
+    if (!event.matches) closeMenu();
   });
 }
 
