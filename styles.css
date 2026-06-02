@@ -1613,6 +1613,9 @@ footer {
     order: 4;
     margin-top: 18px;
     opacity: 0.82;
+    justify-content: flex-end;
+    width: 100%;
+    gap: 7px;
   }
 
   .mini-chara-layout-control span {
@@ -1632,9 +1635,9 @@ footer {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-width: 34px;
-    width: 34px;
-    height: 30px;
+    min-width: 24px;
+    width: 24px;
+    height: 21px;
     padding: 0;
     color: transparent;
     font-size: 0;
@@ -1651,18 +1654,18 @@ footer {
   }
 
   .mini-chara-layout-btn[data-gallery-layout="large"]::before {
-    width: 16px;
-    height: 16px;
-    border: 1.5px solid #6f7680;
+    width: 11px;
+    height: 11px;
+    border: 1px solid #6f7680;
     background: transparent;
   }
 
   .mini-chara-layout-btn[data-gallery-layout="compact"]::before {
-    width: 6px;
-    height: 6px;
+    width: 4px;
+    height: 4px;
     background: #6f7680;
-    box-shadow: 10px 0 0 #6f7680, 0 10px 0 #6f7680, 10px 10px 0 #6f7680;
-    transform: translate(-5px, -5px);
+    box-shadow: 7px 0 0 #6f7680, 0 7px 0 #6f7680, 7px 7px 0 #6f7680;
+    transform: translate(-3.5px, -3.5px);
   }
 
   .mini-chara-layout-btn.is-active::before {
@@ -1677,7 +1680,7 @@ footer {
 
   .mini-chara-layout-btn.is-active[data-gallery-layout="compact"]::before {
     background: #2f343b;
-    box-shadow: 10px 0 0 #2f343b, 0 10px 0 #2f343b, 10px 10px 0 #2f343b;
+    box-shadow: 7px 0 0 #2f343b, 0 7px 0 #2f343b, 7px 7px 0 #2f343b;
   }
 
   body.page-manga .intro {
@@ -1999,13 +2002,13 @@ footer {
   }
 
   .mini-chara-layout-control {
-    gap: 6px;
+    gap: 7px;
   }
 
   .mini-chara-layout-btn {
-    min-width: 34px;
-    width: 34px;
-    height: 30px;
+    min-width: 24px;
+    width: 24px;
+    height: 21px;
     font-size: 0;
     padding: 0;
   }
