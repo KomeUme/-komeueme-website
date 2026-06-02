@@ -635,6 +635,19 @@ function attachGalleryViewer() {
   if (!links.length) return;
 
   let viewer = document.querySelector(".image-viewer");
+  if (viewer?.__openWork) {
+    links.forEach((link) => {
+      if (link.dataset.viewerBound === "true") return;
+      link.dataset.viewerBound = "true";
+      link.addEventListener("click", (event) => {
+        event.preventDefault();
+        const work = map.get(link.dataset.workId);
+        if (!work) return;
+        viewer.__openWork(work, link);
+      });
+    });
+    return;
+  }
   const isNewViewer = !viewer;
   if (!viewer) {
     viewer = document.createElement("div");
@@ -795,26 +808,33 @@ function attachGalleryViewer() {
     draw();
   };
 
+  const openWork = (work, link) => {
+    currentWorkId = String(work.id ?? "");
+    currentWorkPage = link.dataset.workPage || getWorkPagePath(work);
+    currentImages = work.images?.length ? work.images : [work.image];
+    currentTitle = workText(work, "title") || "";
+    index = 0;
+    viewer.classList.toggle("is-mini-chara", work.subcategory === "mini-chara");
+    const layout = link.closest(".gallery-grid[data-gallery]")?.dataset.galleryLayout || "";
+    if (detailBtn) {
+      const workSource = link.dataset.workSource || "";
+      const isTopContext = workSource === "top-selected" || workSource === "top-hero";
+      detailBtn.hidden = layout !== "compact" && !isTopContext;
+      detailBtn.textContent = uiT("viewer_detail", "詳細を見る");
+    }
+    viewer.__viewerState = { currentImages: [...currentImages], currentTitle, index };
+    open();
+  };
+  viewer.__openWork = openWork;
+
   links.forEach((link) => {
+    if (link.dataset.viewerBound === "true") return;
+    link.dataset.viewerBound = "true";
     link.addEventListener("click", (event) => {
       event.preventDefault();
       const work = map.get(link.dataset.workId);
       if (!work) return;
-      currentWorkId = String(work.id ?? "");
-      currentWorkPage = link.dataset.workPage || getWorkPagePath(work);
-      currentImages = work.images?.length ? work.images : [work.image];
-      currentTitle = workText(work, "title") || "";
-      index = 0;
-      viewer.classList.toggle("is-mini-chara", work.subcategory === "mini-chara");
-      const layout = link.closest(".gallery-grid[data-gallery]")?.dataset.galleryLayout || "";
-      if (detailBtn) {
-        const workSource = link.dataset.workSource || "";
-        const isTopContext = workSource === "top-selected" || workSource === "top-hero";
-        detailBtn.hidden = layout !== "compact" && !isTopContext;
-        detailBtn.textContent = uiT("viewer_detail", "詳細を見る");
-      }
-      viewer.__viewerState = { currentImages: [...currentImages], currentTitle, index };
-      open();
+      openWork(work, link);
     });
   });
 
