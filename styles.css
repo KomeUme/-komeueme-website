@@ -11,28 +11,25 @@
 
 * {
   box-sizing: border-box;
-}
-
-html {
   scrollbar-width: thin;
   scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
 }
 
-html::-webkit-scrollbar {
+*::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 
-html::-webkit-scrollbar-track {
+*::-webkit-scrollbar-track {
   background: var(--scrollbar-track);
 }
 
-html::-webkit-scrollbar-thumb {
+*::-webkit-scrollbar-thumb {
   background: var(--scrollbar-thumb);
   border-radius: 999px;
 }
 
-html::-webkit-scrollbar-thumb:hover {
+*::-webkit-scrollbar-thumb:hover {
   background: var(--scrollbar-thumb-hover);
 }
 
