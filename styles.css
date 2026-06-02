@@ -1333,6 +1333,18 @@ footer {
     max-height: 300px;
   }
 
+  .top-selected .gallery-grid.top-selected-row {
+    scrollbar-color: #b4bac4 transparent;
+  }
+
+  .top-selected .gallery-grid.top-selected-row::-webkit-scrollbar-thumb {
+    background: #b4bac4;
+  }
+
+  .top-selected .gallery-grid.top-selected-row::-webkit-scrollbar-thumb:hover {
+    background: #a8b0bb;
+  }
+
   .name-ruby {
     font-size: 0.34em;
   }
