@@ -89,8 +89,8 @@ function setupMobileMenu() {
   const placeLangSwitch = (isMobile) => {
     if (!langSwitch) return;
     if (isMobile) {
-      if (nav.firstElementChild !== langSwitch) {
-        nav.prepend(langSwitch);
+      if (button.previousElementSibling !== langSwitch) {
+        button.insertAdjacentElement("beforebegin", langSwitch);
       }
     } else if (langSwitch.parentElement !== document.body) {
       document.body.insertBefore(langSwitch, header);

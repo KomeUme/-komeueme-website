@@ -586,13 +586,6 @@ main {
   display: none;
 }
 
-body.page-manga .intro h1 {
-  font-family: "Helvetica Neue", Arial, "Hiragino Sans", "Yu Gothic", sans-serif;
-  font-size: 18px;
-  font-weight: 500;
-  letter-spacing: 0.08em;
-}
-
 .actions {
   display: flex;
   justify-content: center;
@@ -1382,7 +1375,7 @@ footer {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    margin-left: auto;
+    margin-left: 8px;
     width: 22px;
     height: 22px;
     padding: 0;
@@ -1393,6 +1386,23 @@ footer {
     opacity: 0.88;
     position: relative;
     z-index: 3002;
+  }
+
+  .site-header > .lang-switch {
+    position: static;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 34px;
+    height: 22px;
+    margin-left: auto;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: #4e5460;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    line-height: 1;
   }
 
   .nav-menu-icon {
@@ -1433,24 +1443,6 @@ footer {
 
   body.menu-open .nav-menu-toggle {
     opacity: 1;
-  }
-
-  .nav .lang-switch {
-    position: static;
-    display: inline-flex;
-    align-items: center;
-    justify-content: flex-start;
-    min-width: 0;
-    height: auto;
-    margin: 0 0 8px;
-    padding: 0 0 10px;
-    border: 0;
-    border-bottom: 1px solid rgba(16, 16, 20, 0.12);
-    background: transparent;
-    color: #4e5460;
-    font-size: 12px;
-    letter-spacing: 0.08em;
-    line-height: 1;
   }
 
   .nav {
