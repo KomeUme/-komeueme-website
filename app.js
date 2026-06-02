@@ -663,6 +663,7 @@ function attachGalleryViewer() {
   let currentTitle = "";
   let index = 0;
   let isZoomed = false;
+  let zoomScale = 1;
   let panX = 0;
   let panY = 0;
   let isPanning = false;
@@ -676,6 +677,13 @@ function attachGalleryViewer() {
   let swipeStartX = 0;
   let swipeStartY = 0;
   let swipeMoved = false;
+  let lastTapTime = 0;
+  let lastTapX = 0;
+  let lastTapY = 0;
+  const touchPointers = new Map();
+  let isPinching = false;
+  let pinchStartDistance = 0;
+  let pinchStartScale = 1;
   let currentWorkId = "";
   let currentWorkPage = "";
   const savedViewerState = viewer.__viewerState;
@@ -689,16 +697,21 @@ function attachGalleryViewer() {
     const tx = Math.round(panX);
     const ty = Math.round(panY);
     image.style.transform = isZoomed
-      ? `translate(${tx}px, ${ty}px) scale(2.5)`
+      ? `translate(${tx}px, ${ty}px) scale(${zoomScale})`
       : "";
   };
 
-  const setZoom = (zoomed) => {
-    isZoomed = zoomed;
+  const clampZoomScale = (scale) => Math.min(4, Math.max(1, scale));
+
+  const setZoom = (zoomed, scale = 2.5) => {
+    zoomScale = zoomed ? clampZoomScale(scale) : 1;
+    isZoomed = zoomScale > 1.01;
     if (!isZoomed) {
       panX = 0;
       panY = 0;
       isPanning = false;
+      isPinching = false;
+      image.classList.remove("is-pinching");
     }
     image.classList.toggle("is-zoomed", isZoomed);
     image.classList.toggle("is-panning", isPanning && isZoomed);
@@ -791,7 +804,7 @@ function attachGalleryViewer() {
   image.addEventListener("dblclick", (event) => {
     event.preventDefault();
     event.stopPropagation();
-    setZoom(!isZoomed);
+    setZoom(!isZoomed, 2.5);
   });
   image.addEventListener("click", (event) => {
     if (hasMoved) {
@@ -804,7 +817,7 @@ function attachGalleryViewer() {
     setZoom(true);
   });
   image.addEventListener("pointerdown", (event) => {
-    if (!isZoomed) return;
+    if (!isZoomed || isPinching) return;
     event.preventDefault();
     event.stopPropagation();
     pointerDown = true;
@@ -817,7 +830,7 @@ function attachGalleryViewer() {
     image.setPointerCapture(event.pointerId);
   });
   image.addEventListener("pointermove", (event) => {
-    if (!pointerDown || !isZoomed) return;
+    if (!pointerDown || !isZoomed || isPinching) return;
     const dx = event.clientX - dragStartX;
     const dy = event.clientY - dragStartY;
     if (!hasMoved && (Math.abs(dx) > 3 || Math.abs(dy) > 3)) {
@@ -846,6 +859,21 @@ function attachGalleryViewer() {
     image.classList.remove("is-panning");
   });
   viewer.addEventListener("pointerdown", (event) => {
+    if (event.pointerType === "touch") {
+      touchPointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+      if (touchPointers.size === 2) {
+        const points = Array.from(touchPointers.values());
+        pinchStartDistance = Math.hypot(points[0].x - points[1].x, points[0].y - points[1].y);
+        pinchStartScale = zoomScale;
+        isPinching = pinchStartDistance > 0;
+        image.classList.toggle("is-pinching", isPinching);
+        pointerDown = false;
+        isPanning = false;
+        image.classList.remove("is-panning");
+        return;
+      }
+    }
+    if (isPinching) return;
     if (isZoomed || event.pointerType !== "touch") return;
     if (event.target.closest("button")) return;
     swipePointerId = event.pointerId;
@@ -855,12 +883,59 @@ function attachGalleryViewer() {
     if (viewer.setPointerCapture) viewer.setPointerCapture(event.pointerId);
   });
   viewer.addEventListener("pointermove", (event) => {
+    if (event.pointerType === "touch" && touchPointers.has(event.pointerId)) {
+      touchPointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+      if (isPinching && touchPointers.size >= 2) {
+        const points = Array.from(touchPointers.values()).slice(0, 2);
+        const distance = Math.hypot(points[0].x - points[1].x, points[0].y - points[1].y);
+        if (pinchStartDistance > 0) {
+          zoomScale = clampZoomScale(pinchStartScale * (distance / pinchStartDistance));
+          isZoomed = zoomScale > 1.01;
+          if (!isZoomed) {
+            panX = 0;
+            panY = 0;
+          }
+          image.classList.toggle("is-zoomed", isZoomed);
+          if (closeBtn) closeBtn.hidden = isZoomed;
+          applyImageTransform();
+        }
+        return;
+      }
+    }
     if (swipePointerId !== event.pointerId || isZoomed) return;
     const dx = event.clientX - swipeStartX;
     const dy = event.clientY - swipeStartY;
     if (Math.abs(dx) > 8 || Math.abs(dy) > 8) swipeMoved = true;
   });
   viewer.addEventListener("pointerup", (event) => {
+    if (event.pointerType === "touch") {
+      touchPointers.delete(event.pointerId);
+      if (isPinching) {
+        if (touchPointers.size < 2) {
+          isPinching = false;
+          image.classList.remove("is-pinching");
+          if (zoomScale <= 1.01) setZoom(false);
+        }
+        swipePointerId = null;
+        swipeMoved = false;
+        hasMoved = true;
+        return;
+      }
+      const now = Date.now();
+      const tapDistance = Math.hypot(event.clientX - lastTapX, event.clientY - lastTapY);
+      if (!swipeMoved && now - lastTapTime < 300 && tapDistance < 32) {
+        if (isZoomed) setZoom(false);
+        else setZoom(true, 2.5);
+        hasMoved = true;
+        lastTapTime = 0;
+        return;
+      }
+      if (!swipeMoved) {
+        lastTapTime = now;
+        lastTapX = event.clientX;
+        lastTapY = event.clientY;
+      }
+    }
     if (swipePointerId !== event.pointerId) return;
     if (viewer.hasPointerCapture?.(event.pointerId)) {
       viewer.releasePointerCapture(event.pointerId);
@@ -877,6 +952,13 @@ function attachGalleryViewer() {
     swipeMoved = false;
   });
   viewer.addEventListener("pointercancel", (event) => {
+    if (event.pointerType === "touch") {
+      touchPointers.delete(event.pointerId);
+      if (touchPointers.size < 2) {
+        isPinching = false;
+        image.classList.remove("is-pinching");
+      }
+    }
     if (swipePointerId !== event.pointerId) return;
     swipePointerId = null;
     swipeMoved = false;
