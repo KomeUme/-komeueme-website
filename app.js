@@ -303,9 +303,6 @@ function renderWorkDetailPage() {
   const pageTitle = document.querySelector("title");
   if (pageTitle) pageTitle.textContent = `${titleText} | Kome Ume`;
 
-  const detailTitle = article.querySelector(".work-detail-title");
-  if (detailTitle) detailTitle.textContent = titleText;
-
   const captionTitle = article.querySelector(".caption-title");
   if (captionTitle) captionTitle.textContent = titleText;
 

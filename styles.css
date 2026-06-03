@@ -1146,20 +1146,11 @@ main {
 .work-detail-header {
   display: flex;
   align-items: flex-end;
-  justify-content: space-between;
-  gap: 18px;
+  justify-content: flex-end;
+  gap: 0;
   margin: 0 0 28px;
   padding-bottom: 14px;
   border-bottom: 1px solid var(--line);
-}
-
-.work-detail-title {
-  margin: 0;
-  font-family: "Didot", "Bodoni 72", "Times New Roman", "Hiragino Mincho ProN", "Yu Mincho", serif;
-  font-size: clamp(28px, 4vw, 48px);
-  font-weight: 400;
-  line-height: 1.16;
-  letter-spacing: 0;
 }
 
 .work-detail-back {
@@ -1167,6 +1158,7 @@ main {
   color: #737983;
   font-size: 11px;
   line-height: 1.25;
+  white-space: nowrap;
   border-bottom: 1px solid #ccd0d6;
   transition: color 0.15s ease, border-color 0.15s ease;
 }
@@ -1208,6 +1200,12 @@ main {
   margin: 0 auto;
   -webkit-touch-callout: none;
   -webkit-user-drag: none;
+}
+
+@media (min-width: 769px) {
+  .work-detail-main-image {
+    max-width: 95%;
+  }
 }
 
 .work-detail-thumbnails {
@@ -2256,14 +2254,11 @@ footer {
   }
 
   .work-detail-header {
-    align-items: flex-start;
-    flex-direction: column;
-    gap: 10px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-end;
+    gap: 0;
     margin-bottom: 22px;
-  }
-
-  .work-detail-title {
-    font-size: clamp(24px, 7vw, 34px);
   }
 
   .work-detail-grid {
@@ -2271,12 +2266,12 @@ footer {
     gap: 22px;
   }
 
-  .work-detail-image-frame {
+  .work-detail-main {
     min-height: 320px;
     padding: 10px;
   }
 
-  .work-detail-image-frame img {
+  .work-detail-main-image {
     max-height: 560px;
   }
 
@@ -2390,7 +2385,7 @@ footer {
   }
 
   .top-links {
-    grid-template-columns: 1fr;
+    display: none;
   }
 
   .top-selected-head {

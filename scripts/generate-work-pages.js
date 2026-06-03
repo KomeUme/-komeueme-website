@@ -184,7 +184,6 @@ ${buildHeader(work)}
   <main>
     <article class="work-detail" data-work-id="${escapeHtml(id)}">
       <header class="work-detail-header">
-        <h1 class="work-detail-title">${escapeHtml(title)}</h1>
         <a class="work-detail-back" href="${escapeHtml(listPage)}" data-i18n="back_to_works">作品一覧へ</a>
       </header>
       <div class="work-detail-grid">
