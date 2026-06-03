@@ -158,7 +158,7 @@ let topCategoryButtonsVisible = false;
 let pendingOpenWorkId = null;
 let pendingOpenEnabled = false;
 let workListLocationRestored = false;
-const detailPageVersion = "20260603j";
+const detailPageVersion = "20260603m";
 
 function appendPageVersion(href) {
   const text = String(href ?? "").trim();
@@ -1073,6 +1073,10 @@ function attachGallerySortControls() {
         if (!option) return;
         const sortMode = option.dataset.gallerySortOption || "year";
         const latest = galleryState.get(galleryId) || {};
+        if ((latest.sortMode || "year") === sortMode) {
+          closeAll();
+          return;
+        }
         const scrollY = window.scrollY || 0;
         galleryState.set(galleryId, {
           ...latest,

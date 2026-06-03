@@ -2032,7 +2032,8 @@ footer {
     display: flex;
     flex-direction: column;
     align-items: flex-end;
-    width: min(186px, 100%);
+    width: fit-content;
+    max-width: 100%;
   }
 
   .gallery-sort-control[data-sort-open="true"] .gallery-sort-button {
@@ -2057,7 +2058,8 @@ footer {
     right: auto;
     top: auto;
     min-width: 0;
-    width: 100%;
+    width: fit-content;
+    max-width: 100%;
     padding: 4px 0 0;
     border: 0;
     background: transparent;
@@ -2069,7 +2071,8 @@ footer {
 
   .gallery-sort-option {
     width: 100%;
-    padding: 7px 10px;
+    min-width: 140px;
+    padding: 6px 8px;
     border: 1px solid var(--line);
     background: rgba(255, 255, 255, 0.94);
     font-size: 10.5px;
