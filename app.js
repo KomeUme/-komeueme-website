@@ -158,7 +158,7 @@ let topCategoryButtonsVisible = false;
 let pendingOpenWorkId = null;
 let pendingOpenEnabled = false;
 let workListLocationRestored = false;
-const detailPageVersion = "20260603an";
+const detailPageVersion = "20260603as";
 
 function appendPageVersion(href) {
   const text = String(href ?? "").trim();
@@ -217,6 +217,11 @@ function parseSizeInfo(sizeText) {
   const h = Number(match[2]);
   if (!w || !h) return { width: null, height: null, ratio: null, area: null };
   return { width: w, height: h, ratio: w / h, area: w * h };
+}
+
+function isCopperTechnique(technique) {
+  const text = String(technique ?? "");
+  return /エッチング|ドライポイント|アクアチント|銅版/.test(text);
 }
 
 function getWorkRatio(work) {
@@ -299,19 +304,6 @@ function getWorkDetailPagePath(work, workIds = null) {
   return `${basePath}?${params.toString()}`;
 }
 
-function getWorkCategoryI18nKey(work) {
-  const listPage = getWorkPagePath(work);
-  const keyMap = {
-    "hanga-wood.html": "category_wood",
-    "hanga-copper.html": "category_copper",
-    "digital-illustration.html": "category_digital_illustration",
-    "digital-mini-chara.html": "category_digital_mini_chara",
-    "manga-4koma.html": "category_manga_4koma",
-    "manga-story.html": "category_manga_story",
-  };
-  return keyMap[listPage] || "category_wood";
-}
-
 function renderWorkDetailPage() {
   const article = document.querySelector(".work-detail[data-work-id]");
   if (!article || !Array.isArray(works) || !works.length) return;
@@ -324,12 +316,6 @@ function renderWorkDetailPage() {
   const technique = workText(work, "technique");
   const size = workText(work, "size");
   const caption = workText(work, "caption");
-  const categoryKey = getWorkCategoryI18nKey(work);
-  const categoryLabel = uiT(categoryKey, work.category === "hanga"
-    ? "木版画"
-    : work.category === "digital"
-      ? "デジタル"
-      : "漫画");
 
   const titleText = withFallback(title);
   const metaValues = [year, technique, size];
@@ -346,23 +332,8 @@ function renderWorkDetailPage() {
     if (!cells.length) return;
     if (index < metaValues.length) {
       if (cells[1]) cells[1].textContent = withFallback(metaValues[index]);
-      return;
-    }
-    if (index === metaValues.length) {
-      if (cells[0]) cells[0].textContent = uiT("cap_category", "カテゴリー");
-      if (cells[1]) {
-        cells[1].textContent = categoryLabel;
-        row.querySelector("a")?.setAttribute("href", getVersionedWorkPagePath(work));
-      }
     }
   });
-
-  const categoryLink = article.querySelector(".caption-category-link");
-  if (categoryLink) {
-    categoryLink.dataset.i18n = categoryKey;
-    categoryLink.textContent = categoryLabel;
-    categoryLink.setAttribute("href", getVersionedWorkPagePath(work));
-  }
 
   const captionText = article.querySelector(".caption-text");
   if (captionText) captionText.textContent = withFallback(caption);
@@ -728,61 +699,50 @@ function getWorkCardClass(work) {
 
 function renderFeatureImages() {
   const featureImages = document.querySelectorAll("[data-feature-image]");
-  if (!featureImages.length || !works.length) return;
-  const selectedWorksSection = document.querySelector('[data-gallery-id="top-selected"]');
-  const selectedIds = String(selectedWorksSection?.dataset.selectedWorks ?? "")
-    .split(",")
-    .map((id) => id.trim())
-    .filter(Boolean);
-  const selectedPool = selectedIds
-    .map((id) => works.find((work) => String(work.id) === id))
-    .filter((work) => work && (work.image || work.images?.[0]));
+  const featureImageLinks = document.querySelectorAll("[data-feature-image-link]");
+  const featureDetailLinks = document.querySelectorAll("[data-feature-detail-link]");
+  if ((!featureImages.length && !featureImageLinks.length && !featureDetailLinks.length) || !works.length) return;
+  const woodblockPool = works.filter((work) => work
+    && work.category === "hanga"
+    && !isCopperTechnique(work.technique)
+    && (work.image || work.images?.[0]));
+  const largeWoodblockPool = woodblockPool.filter((work) => isMainScaleWork(work));
   const fallbackPool = works.filter((work) => work && (work.image || work.images?.[0]));
-  const sourcePool = selectedPool.length ? selectedPool : fallbackPool;
-
-  const targetCount = Math.min(5, sourcePool.length);
-  const featured = shuffle(sourcePool).slice(0, targetCount).map((work) => ({
-    work,
-    featureImage: work.image || work.images?.[0] || "",
-  }));
-  if (!featured.length) return;
-  let activeIndex = 0;
-  const setFeatured = () => {
-    const active = featured[activeIndex % featured.length];
-    const title = workText(active.work, "title");
-    const year = workText(active.work, "year");
-    featureImages.forEach((img) => {
-      img.src = active.featureImage;
-      img.alt = `${title} (${categories[active.work.category]})`;
-      img.classList.add("js-work-link");
-      img.dataset.workId = String(active.work.id ?? "");
-      img.dataset.workPage = getWorkDetailPagePath(active.work);
-      img.dataset.workSource = "top-hero";
-      img.dataset.workDetailLink = "true";
-      img.style.cursor = "pointer";
-      img.onclick = () => {
-        rememberWorkListLocation(active.work.id, img);
-        window.location.href = getWorkDetailPagePath(active.work);
-      };
-    });
-    activeIndex += 1;
-  };
-
-  setFeatured();
-  if (featured.length >= 2) {
-    if (window.__featureIntervalId) window.clearInterval(window.__featureIntervalId);
-    window.__featureIntervalId = window.setInterval(setFeatured, 3000);
-  }
+  const sourcePool = largeWoodblockPool.length ? largeWoodblockPool : (woodblockPool.length ? woodblockPool : fallbackPool);
+  const active = shuffle(sourcePool)[0];
+  if (!active) return;
+  const featureImage = active.image || active.images?.[0] || "";
+  const title = workText(active, "title");
+  const href = getWorkDetailPagePath(active);
+  featureImages.forEach((img) => {
+    img.src = featureImage;
+    img.alt = `${title} (${categories[active.category]})`;
+  });
+  featureImageLinks.forEach((link) => {
+    link.href = href;
+    link.dataset.workId = String(active.id ?? "");
+    link.dataset.workPage = href;
+    link.dataset.workSource = "top-hero";
+    link.dataset.workDetailLink = "true";
+    link.onclick = () => {
+      rememberWorkListLocation(active.id, link);
+    };
+  });
+  featureDetailLinks.forEach((link) => {
+    link.href = href;
+    link.dataset.workId = String(active.id ?? "");
+    link.dataset.workPage = href;
+    link.dataset.workSource = "top-hero";
+    link.dataset.workDetailLink = "true";
+    link.onclick = () => {
+      rememberWorkListLocation(active.id, link);
+    };
+  });
 }
 
 function renderGallery() {
   const galleries = document.querySelectorAll("[data-gallery]");
   if (!galleries.length) return;
-
-  const isCopperTechnique = (technique) => {
-    const text = String(technique ?? "");
-    return /エッチング|ドライポイント|アクアチント|銅版/.test(text);
-  };
   const isFourPanelManga = (work) => {
     const sub = String(work.subcategory ?? "");
     if (sub) return /4koma|four|四コマ|4コマ/i.test(sub);

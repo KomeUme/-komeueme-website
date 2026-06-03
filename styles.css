@@ -232,6 +232,9 @@ main {
 
 .top-hero-copy {
   position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
   border: 1px solid #cdced4;
   background: rgba(255, 255, 255, 0.74);
   padding: 28px 28px 24px;
@@ -340,14 +343,22 @@ main {
 }
 
 .top-hero-media {
-  display: grid;
-  place-items: center;
-  min-height: 640px;
-  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  height: 100%;
+  gap: 10px;
+  padding: 12px 12px 10px;
   border: 1px solid #cdced4;
   background: rgba(255, 255, 255, 0.82);
   margin: 0;
   border-radius: 8px;
+}
+
+.top-hero-image-link {
+  display: block;
+  width: 100%;
 }
 
 .top-hero-media img {
@@ -355,6 +366,23 @@ main {
   max-width: 100%;
   width: auto;
   object-fit: contain;
+  margin: 0 auto;
+}
+
+.top-hero-detail-link {
+  align-self: flex-end;
+  margin-top: 2px;
+  color: #4e5460;
+  font-size: 12px;
+  line-height: 1.2;
+  letter-spacing: 0;
+  opacity: 0.78;
+  transition: opacity 0.16s ease, color 0.16s ease;
+}
+
+.top-hero-detail-link:hover {
+  color: #2a2c31;
+  opacity: 1;
 }
 
 .top-links {
@@ -617,17 +645,17 @@ main {
 
 .intro {
   max-width: 760px;
-  margin: 0 auto 64px;
+  margin: 0 auto 56px;
   text-align: center;
 }
 
 .intro h1 {
   margin: 0;
   font-family: "Didot", "Bodoni 72", "Times New Roman", "Hiragino Mincho ProN", "Yu Mincho", serif;
-  font-size: clamp(34px, 6vw, 68px);
+  font-size: clamp(30px, 5.2vw, 58px);
   font-weight: 400;
   line-height: 1.12;
-  letter-spacing: -.045em;
+  letter-spacing: -.035em;
 }
 
 .intro p {
@@ -689,8 +717,7 @@ main {
   width: 100%;
   margin: 0 0 16px;
   flex-wrap: wrap;
-  position: sticky;
-  top: 16px;
+  position: static;
   z-index: 12;
   pointer-events: none;
 }
@@ -1993,11 +2020,12 @@ footer {
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-bottom: 44px;
+    margin-bottom: 38px;
   }
 
   .intro h1 {
     order: 1;
+    font-size: clamp(26px, 7vw, 44px);
   }
 
   .intro p {
@@ -2166,15 +2194,18 @@ footer {
   }
 
   .top-hero-media {
-    min-height: 320px;
-    padding: 12px 10px;
+    padding: 10px 10px 8px;
     overflow: hidden;
   }
 
   .top-hero-media img {
-    max-height: 230px;
-    transform: scale(1.22);
+    max-height: 220px;
+    transform: scale(1.18);
     transform-origin: center center;
+  }
+
+  .top-hero-detail-link {
+    font-size: 11px;
   }
 
   .top-selected {
@@ -2435,15 +2466,18 @@ footer {
   }
 
   .top-hero-media {
-    min-height: 280px;
-    padding: 10px 8px;
+    padding: 8px 8px 6px;
     overflow: hidden;
   }
 
   .top-hero-media img {
-    max-height: 200px;
-    transform: scale(1.22);
+    max-height: 190px;
+    transform: scale(1.16);
     transform-origin: center center;
+  }
+
+  .top-hero-detail-link {
+    font-size: 10px;
   }
 
   .top-selected {
