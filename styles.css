@@ -2015,6 +2015,7 @@ footer {
     grid-template-columns: minmax(0, 1fr) auto;
     gap: 10px 14px;
     align-items: start;
+    margin-bottom: 22px;
   }
 
   .gallery-page-head .intro {
@@ -2027,8 +2028,19 @@ footer {
     align-self: start;
   }
 
+  .gallery-sort-dropdown {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    width: min(186px, 100%);
+  }
+
+  .gallery-sort-control[data-sort-open="true"] .gallery-sort-button {
+    display: none;
+  }
+
   .gallery-sort-control::after {
-    margin-top: 12px;
+    margin-top: 10px;
   }
 
   .gallery-sort-label span {
@@ -2036,16 +2048,38 @@ footer {
   }
 
   .gallery-sort-button {
-    width: 28px;
-    height: 28px;
+    width: 26px;
+    height: 26px;
   }
 
   .gallery-sort-menu {
-    min-width: 152px;
+    position: static;
+    right: auto;
+    top: auto;
+    min-width: 0;
+    width: 100%;
+    padding: 4px 0 0;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
   }
 
   .gallery-sort-option {
+    width: 100%;
+    padding: 7px 10px;
+    border: 1px solid var(--line);
+    background: rgba(255, 255, 255, 0.94);
     font-size: 10.5px;
+    line-height: 1.25;
+    text-align: left;
+  }
+
+  .gallery-sort-option:hover,
+  .gallery-sort-option.is-active {
+    background: #f4f5f3;
   }
 
   body.page-manga .intro {
