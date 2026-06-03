@@ -2056,9 +2056,9 @@ footer {
     display: flex;
     flex-direction: column;
     gap: 4px;
-    bottom: auto;
-    top: calc(100% + 6px);
-    transform-origin: top right;
+    bottom: 0;
+    top: auto;
+    transform-origin: bottom right;
   }
 
   .gallery-sort-option {
