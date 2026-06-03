@@ -48,10 +48,14 @@ function detectSiteBasePath() {
     "manga",
     "manga-4koma",
     "manga-story",
+    "about",
     "profile",
     "shop",
   ];
   const path = window.location.pathname;
+  if (/\/work-[^/]+\.html$/.test(path)) {
+    return `${path.slice(0, path.lastIndexOf("/") + 1)}`.replace(/\/+/g, "/");
+  }
   for (const page of pages) {
     const patterns = [`/${page}.html`, `/${page}/`, `/${page}`];
     for (const suffix of patterns) {
@@ -149,19 +153,16 @@ const galleryState = new Map();
 let topCategoryButtonsVisible = false;
 let pendingOpenWorkId = null;
 let pendingOpenEnabled = false;
-let pendingLayout = null;
+let workListLocationRestored = false;
 
 try {
   const params = new URLSearchParams(window.location.search);
   const workId = params.get("work");
   pendingOpenWorkId = workId ? String(workId) : null;
   pendingOpenEnabled = params.get("open") === "1";
-  const layout = params.get("layout");
-  pendingLayout = ["compact", "standard", "large"].includes(layout || "") ? layout : null;
 } catch (_) {
   pendingOpenWorkId = null;
   pendingOpenEnabled = false;
-  pendingLayout = null;
 }
 
 function shuffle(items) {
@@ -247,6 +248,230 @@ function getWorkPagePath(work) {
   return "index.html";
 }
 
+function getWorkDetailPagePath(work) {
+  const id = String(work?.id ?? "").replace(/[^a-zA-Z0-9_-]/g, "");
+  return id ? `work-${id}.html` : getWorkPagePath(work);
+}
+
+function getWorkCategoryI18nKey(work) {
+  const listPage = getWorkPagePath(work);
+  const keyMap = {
+    "hanga-wood.html": "category_wood",
+    "hanga-copper.html": "category_copper",
+    "digital-illustration.html": "category_digital_illustration",
+    "digital-mini-chara.html": "category_digital_mini_chara",
+    "manga-4koma.html": "category_manga_4koma",
+    "manga-story.html": "category_manga_story",
+  };
+  return keyMap[listPage] || "category_wood";
+}
+
+function renderWorkDetailPage() {
+  const article = document.querySelector(".work-detail[data-work-id]");
+  if (!article || !Array.isArray(works) || !works.length) return;
+  const workId = String(article.dataset.workId || "");
+  const work = works.find((item) => String(item?.id ?? "") === workId);
+  if (!work) return;
+
+  const title = workText(work, "title");
+  const year = workText(work, "year");
+  const technique = workText(work, "technique");
+  const size = workText(work, "size");
+  const caption = workText(work, "caption");
+  const categoryKey = getWorkCategoryI18nKey(work);
+  const categoryLabel = uiT(categoryKey, work.category === "hanga"
+    ? "木版画"
+    : work.category === "digital"
+      ? "デジタル"
+      : "漫画");
+
+  const titleText = withFallback(title);
+  const metaValues = [year, technique, size];
+
+  const pageTitle = document.querySelector("title");
+  if (pageTitle) pageTitle.textContent = `${titleText} | Kome Ume`;
+
+  const detailTitle = article.querySelector(".work-detail-title");
+  if (detailTitle) detailTitle.textContent = titleText;
+
+  const captionTitle = article.querySelector(".caption-title");
+  if (captionTitle) captionTitle.textContent = titleText;
+
+  const metaRows = article.querySelectorAll(".caption-meta");
+  metaRows.forEach((row, index) => {
+    const cells = row.querySelectorAll("span");
+    if (!cells.length) return;
+    if (index < metaValues.length) {
+      if (cells[1]) cells[1].textContent = withFallback(metaValues[index]);
+      return;
+    }
+    if (index === metaValues.length) {
+      if (cells[0]) cells[0].textContent = uiT("cap_category", "カテゴリー");
+      if (cells[1]) {
+        cells[1].textContent = categoryLabel;
+        row.querySelector("a")?.setAttribute("href", getWorkPagePath(work));
+      }
+    }
+  });
+
+  const categoryLink = article.querySelector(".caption-category-link");
+  if (categoryLink) {
+    categoryLink.dataset.i18n = categoryKey;
+    categoryLink.textContent = categoryLabel;
+    categoryLink.setAttribute("href", getWorkPagePath(work));
+  }
+
+  article.querySelectorAll(".work-detail-image-frame img").forEach((img, index) => {
+    img.alt = `${titleText}${article.querySelectorAll(".work-detail-image-frame img").length > 1 ? ` ${index + 1}` : ""}`;
+  });
+
+  const captionText = article.querySelector(".caption-text");
+  if (captionText) captionText.textContent = withFallback(caption);
+}
+
+function renderAboutPage() {
+  const snsCard = document.querySelector("[data-about-sns]");
+  const contactCard = document.querySelector("[data-about-contact]");
+  if (!snsCard && !contactCard) return;
+
+  const instagramPrint = "https://www.instagram.com/komeume1121/";
+  const instagramDigital = "https://www.instagram.com/unomori1121/";
+  const email = "komeume1121@gmail.com";
+
+  if (snsCard) {
+    snsCard.innerHTML = `
+      <h2 data-i18n="card_sns_title">${uiT("card_sns_title", "SNS")}</h2>
+      <p data-i18n="card_sns_desc">${uiT("card_sns_desc", "主にInstagramで告知・発表をしています。")}</p>
+      <div class="sns-actions">
+        <div class="sns-row">
+          <span class="sns-label" data-i18n="sns_print">${uiT("sns_print", "版画など")}</span>
+          <a class="button secondary" href="${instagramPrint}" target="_blank" rel="noopener noreferrer">@komeume1121</a>
+        </div>
+        <div class="sns-row">
+          <span class="sns-label" data-i18n="sns_digital">${uiT("sns_digital", "デジタル・漫画など")}</span>
+          <a class="button secondary" href="${instagramDigital}" target="_blank" rel="noopener noreferrer">@unomori1121</a>
+        </div>
+      </div>
+    `;
+  }
+
+  if (contactCard) {
+    contactCard.innerHTML = `
+      <h2 data-i18n="card_contact_title">${uiT("card_contact_title", "Contact")}</h2>
+      <p data-i18n="card_contact_desc">${uiT("card_contact_desc", "お仕事の依頼などは、下記のメールまでお問い合わせ下さい。")}</p>
+      <div class="actions contact-actions-inline">
+        <a class="button secondary" href="mailto:${escapeHtml(email)}">${escapeHtml(email)}</a>
+        <button class="button-copy-inline" type="button" data-copy-email="${escapeHtml(email)}" aria-label="メールアドレスをコピー">
+          <span class="copy-done-label">${uiT("copy_done", "コピー完了！")}</span>
+        </button>
+      </div>
+    `;
+  }
+
+  setupCopyEmailButtons();
+}
+
+function rememberWorkListLocation(workId, link = null) {
+  try {
+    const url = `${window.location.pathname}${window.location.search}${window.location.hash}`;
+    const scroll = String(Math.max(0, Math.round(window.scrollY || 0)));
+    sessionStorage.setItem("work-list-return-url", url);
+    sessionStorage.setItem("work-list-return-scroll", scroll);
+    if (workId) sessionStorage.setItem(`work-list-return-url:${workId}`, url);
+    if (workId) sessionStorage.setItem(`work-list-return-scroll:${workId}`, scroll);
+
+    const gallery = link?.closest?.("[data-gallery]");
+    const galleryId = gallery?.dataset.galleryId || gallery?.dataset.gallery || "";
+    const state = galleryId ? galleryState.get(galleryId) : null;
+    if (galleryId && state) {
+      const payload = {
+        url,
+        workId: String(workId || ""),
+        galleryId,
+        currentPage: state.currentPage || 1,
+        shownCount: state.shownCount || 0,
+        scroll: Number(scroll) || 0,
+      };
+      const serialized = JSON.stringify(payload);
+      sessionStorage.setItem("work-list-return-state", serialized);
+      if (workId) sessionStorage.setItem(`work-list-return-state:${workId}`, serialized);
+    }
+  } catch (_) {
+    // ignore storage failures
+  }
+}
+
+function getWorkListReturnState(workId = "") {
+  try {
+    const raw = (workId && sessionStorage.getItem(`work-list-return-state:${workId}`))
+      || sessionStorage.getItem("work-list-return-state")
+      || "";
+    if (!raw) return null;
+    const state = JSON.parse(raw);
+    if (!state || typeof state !== "object") return null;
+    return state;
+  } catch (_) {
+    return null;
+  }
+}
+
+function setupWorkDetailBackLink() {
+  const backLink = document.querySelector(".work-detail-back");
+  const workId = document.querySelector(".work-detail")?.dataset.workId || "";
+  if (!backLink) return;
+  try {
+    const returnState = getWorkListReturnState(workId);
+    if (returnState?.galleryId === "top-selected") {
+      backLink.dataset.i18n = "back_to_selected_works";
+      backLink.textContent = uiT("back_to_selected_works", "Selected Worksへ");
+    }
+    const saved = (workId && sessionStorage.getItem(`work-list-return-url:${workId}`))
+      || sessionStorage.getItem("work-list-return-url")
+      || "";
+    const referrer = document.referrer ? new URL(document.referrer) : null;
+    const isSameOriginReferrer = referrer && referrer.origin === window.location.origin;
+    const referrerPath = isSameOriginReferrer ? `${referrer.pathname}${referrer.search}${referrer.hash}` : "";
+    const referrerIsWorkDetail = /\/work-[^/]+\.html(?:[?#].*)?$/.test(referrerPath);
+    const target = saved || (!referrerIsWorkDetail ? referrerPath : "");
+    if (target) backLink.setAttribute("href", target);
+    if (isSameOriginReferrer && !referrerIsWorkDetail) {
+      backLink.addEventListener("click", (event) => {
+        event.preventDefault();
+        window.history.back();
+      });
+    }
+  } catch (_) {
+    // keep generated fallback href
+  }
+}
+
+function restoreWorkListLocation() {
+  if (workListLocationRestored) return;
+  if (/\/work-[^/]+\.html(?:[?#].*)?$/.test(window.location.pathname)) return;
+  try {
+    const saved = sessionStorage.getItem("work-list-return-url") || "";
+    const current = `${window.location.pathname}${window.location.search}${window.location.hash}`;
+    if (!saved || saved !== current) return;
+    const returnState = getWorkListReturnState();
+    const scroll = Number.parseInt(String(returnState?.scroll ?? sessionStorage.getItem("work-list-return-scroll") ?? ""), 10);
+    if (!Number.isFinite(scroll) || scroll <= 0) return;
+    workListLocationRestored = true;
+    window.requestAnimationFrame(() => {
+      window.scrollTo({ top: scroll, behavior: "auto" });
+    });
+  } catch (_) {
+    // ignore storage failures
+  }
+}
+
+function getReturnStateForGallery(galleryId) {
+  const state = getWorkListReturnState();
+  if (!state || state.galleryId !== galleryId) return null;
+  const current = `${window.location.pathname}${window.location.search}${window.location.hash}`;
+  if (state.url !== current) return null;
+  return state;
+}
+
 function arrangeBySimilarityInGroup(list) {
   const base = [...list].sort((a, b) => {
     const keyDiff = arrangementKey(a) - arrangementKey(b);
@@ -278,6 +503,42 @@ function arrangeBySimilarity(list) {
   return [...arrangeBySimilarityInGroup(mainWorks), ...arrangeBySimilarityInGroup(otherWorks)];
 }
 
+function hasGallerySortControls(galleryId) {
+  return Boolean(document.querySelector(`[data-gallery-sort-for="${CSS.escape(galleryId)}"]`));
+}
+
+function getGallerySortMode(gallery, galleryId, prev) {
+  if (prev?.sortMode) return prev.sortMode;
+  if (galleryId === "hanga" || galleryId.startsWith("hanga-")) return "size";
+  if (hasGallerySortControls(galleryId)) return "year";
+  return gallery.dataset.sort || "default";
+}
+
+function sortWorks(list, sortMode, category) {
+  if (sortMode === "year" || sortMode === "recent") {
+    return [...list].sort((a, b) => {
+      if (sortMode === "recent" && category === "digital-mini-chara") {
+        const catDiff = getMiniCharaCatPriority(b) - getMiniCharaCatPriority(a);
+        if (catDiff) return catDiff;
+      }
+      const yearDiff = getYearScore(b.year) - getYearScore(a.year);
+      if (yearDiff) return yearDiff;
+      return getIdScore(b.id) - getIdScore(a.id);
+    });
+  }
+  if (sortMode === "size") {
+    return [...list].sort((a, b) => {
+      const areaDiff = getWorkArea(b) - getWorkArea(a);
+      if (areaDiff) return areaDiff;
+      const yearDiff = getYearScore(b.year) - getYearScore(a.year);
+      if (yearDiff) return yearDiff;
+      return getIdScore(b.id) - getIdScore(a.id);
+    });
+  }
+  if (sortMode === "random") return shuffle(list);
+  return arrangeBySimilarity(list);
+}
+
 function getWorkCardClass(work) {
   const classes = ["work"];
   const { ratio, area } = parseSizeInfo(work.size);
@@ -297,24 +558,19 @@ function renderFeatureImages() {
   if (!featureImages.length || !works.length) return;
   const featureCaption = document.querySelector("[data-feature-caption]");
 
-  const isCopperTechnique = (technique) => /エッチング|ドライポイント|アクアチント|銅版/.test(String(technique ?? ""));
-  const woodLargePool = works.filter((work) => {
-    if (work.category !== "hanga") return false;
-    if (isCopperTechnique(work.technique)) return false;
-    const { width, height } = parseSizeInfo(work.size);
-    return Number(width) > 1000 || Number(height) > 1000;
-  });
+  const selectedWorksSection = document.querySelector('[data-gallery-id="top-selected"]');
+  const selectedIds = String(selectedWorksSection?.dataset.selectedWorks ?? "")
+    .split(",")
+    .map((id) => id.trim())
+    .filter(Boolean);
+  const selectedPool = selectedIds
+    .map((id) => works.find((work) => String(work.id) === id))
+    .filter((work) => work && (work.image || work.images?.[0]));
+  const fallbackPool = works.filter((work) => work && (work.image || work.images?.[0]));
+  const sourcePool = selectedPool.length ? selectedPool : fallbackPool;
 
-  const targetCount = 5;
-  const minLargeWoodCount = 2;
-  const largeWoodSelected = shuffle(woodLargePool).slice(0, Math.min(minLargeWoodCount, woodLargePool.length));
-  const selectedIds = new Set(largeWoodSelected.map((work) => String(work.id)));
-  const otherPool = works.filter((work) => {
-    if (!work?.image) return false;
-    return !selectedIds.has(String(work.id));
-  });
-  const othersSelected = shuffle(otherPool).slice(0, Math.max(0, targetCount - largeWoodSelected.length));
-  const featured = shuffle([...largeWoodSelected, ...othersSelected]).slice(0, targetCount).map((work) => ({
+  const targetCount = Math.min(5, sourcePool.length);
+  const featured = shuffle(sourcePool).slice(0, targetCount).map((work) => ({
     work,
     featureImage: work.image || work.images?.[0] || "",
   }));
@@ -329,8 +585,14 @@ function renderFeatureImages() {
       img.alt = `${title} (${categories[active.work.category]})`;
       img.classList.add("js-work-link");
       img.dataset.workId = String(active.work.id ?? "");
-      img.dataset.workPage = getWorkPagePath(active.work);
+      img.dataset.workPage = getWorkDetailPagePath(active.work);
       img.dataset.workSource = "top-hero";
+      img.dataset.workDetailLink = "true";
+      img.style.cursor = "pointer";
+      img.onclick = () => {
+        rememberWorkListLocation(active.work.id, img);
+        window.location.href = getWorkDetailPagePath(active.work);
+      };
     });
     if (featureCaption) {
       featureCaption.textContent = `${title}｜${withFallback(year)}`;
@@ -382,26 +644,24 @@ function renderGallery() {
       list = works.filter((work) => work.category === category);
     }
 
-    const sortMode = gallery.dataset.sort;
-    const arranged = sortMode === "recent"
-      ? [...list].sort((a, b) => {
-        if (category === "digital-mini-chara") {
-          const catDiff = getMiniCharaCatPriority(b) - getMiniCharaCatPriority(a);
-          if (catDiff) return catDiff;
-        }
-        const yearDiff = getYearScore(b.year) - getYearScore(a.year);
-        if (yearDiff) return yearDiff;
-        return getIdScore(b.id) - getIdScore(a.id);
-      })
-      : sortMode === "random"
-        ? shuffle(list)
-        : arrangeBySimilarity(list);
+    const selectedIds = String(gallery.dataset.selectedWorks || "")
+      .split(",")
+      .map((id) => id.trim())
+      .filter(Boolean);
+    if (selectedIds.length) {
+      const byId = new Map(list.map((work) => [String(work.id), work]));
+      list = selectedIds.map((id) => byId.get(id)).filter(Boolean);
+    }
+
     const limit = Number.parseInt(gallery.dataset.limit || "", 10);
+    const prev = galleryState.get(galleryId);
+    const sortMode = selectedIds.length ? "selected" : getGallerySortMode(gallery, galleryId, prev);
+    const arranged = selectedIds.length ? list : sortWorks(list, sortMode, category);
     const defaultCount = Number.isFinite(limit) && limit > 0 ? limit : arranged.length;
     const isLoadMore = gallery.dataset.loadMore === "true";
     const pageSize = Number.parseInt(gallery.dataset.pageSize || "", 10) || 12;
-    const prev = galleryState.get(galleryId);
-    const stableList = isLoadMore && prev?.arranged?.length === arranged.length ? prev.arranged : arranged;
+    const returnState = getReturnStateForGallery(galleryId);
+    const stableList = isLoadMore && prev?.sortMode === sortMode && prev?.arranged?.length === arranged.length ? prev.arranged : arranged;
     let shownCount = isLoadMore
       ? Math.min(prev?.shownCount || defaultCount, stableList.length)
       : defaultCount;
@@ -409,6 +669,14 @@ function renderGallery() {
     let currentPage = isLoadMore
       ? 1
       : Math.min(Math.max(prev?.currentPage || 1, 1), totalPages);
+
+    if (!prev && returnState) {
+      if (isLoadMore && Number.isFinite(Number(returnState.shownCount))) {
+        shownCount = Math.min(Math.max(Number(returnState.shownCount), defaultCount), stableList.length);
+      } else if (Number.isFinite(Number(returnState.currentPage))) {
+        currentPage = Math.min(Math.max(Number(returnState.currentPage), 1), totalPages);
+      }
+    }
 
     // If this page was opened from Selected Works, prioritize showing that work.
     if (pendingOpenWorkId) {
@@ -433,6 +701,7 @@ function renderGallery() {
       pageSize,
       currentPage,
       totalPages,
+      sortMode,
       revealFromIndex: prev?.revealFromIndex ?? null,
     });
 
@@ -443,7 +712,7 @@ function renderGallery() {
       const title = workText(work, "title");
       return `
       <article class="top-selected-item" data-work-id="${escapeHtml(work.id)}">
-        <a class="top-selected-link js-work-link" href="${escapeHtml(firstImage)}" data-work-id="${escapeHtml(work.id)}" data-work-page="${escapeHtml(getWorkPagePath(work))}" data-work-source="top-selected">
+        <a class="top-selected-link js-work-link" href="${escapeHtml(getWorkDetailPagePath(work))}" data-work-id="${escapeHtml(work.id)}" data-work-page="${escapeHtml(getWorkDetailPagePath(work))}" data-work-source="top-selected" data-work-detail-link="true">
           <span class="top-selected-image-wrap">
             <img src="${escapeHtml(firstImage)}" alt="${escapeHtml(title)}" loading="lazy">
           </span>
@@ -474,7 +743,7 @@ function renderGallery() {
       const caption = workText(work, "caption");
       return `
       <article class="${getWorkCardClass(work)}" data-work-id="${escapeHtml(work.id)}">
-        <a class="work-image-link js-work-link" href="${escapeHtml(firstImage)}" data-work-id="${escapeHtml(work.id)}" data-work-page="${escapeHtml(getWorkPagePath(work))}">
+        <a class="work-image-link js-work-link" href="${escapeHtml(getWorkDetailPagePath(work))}" data-work-id="${escapeHtml(work.id)}" data-work-page="${escapeHtml(getWorkDetailPagePath(work))}" data-work-detail-link="true">
           <img src="${escapeHtml(firstImage)}" alt="${escapeHtml(title)}" loading="lazy">
         </a>
         <div class="caption">
@@ -501,10 +770,13 @@ function renderGallery() {
   applyImageOrientationClasses();
   attachCaptionToggles();
   attachGalleryViewer();
+  attachWorkDetailLinkMemory();
   attachLoadMoreHandlers();
   attachPaginationHandlers();
   attachGalleryLayoutControls();
+  attachGallerySortControls();
   autoOpenWorkFromQuery();
+  restoreWorkListLocation();
 }
 
 function autoOpenWorkFromQuery() {
@@ -565,45 +837,42 @@ function attachPaginationHandlers() {
   });
 }
 
+function attachGallerySortControls() {
+  const controls = document.querySelectorAll("[data-gallery-sort-for]");
+  controls.forEach((control) => {
+    const galleryId = control.dataset.gallerySortFor || "";
+    const state = galleryState.get(galleryId);
+    const activeSort = state?.sortMode || "year";
+    const select = control.querySelector("select[data-gallery-sort]");
+    if (!select) return;
+    select.value = activeSort;
+    if (select.dataset.bound === "true") return;
+    select.dataset.bound = "true";
+    select.addEventListener("change", () => {
+      const sortMode = select.value || "year";
+      const latest = galleryState.get(galleryId) || {};
+      const scrollY = window.scrollY || 0;
+      galleryState.set(galleryId, {
+        ...latest,
+        sortMode,
+        revealFromIndex: null,
+      });
+      renderGallery();
+      window.requestAnimationFrame(() => {
+        window.scrollTo({ top: scrollY, behavior: "auto" });
+      });
+    });
+  });
+}
+
 function attachGalleryLayoutControls() {
-  const buttons = document.querySelectorAll("button[data-gallery-layout]");
-  if (!buttons.length) return;
   const main = document.querySelector("main");
   if (!main) return;
   const galleries = Array.from(main.querySelectorAll(".gallery-grid[data-gallery]"));
   if (!galleries.length) return;
-
-  buttons.forEach((btn) => {
-    if (btn.dataset.galleryLayout === "large") {
-      btn.textContent = uiT("mini_chara_layout_large", "拡大");
-      btn.setAttribute("aria-label", uiT("mini_chara_layout_large", "拡大"));
-      btn.title = uiT("mini_chara_layout_large", "拡大");
-    } else if (btn.dataset.galleryLayout === "compact") {
-      btn.setAttribute("aria-label", uiT("mini_chara_layout_compact", "一覧"));
-      btn.title = uiT("mini_chara_layout_compact", "一覧");
-    }
-  });
-
-  const applyLayout = (layout) => {
-    let next = ["compact", "standard", "large"].includes(layout) ? layout : "compact";
-    if (next === "standard") next = "large";
-    galleries.forEach((gallery) => {
-      gallery.dataset.galleryLayout = next;
-    });
-    buttons.forEach((btn) => {
-      btn.classList.toggle("is-active", btn.dataset.galleryLayout === next);
-    });
-  };
-
-  const initialLayout = pendingLayout || galleries[0].dataset.galleryLayout || "large";
-  applyLayout(initialLayout);
-  pendingLayout = null;
-  buttons.forEach((button) => {
-    if (button.dataset.bound === "true") return;
-    button.dataset.bound = "true";
-    button.addEventListener("click", () => {
-      applyLayout(button.dataset.galleryLayout || "large");
-    });
+  galleries.forEach((gallery) => {
+    if (gallery.dataset.galleryId === "top-selected") return;
+    gallery.dataset.galleryLayout = "compact";
   });
 }
 
@@ -629,9 +898,20 @@ function applyImageOrientationClasses() {
   });
 }
 
+function attachWorkDetailLinkMemory() {
+  const links = document.querySelectorAll('[data-work-detail-link="true"][data-work-id]');
+  links.forEach((link) => {
+    if (link.dataset.returnBound === "true") return;
+    link.dataset.returnBound = "true";
+    link.addEventListener("click", () => {
+      rememberWorkListLocation(link.dataset.workId || "", link);
+    });
+  });
+}
+
 function attachGalleryViewer() {
   const map = new Map(works.map((work) => [String(work.id), work]));
-  const links = document.querySelectorAll(".js-work-link[data-work-id]");
+  const links = document.querySelectorAll('.js-work-link[data-work-id]:not([data-work-detail-link="true"])');
   if (!links.length) return;
 
   let viewer = document.querySelector(".image-viewer");
@@ -841,12 +1121,7 @@ function attachGalleryViewer() {
   if (detailBtn) {
     detailBtn.addEventListener("click", () => {
       if (!currentWorkId || !currentWorkPage) return;
-      const params = new URLSearchParams({
-        work: currentWorkId,
-        open: "1",
-        layout: "large",
-      });
-      window.location.href = `${currentWorkPage}?${params.toString()}`;
+      window.location.href = currentWorkPage;
     });
   }
 
@@ -1096,7 +1371,7 @@ function attachImageProtection() {
   document.addEventListener("contextmenu", (event) => {
     const target = event.target;
     if (!(target instanceof HTMLElement)) return;
-    if (target.closest(".work-image-link img, .viewer-image")) {
+    if (target.closest(".work-image-link img, .work-detail-image-frame img, .viewer-image")) {
       event.preventDefault();
     }
   });
@@ -1104,7 +1379,7 @@ function attachImageProtection() {
   document.addEventListener("dragstart", (event) => {
     const target = event.target;
     if (!(target instanceof HTMLElement)) return;
-    if (target.closest(".work-image-link img, .viewer-image")) {
+    if (target.closest(".work-image-link img, .work-detail-image-frame img, .viewer-image")) {
       event.preventDefault();
     }
   });
@@ -1123,7 +1398,12 @@ function attachBackToTopButtons() {
 
 normalizeInternalPageLinks();
 setupMobileMenu();
+setupWorkDetailBackLink();
 attachImageProtection();
 renderFeatureImages();
 renderGallery();
 attachBackToTopButtons();
+
+window.renderWorkDetailPage = renderWorkDetailPage;
+window.renderAboutPage = renderAboutPage;
+window.setupCopyEmailButtons = setupCopyEmailButtons;

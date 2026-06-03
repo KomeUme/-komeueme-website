@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title data-i18n="page_title_shop">販売 | Kome Ume</title>
+  <title data-i18n="page_title_about">About | Kome Ume</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -33,26 +33,21 @@
           <a href="manga-story.html" data-i18n="nav_manga_story">ストーリー</a>
         </div>
       </div>
-      <a class="active shop-link" href="shop.html" data-i18n="nav_shop">販売</a>
+      <a class="shop-link" href="shop.html" data-i18n="nav_shop">販売</a>
       <a href="profile.html" data-i18n="nav_profile">Profile</a>
-      <a class="about-link" href="about.html" data-i18n="nav_about">About</a>
+      <a class="active about-link" href="about.html" data-i18n="nav_about">About</a>
     </nav>
   </header>
 
   <main>
-        <section class="intro">
-      <h1 data-i18n="intro_shop">販売</h1>
-      <p data-i18n="intro_shop_desc">販売サイトへのリンクをまとめています。</p>
+    <section class="intro">
+      <h1 data-i18n="page_title_about">About</h1>
+      <p data-i18n="intro_about_desc">Profile、SNS、Contact をまとめています。</p>
     </section>
 
-        <section class="card-grid">
-      <article class="card">
-        <h2 data-i18n="card_shop_title">Online Shop</h2>
-        <p data-i18n="card_shop_desc">販売サイトのURLまとめ。</p>
-        <div class="actions">
-          <a class="button secondary" href="https://komeume1121.base.shop" target="_blank" rel="noopener noreferrer">BASE Shop</a>
-        </div>
-      </article>
+    <section class="card-grid" data-about-grid>
+      <article class="card" data-about-sns></article>
+      <article class="card" data-about-contact></article>
     </section>
   </main>
 

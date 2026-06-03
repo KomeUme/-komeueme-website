@@ -33,8 +33,9 @@
           <a href="manga-story.html" data-i18n="nav_manga_story">ストーリー</a>
         </div>
       </div>
-      <a href="profile.html" data-i18n="nav_profile">Profile</a>
       <a class="shop-link" href="shop.html" data-i18n="nav_shop">販売</a>
+      <a href="profile.html" data-i18n="nav_profile">Profile</a>
+      <a class="about-link" href="about.html" data-i18n="nav_about">About</a>
     </nav>
   </header>
 
@@ -45,12 +46,16 @@
         <a class="subcategory-link" href="digital-illustration.html" data-i18n="nav_digital_illustration">イラスト</a>
         <a class="subcategory-link is-current" href="digital-mini-chara.html" aria-current="page" data-i18n="nav_digital_mini_chara">ミニキャラ</a>
       </div>
-      <div class="mini-chara-layout-control">
-        <span data-i18n="label_mini_chara_layout">表示サイズ</span>
-        <button class="mini-chara-layout-btn is-active" type="button" data-gallery-layout="large" data-i18n="mini_chara_layout_large">拡大</button>
-        <button class="mini-chara-layout-btn" type="button" data-gallery-layout="compact" data-i18n="mini_chara_layout_compact">一覧</button>
-      </div>
     </section>
+    <div class="gallery-sort-control gallery-sort-control-section" data-gallery-sort-for="digital-mini-chara">
+      <label class="gallery-sort-label">
+        <span data-i18n="label_gallery_sort">表示順</span>
+        <select class="gallery-sort-select" data-gallery-sort>
+          <option value="year" data-i18n="sort_year">制作年度順</option>
+          <option value="size" data-i18n="sort_size">作品サイズ順</option>
+        </select>
+      </label>
+    </div>
     <section class="gallery gallery-grid" data-gallery="digital-mini-chara" data-sort="recent"></section>
     <section class="site-mini-contact">
       <div><strong class="label-sns" data-i18n="label_sns">SNS</strong> <a href="https://www.instagram.com/komeume1121/" target="_blank" rel="noopener noreferrer">@komeume1121</a></div>
