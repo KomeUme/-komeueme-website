@@ -2220,6 +2220,11 @@ footer {
     grid-auto-columns: minmax(240px, 1fr);
   }
 
+  .top-selected-image-wrap {
+    height: calc(var(--top-selected-frame-size, 196px) * 1.3);
+    padding: 36px 10px 12px;
+  }
+
   .top-selected .gallery-grid.top-selected-row::-webkit-scrollbar {
     height: 8px;
   }
@@ -2524,7 +2529,7 @@ footer {
   }
 
   .top-selected-image-wrap {
-    padding: 12px 10px;
+    padding: 36px 10px 12px;
   }
 
   .top-selected-link {
