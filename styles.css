@@ -2166,7 +2166,7 @@ footer {
 
   .gallery-grid[data-gallery-layout="compact"] .work {
     height: 100%;
-    grid-template-rows: 230px 40px;
+    grid-template-rows: 230px;
   }
 
   .gallery-grid[data-gallery-layout="compact"] .work-image-link {
@@ -2180,23 +2180,7 @@ footer {
   }
 
   .gallery-grid[data-gallery-layout="compact"] .caption {
-    min-height: 0;
-    height: 40px;
-    gap: 4px;
-    margin-top: 0;
-    padding-top: 0;
-    border-top: 0;
-  }
-
-  .gallery-grid[data-gallery-layout="compact"] .caption-title {
-    font-size: 12px;
-    margin-bottom: 0;
-    line-height: 1.35;
-    height: 40px;
-    overflow: hidden;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
+    display: none;
   }
 
   .gallery-grid[data-gallery-layout="compact"] .caption-meta-list,
