@@ -706,6 +706,10 @@ main {
   pointer-events: none;
 }
 
+.gallery-page-head {
+  display: block;
+}
+
 .gallery-sort-control-section {
   margin: 0 0 16px;
 }
@@ -1999,15 +2003,28 @@ footer {
   }
 
   .gallery-sort-control {
-    justify-content: center;
+    justify-content: flex-end;
     margin: 0 0 12px;
     width: 100%;
     position: static;
     pointer-events: auto;
   }
 
+  .gallery-page-head {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 10px 14px;
+    align-items: start;
+  }
+
+  .gallery-page-head .intro {
+    margin-bottom: 0;
+  }
+
   .gallery-sort-control-section {
-    margin: 0 0 12px;
+    margin: 0;
+    padding-right: 0;
+    align-self: start;
   }
 
   .gallery-sort-control::after {
