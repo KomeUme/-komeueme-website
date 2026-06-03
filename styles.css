@@ -2166,14 +2166,14 @@ footer {
   }
 
   .top-hero-media {
-    min-height: 300px;
-    padding: 6px;
+    min-height: 320px;
+    padding: 12px 10px;
     overflow: hidden;
   }
 
   .top-hero-media img {
-    max-height: 250px;
-    transform: scale(1.35);
+    max-height: 230px;
+    transform: scale(1.22);
     transform-origin: center center;
   }
 
@@ -2435,14 +2435,14 @@ footer {
   }
 
   .top-hero-media {
-    min-height: 260px;
-    padding: 6px;
+    min-height: 280px;
+    padding: 10px 8px;
     overflow: hidden;
   }
 
   .top-hero-media img {
-    max-height: 220px;
-    transform: scale(1.35);
+    max-height: 200px;
+    transform: scale(1.22);
     transform-origin: center center;
   }
 
