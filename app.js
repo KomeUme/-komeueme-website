@@ -158,7 +158,7 @@ let topCategoryButtonsVisible = false;
 let pendingOpenWorkId = null;
 let pendingOpenEnabled = false;
 let workListLocationRestored = false;
-const detailPageVersion = "20260603ai";
+const detailPageVersion = "20260603al";
 
 function appendPageVersion(href) {
   const text = String(href ?? "").trim();
@@ -729,8 +729,6 @@ function getWorkCardClass(work) {
 function renderFeatureImages() {
   const featureImages = document.querySelectorAll("[data-feature-image]");
   if (!featureImages.length || !works.length) return;
-  const featureCaption = document.querySelector("[data-feature-caption]");
-
   const selectedWorksSection = document.querySelector('[data-gallery-id="top-selected"]');
   const selectedIds = String(selectedWorksSection?.dataset.selectedWorks ?? "")
     .split(",")
@@ -767,9 +765,6 @@ function renderFeatureImages() {
         window.location.href = getWorkDetailPagePath(active.work);
       };
     });
-    if (featureCaption) {
-      featureCaption.textContent = `${title}｜${withFallback(year)}`;
-    }
     activeIndex += 1;
   };
 
