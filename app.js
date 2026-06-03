@@ -73,14 +73,14 @@ function detectSiteBasePath() {
 }
 
 function normalizeInternalPageLinks() {
-  const base = detectSiteBasePath();
   const links = document.querySelectorAll('a[href$=".html"]');
   links.forEach((link) => {
     const href = link.getAttribute("href");
     if (!href || href.startsWith("http") || href.startsWith("mailto:") || href.startsWith("#")) return;
     const page = href.split("/").pop();
     if (!page) return;
-    link.setAttribute("href", `${base}${page}`);
+    const base = detectSiteBasePath();
+    link.setAttribute("href", appendPageVersion(`${base}${page}`));
   });
 }
 
@@ -158,7 +158,37 @@ let topCategoryButtonsVisible = false;
 let pendingOpenWorkId = null;
 let pendingOpenEnabled = false;
 let workListLocationRestored = false;
-const detailPageVersion = "20260603e";
+const detailPageVersion = "20260603g";
+
+function appendPageVersion(href) {
+  const text = String(href ?? "").trim();
+  if (!text) return text;
+  if (/^(?:https?:|mailto:|tel:|#|javascript:)/i.test(text)) return text;
+  try {
+    const url = new URL(text, window.location.href);
+    if (/\.html(?:$|[?#])/.test(url.pathname)) {
+      url.searchParams.set("v", detailPageVersion);
+      return url.toString();
+    }
+  } catch (_) {
+    // keep original href on parse failures
+  }
+  return text;
+}
+
+function ensureVersionedLocation() {
+  if (!/\.html(?:$|[?#])/.test(window.location.pathname)) return;
+  try {
+    const url = new URL(window.location.href);
+    if (url.searchParams.get("v") === detailPageVersion) return;
+    url.searchParams.set("v", detailPageVersion);
+    window.history.replaceState({}, "", url.toString());
+  } catch (_) {
+    // ignore URL rewrite failures
+  }
+}
+
+ensureVersionedLocation();
 
 try {
   const params = new URLSearchParams(window.location.search);
@@ -253,6 +283,10 @@ function getWorkPagePath(work) {
   return "index.html";
 }
 
+function getVersionedWorkPagePath(work) {
+  return appendPageVersion(getWorkPagePath(work));
+}
+
 function getWorkDetailPagePath(work, workIds = null) {
   const id = String(work?.id ?? "").replace(/[^a-zA-Z0-9_-]/g, "");
   const basePath = id ? `work-${id}.html` : getWorkPagePath(work);
@@ -318,7 +352,7 @@ function renderWorkDetailPage() {
       if (cells[0]) cells[0].textContent = uiT("cap_category", "カテゴリー");
       if (cells[1]) {
         cells[1].textContent = categoryLabel;
-        row.querySelector("a")?.setAttribute("href", getWorkPagePath(work));
+        row.querySelector("a")?.setAttribute("href", getVersionedWorkPagePath(work));
       }
     }
   });
@@ -327,7 +361,7 @@ function renderWorkDetailPage() {
   if (categoryLink) {
     categoryLink.dataset.i18n = categoryKey;
     categoryLink.textContent = categoryLabel;
-    categoryLink.setAttribute("href", getWorkPagePath(work));
+    categoryLink.setAttribute("href", getVersionedWorkPagePath(work));
   }
 
   const captionText = article.querySelector(".caption-text");
@@ -567,7 +601,7 @@ function setupWorkDetailBackLink() {
     const referrerPath = isSameOriginReferrer ? `${referrer.pathname}${referrer.search}${referrer.hash}` : "";
     const referrerIsWorkDetail = /\/work-[^/]+\.html(?:[?#].*)?$/.test(referrerPath);
     const target = saved || (!referrerIsWorkDetail ? referrerPath : "");
-    if (target) backLink.setAttribute("href", target);
+    if (target) backLink.setAttribute("href", appendPageVersion(target));
     if (isSameOriginReferrer && !referrerIsWorkDetail) {
       backLink.addEventListener("click", (event) => {
         event.preventDefault();
@@ -1292,7 +1326,7 @@ function attachGalleryViewer() {
 
   const openWork = (work, link) => {
     currentWorkId = String(work.id ?? "");
-    currentWorkPage = link.dataset.workPage || getWorkPagePath(work);
+    currentWorkPage = link.dataset.workPage || getVersionedWorkPagePath(work);
     currentImages = work.images?.length ? work.images : [work.image];
     currentTitle = workText(work, "title") || "";
     index = 0;
