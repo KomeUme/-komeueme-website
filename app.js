@@ -158,7 +158,7 @@ let topCategoryButtonsVisible = false;
 let pendingOpenWorkId = null;
 let pendingOpenEnabled = false;
 let workListLocationRestored = false;
-const detailPageVersion = "20260603d";
+const detailPageVersion = "20260603e";
 
 try {
   const params = new URLSearchParams(window.location.search);
