@@ -158,7 +158,7 @@ let topCategoryButtonsVisible = false;
 let pendingOpenWorkId = null;
 let pendingOpenEnabled = false;
 let workListLocationRestored = false;
-const detailPageVersion = "20260603x";
+const detailPageVersion = "20260603y";
 
 function appendPageVersion(href) {
   const text = String(href ?? "").trim();
@@ -1022,14 +1022,36 @@ function attachPaginationHandlers() {
 
 function attachGallerySortControls() {
   const controls = document.querySelectorAll("[data-gallery-sort-for]");
+  const closeTimers = new WeakMap();
+  const finishClose = (control, immediate = false) => {
+    const button = control.querySelector("[data-gallery-sort-toggle]");
+    const menu = control.querySelector("[data-gallery-sort-menu]");
+    if (!button || !menu) return;
+    const timer = closeTimers.get(control);
+    if (timer) {
+      window.clearTimeout(timer);
+      closeTimers.delete(control);
+    }
+    control.dataset.sortOpen = "false";
+    control.dataset.sortClosing = immediate ? "false" : "true";
+    button.setAttribute("aria-expanded", "false");
+    if (immediate) {
+      control.dataset.sortClosing = "false";
+      menu.hidden = true;
+      return;
+    }
+    if (menu.hidden) return;
+    const closeTimer = window.setTimeout(() => {
+      menu.hidden = true;
+      control.dataset.sortClosing = "false";
+      closeTimers.delete(control);
+    }, 180);
+    closeTimers.set(control, closeTimer);
+  };
   const closeAll = (except = null) => {
     controls.forEach((control) => {
       if (except && control === except) return;
-      control.dataset.sortOpen = "false";
-      const button = control.querySelector("[data-gallery-sort-toggle]");
-      const menu = control.querySelector("[data-gallery-sort-menu]");
-      if (button) button.setAttribute("aria-expanded", "false");
-      if (menu) menu.hidden = true;
+      finishClose(control);
     });
   };
 
@@ -1058,11 +1080,22 @@ function attachGallerySortControls() {
       button.addEventListener("click", (event) => {
         event.stopPropagation();
         const isOpen = control.dataset.sortOpen === "true";
+        if (isOpen) {
+          finishClose(control);
+          return;
+        }
         closeAll(control);
-        const nextOpen = !isOpen;
-        control.dataset.sortOpen = nextOpen ? "true" : "false";
-        button.setAttribute("aria-expanded", nextOpen ? "true" : "false");
-        menu.hidden = !nextOpen;
+        control.dataset.sortOpen = "true";
+        control.dataset.sortClosing = "false";
+        button.setAttribute("aria-expanded", "true");
+        {
+          const timer = closeTimers.get(control);
+          if (timer) {
+            window.clearTimeout(timer);
+            closeTimers.delete(control);
+          }
+          menu.hidden = false;
+        }
       });
     }
 
@@ -1100,7 +1133,7 @@ function attachGallerySortControls() {
     });
     document.addEventListener("keydown", (event) => {
       if (event.key !== "Escape") return;
-      closeAll();
+      controls.forEach((control) => finishClose(control, true));
     });
   }
 }
