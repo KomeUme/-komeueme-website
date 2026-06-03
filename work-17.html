@@ -48,9 +48,14 @@
       </header>
       <div class="work-detail-grid">
         <div class="work-detail-media">
-        <figure class="work-detail-image-frame">
-          <img src="assets/works/work-17-01.jpg" alt="とりかご">
-        </figure>
+          <figure class="work-detail-main">
+            <img class="work-detail-main-image" data-work-detail-main-image src="assets/works/work-17-01.jpg" alt="とりかご">
+          </figure>
+          <div class="work-detail-thumbnails" data-work-detail-thumbnails aria-label="作品画像一覧">
+          <button class="work-detail-thumb is-active" type="button" data-work-detail-thumb data-work-index="0" aria-pressed="true">
+            <img src="assets/works/work-17-01.jpg" alt="とりかご 1" loading="lazy">
+          </button>
+          </div>
         </div>
         <aside class="work-detail-caption">
           <div class="caption">
@@ -64,8 +69,8 @@
             <p class="caption-text">人が支配している地球も、実は誰かの宝物のひとつなのではないだろうか。誰かはきっと人間とはかけ離れた姿をしており、時折それを取り出しては、うっとりと眺める。誰かは宝石を眺めるように、はたまた水槽の魚を眺めるかのようにそれを見つめている。暫くすると、また、箱の奥へと満足げにしまい込むのだろう。</p>
           </div>
       <nav class="work-detail-pager" aria-label="work navigation">
-        <span><a href="work-16.html" data-i18n="prev_work">前の作品</a></span>
-        <span><a href="work-18.html" data-i18n="next_work">次の作品</a></span>
+        <span class="work-detail-pager-slot work-detail-pager-prev"><a href="work-16.html?v=20260603d" data-i18n="prev_work">前の作品</a></span>
+        <span class="work-detail-pager-slot work-detail-pager-next"><a href="work-18.html?v=20260603d" data-i18n="next_work">次の作品</a></span>
       </nav>
         </aside>
       </div>
@@ -83,7 +88,7 @@
 
   <footer>© Kome Ume</footer>
   <script src="data.js"></script>
-  <script src="app.js"></script>
-  <script src="i18n.js"></script>
+  <script src="app.js?v=20260603d"></script>
+  <script src="i18n.js?v=20260603d"></script>
 </body>
 </html>

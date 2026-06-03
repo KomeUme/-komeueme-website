@@ -7,6 +7,10 @@ function escapeHtml(value) {
     .replace(/'/g, "&#39;");
 }
 
+function encodeImageSrc(value) {
+  return encodeURI(String(value ?? "").trim());
+}
+
 function withFallback(value) {
   const text = String(value ?? "").trim();
   return text || "—";
@@ -154,6 +158,7 @@ let topCategoryButtonsVisible = false;
 let pendingOpenWorkId = null;
 let pendingOpenEnabled = false;
 let workListLocationRestored = false;
+const detailPageVersion = "20260603d";
 
 try {
   const params = new URLSearchParams(window.location.search);
@@ -248,9 +253,16 @@ function getWorkPagePath(work) {
   return "index.html";
 }
 
-function getWorkDetailPagePath(work) {
+function getWorkDetailPagePath(work, workIds = null) {
   const id = String(work?.id ?? "").replace(/[^a-zA-Z0-9_-]/g, "");
-  return id ? `work-${id}.html` : getWorkPagePath(work);
+  const basePath = id ? `work-${id}.html` : getWorkPagePath(work);
+  const orderedIds = Array.isArray(workIds)
+    ? workIds.map((item) => String(item ?? "")).filter(Boolean)
+    : [];
+  const params = new URLSearchParams();
+  params.set("v", detailPageVersion);
+  if (orderedIds.length) params.set("list", orderedIds.join(","));
+  return `${basePath}?${params.toString()}`;
 }
 
 function getWorkCategoryI18nKey(work) {
@@ -321,12 +333,122 @@ function renderWorkDetailPage() {
     categoryLink.setAttribute("href", getWorkPagePath(work));
   }
 
-  article.querySelectorAll(".work-detail-image-frame img").forEach((img, index) => {
-    img.alt = `${titleText}${article.querySelectorAll(".work-detail-image-frame img").length > 1 ? ` ${index + 1}` : ""}`;
-  });
-
   const captionText = article.querySelector(".caption-text");
   if (captionText) captionText.textContent = withFallback(caption);
+
+  const images = Array.isArray(work.images) && work.images.length
+    ? work.images.map((image) => String(image ?? "")).filter(Boolean)
+    : [work.image].map((image) => String(image ?? "")).filter(Boolean);
+  const media = article.querySelector(".work-detail-media");
+  if (media && images.length) {
+    const thumbnailLabel = uiT("detail_thumbnails", "作品画像一覧");
+    media.innerHTML = `
+      <figure class="work-detail-main">
+        <img class="work-detail-main-image" data-work-detail-main-image src="${escapeHtml(encodeImageSrc(images[0]))}" alt="${escapeHtml(images.length > 1 ? `${titleText} 1` : titleText)}">
+      </figure>
+      <div class="work-detail-thumbnails" data-work-detail-thumbnails aria-label="${escapeHtml(thumbnailLabel)}">
+        ${images.map((imagePath, index) => `
+          <button class="work-detail-thumb${index === 0 ? " is-active" : ""}" type="button" data-work-detail-thumb data-work-index="${index}" aria-pressed="${index === 0 ? "true" : "false"}">
+            <img src="${escapeHtml(encodeImageSrc(imagePath))}" alt="${escapeHtml(`${titleText} ${index + 1}`)}" loading="lazy">
+          </button>
+        `).join("")}
+      </div>
+    `;
+
+    const mainImage = media.querySelector("[data-work-detail-main-image]");
+    const thumbButtons = Array.from(media.querySelectorAll("[data-work-detail-thumb]"));
+    const activateIndex = (index) => {
+      const safeIndex = Math.min(Math.max(Number(index) || 0, 0), images.length - 1);
+      if (mainImage) {
+        mainImage.setAttribute("src", encodeImageSrc(images[safeIndex]));
+        mainImage.setAttribute("alt", images.length > 1 ? `${titleText} ${safeIndex + 1}` : titleText);
+      }
+      thumbButtons.forEach((button) => {
+        const isActive = Number(button.dataset.workIndex || "-1") === safeIndex;
+        button.classList.toggle("is-active", isActive);
+        button.setAttribute("aria-pressed", isActive ? "true" : "false");
+      });
+    };
+
+    thumbButtons.forEach((button) => {
+      if (button.dataset.bound === "true") return;
+      button.dataset.bound = "true";
+      button.addEventListener("click", () => {
+        activateIndex(button.dataset.workIndex || 0);
+      });
+    });
+  }
+
+  const returnState = getWorkListReturnState(workId);
+  updateWorkDetailPager(work, returnState);
+}
+
+function updateWorkDetailPager(work, returnState) {
+  const pager = document.querySelector(".work-detail-pager");
+  if (!pager) return;
+
+  const pagerLinks = pager.querySelectorAll("a");
+  if (!pagerLinks.length) return;
+
+  const urlWorkIds = (() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const raw = params.get("list") || "";
+      if (!raw) return [];
+      return raw.split(",").map((id) => String(id ?? "")).filter(Boolean);
+    } catch (_) {
+      return [];
+    }
+  })();
+  const workIds = urlWorkIds.length
+    ? urlWorkIds
+    : Array.isArray(returnState?.workIds) && returnState.workIds.length
+      ? returnState.workIds.map((id) => String(id ?? "")).filter(Boolean)
+      : getTopSelectedWorkIds();
+  if (!workIds.length) return;
+
+  const currentId = String(work?.id ?? "");
+  const currentIndex = workIds.indexOf(currentId);
+  if (currentIndex < 0) return;
+
+  const prevId = currentIndex > 0 ? workIds[currentIndex - 1] : "";
+  const nextId = currentIndex < workIds.length - 1 ? workIds[currentIndex + 1] : "";
+  const prevSlot = pager.querySelector(".work-detail-pager-prev");
+  const nextSlot = pager.querySelector(".work-detail-pager-next");
+  const prevLink = prevSlot?.querySelector("a");
+  const nextLink = nextSlot?.querySelector("a");
+
+  if (prevLink) {
+    if (prevId) {
+      const prevWork = works.find((item) => String(item?.id ?? "") === prevId);
+      if (prevWork) prevLink.setAttribute("href", getWorkDetailPagePath(prevWork));
+      prevLink.hidden = false;
+      prevLink.style.visibility = "visible";
+      prevLink.style.pointerEvents = "";
+      prevLink.tabIndex = 0;
+    } else {
+      prevLink.hidden = false;
+      prevLink.style.visibility = "hidden";
+      prevLink.style.pointerEvents = "none";
+      prevLink.tabIndex = -1;
+    }
+  }
+
+  if (nextLink) {
+    if (nextId) {
+      const nextWork = works.find((item) => String(item?.id ?? "") === nextId);
+      if (nextWork) nextLink.setAttribute("href", getWorkDetailPagePath(nextWork));
+      nextLink.hidden = false;
+      nextLink.style.visibility = "visible";
+      nextLink.style.pointerEvents = "";
+      nextLink.tabIndex = 0;
+    } else {
+      nextLink.hidden = false;
+      nextLink.style.visibility = "hidden";
+      nextLink.style.pointerEvents = "none";
+      nextLink.tabIndex = -1;
+    }
+  }
 }
 
 function renderAboutPage() {
@@ -392,6 +514,9 @@ function rememberWorkListLocation(workId, link = null) {
         shownCount: state.shownCount || 0,
         scroll: Number(scroll) || 0,
       };
+      if (Array.isArray(state.arranged)) {
+        payload.workIds = state.arranged.map((work) => String(work?.id ?? "")).filter(Boolean);
+      }
       const serialized = JSON.stringify(payload);
       sessionStorage.setItem("work-list-return-state", serialized);
       if (workId) sessionStorage.setItem(`work-list-return-state:${workId}`, serialized);
@@ -412,6 +537,18 @@ function getWorkListReturnState(workId = "") {
     return state;
   } catch (_) {
     return null;
+  }
+}
+
+function getTopSelectedWorkIds() {
+  try {
+    const raw = sessionStorage.getItem("top-selected-work-ids") || "";
+    if (!raw) return [];
+    const ids = JSON.parse(raw);
+    if (!Array.isArray(ids)) return [];
+    return ids.map((id) => String(id ?? "")).filter(Boolean);
+  } catch (_) {
+    return [];
   }
 }
 
@@ -537,6 +674,11 @@ function sortWorks(list, sortMode, category) {
   }
   if (sortMode === "random") return shuffle(list);
   return arrangeBySimilarity(list);
+}
+
+function getGallerySortLabel(sortMode) {
+  if (sortMode === "size") return uiT("sort_size", "作品サイズ順");
+  return uiT("sort_year", "制作年度順");
 }
 
 function getWorkCardClass(work) {
@@ -710,9 +852,10 @@ function renderGallery() {
     gallery.innerHTML = outputList.map((work) => {
       const firstImage = work.images?.[0] || work.image;
       const title = workText(work, "title");
+      const orderedIds = stableList.map((item) => String(item?.id ?? "")).filter(Boolean);
       return `
       <article class="top-selected-item" data-work-id="${escapeHtml(work.id)}">
-        <a class="top-selected-link js-work-link" href="${escapeHtml(getWorkDetailPagePath(work))}" data-work-id="${escapeHtml(work.id)}" data-work-page="${escapeHtml(getWorkDetailPagePath(work))}" data-work-source="top-selected" data-work-detail-link="true">
+        <a class="top-selected-link js-work-link" href="${escapeHtml(getWorkDetailPagePath(work, orderedIds))}" data-work-id="${escapeHtml(work.id)}" data-work-page="${escapeHtml(getWorkDetailPagePath(work, orderedIds))}" data-work-source="top-selected" data-work-detail-link="true">
           <span class="top-selected-image-wrap">
             <img src="${escapeHtml(firstImage)}" alt="${escapeHtml(title)}" loading="lazy">
           </span>
@@ -721,6 +864,14 @@ function renderGallery() {
       </article>
     `;
       }).join("");
+      try {
+        sessionStorage.setItem(
+          "top-selected-work-ids",
+          JSON.stringify(stableList.map((work) => String(work?.id ?? "")).filter(Boolean))
+        );
+      } catch (_) {
+        // ignore storage failures
+      }
       const currentState = galleryState.get(galleryId);
       if (currentState && Number.isFinite(currentState.revealFromIndex)) {
         const target = gallery.querySelector(`.top-selected-item:nth-child(${currentState.revealFromIndex + 1})`);
@@ -741,9 +892,10 @@ function renderGallery() {
       const technique = workText(work, "technique");
       const size = workText(work, "size");
       const caption = workText(work, "caption");
+      const orderedIds = stableList.map((item) => String(item?.id ?? "")).filter(Boolean);
       return `
       <article class="${getWorkCardClass(work)}" data-work-id="${escapeHtml(work.id)}">
-        <a class="work-image-link js-work-link" href="${escapeHtml(getWorkDetailPagePath(work))}" data-work-id="${escapeHtml(work.id)}" data-work-page="${escapeHtml(getWorkDetailPagePath(work))}" data-work-detail-link="true">
+        <a class="work-image-link js-work-link" href="${escapeHtml(getWorkDetailPagePath(work, orderedIds))}" data-work-id="${escapeHtml(work.id)}" data-work-page="${escapeHtml(getWorkDetailPagePath(work, orderedIds))}" data-work-detail-link="true">
           <img src="${escapeHtml(firstImage)}" alt="${escapeHtml(title)}" loading="lazy">
         </a>
         <div class="caption">
@@ -839,30 +991,83 @@ function attachPaginationHandlers() {
 
 function attachGallerySortControls() {
   const controls = document.querySelectorAll("[data-gallery-sort-for]");
+  const closeAll = (except = null) => {
+    controls.forEach((control) => {
+      if (except && control === except) return;
+      control.dataset.sortOpen = "false";
+      const button = control.querySelector("[data-gallery-sort-toggle]");
+      const menu = control.querySelector("[data-gallery-sort-menu]");
+      if (button) button.setAttribute("aria-expanded", "false");
+      if (menu) menu.hidden = true;
+    });
+  };
+
   controls.forEach((control) => {
     const galleryId = control.dataset.gallerySortFor || "";
     const state = galleryState.get(galleryId);
     const activeSort = state?.sortMode || "year";
-    const select = control.querySelector("select[data-gallery-sort]");
-    if (!select) return;
-    select.value = activeSort;
-    if (select.dataset.bound === "true") return;
-    select.dataset.bound = "true";
-    select.addEventListener("change", () => {
-      const sortMode = select.value || "year";
-      const latest = galleryState.get(galleryId) || {};
-      const scrollY = window.scrollY || 0;
-      galleryState.set(galleryId, {
-        ...latest,
-        sortMode,
-        revealFromIndex: null,
-      });
-      renderGallery();
-      window.requestAnimationFrame(() => {
-        window.scrollTo({ top: scrollY, behavior: "auto" });
-      });
+    const button = control.querySelector("[data-gallery-sort-toggle]");
+    const menu = control.querySelector("[data-gallery-sort-menu]");
+    const current = control.querySelector("[data-gallery-sort-current]");
+    if (!button || !menu || !current) return;
+
+    current.textContent = getGallerySortLabel(activeSort);
+    const label = `${uiT("label_gallery_sort", "表示順")} ${getGallerySortLabel(activeSort)}`;
+    button.setAttribute("aria-label", label);
+    button.setAttribute("title", label);
+    menu.querySelectorAll("[data-gallery-sort-option]").forEach((option) => {
+      const optionMode = option.dataset.gallerySortOption || "";
+      const isActive = optionMode === activeSort;
+      option.classList.toggle("is-active", isActive);
+      option.setAttribute("aria-pressed", isActive ? "true" : "false");
     });
+
+    if (button.dataset.bound !== "true") {
+      button.dataset.bound = "true";
+      button.addEventListener("click", (event) => {
+        event.stopPropagation();
+        const isOpen = control.dataset.sortOpen === "true";
+        closeAll(control);
+        const nextOpen = !isOpen;
+        control.dataset.sortOpen = nextOpen ? "true" : "false";
+        button.setAttribute("aria-expanded", nextOpen ? "true" : "false");
+        menu.hidden = !nextOpen;
+      });
+    }
+
+    if (menu.dataset.bound !== "true") {
+      menu.dataset.bound = "true";
+      menu.addEventListener("click", (event) => {
+        const option = event.target.closest("[data-gallery-sort-option]");
+        if (!option) return;
+        const sortMode = option.dataset.gallerySortOption || "year";
+        const latest = galleryState.get(galleryId) || {};
+        const scrollY = window.scrollY || 0;
+        galleryState.set(galleryId, {
+          ...latest,
+          sortMode,
+          revealFromIndex: null,
+        });
+        closeAll();
+        renderGallery();
+        window.requestAnimationFrame(() => {
+          window.scrollTo({ top: scrollY, behavior: "auto" });
+        });
+      });
+    }
   });
+
+  if (document.body.dataset.gallerySortBound !== "true") {
+    document.body.dataset.gallerySortBound = "true";
+    document.addEventListener("click", (event) => {
+      if (event.target.closest("[data-gallery-sort-for]")) return;
+      closeAll();
+    });
+    document.addEventListener("keydown", (event) => {
+      if (event.key !== "Escape") return;
+      closeAll();
+    });
+  }
 }
 
 function attachGalleryLayoutControls() {
@@ -1371,7 +1576,7 @@ function attachImageProtection() {
   document.addEventListener("contextmenu", (event) => {
     const target = event.target;
     if (!(target instanceof HTMLElement)) return;
-    if (target.closest(".work-image-link img, .work-detail-image-frame img, .viewer-image")) {
+    if (target.closest(".work-image-link img, .work-detail-main-image, .work-detail-thumb img, .viewer-image")) {
       event.preventDefault();
     }
   });
@@ -1379,7 +1584,7 @@ function attachImageProtection() {
   document.addEventListener("dragstart", (event) => {
     const target = event.target;
     if (!(target instanceof HTMLElement)) return;
-    if (target.closest(".work-image-link img, .work-detail-image-frame img, .viewer-image")) {
+    if (target.closest(".work-image-link img, .work-detail-main-image, .work-detail-thumb img, .viewer-image")) {
       event.preventDefault();
     }
   });

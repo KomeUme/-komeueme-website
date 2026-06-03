@@ -48,13 +48,17 @@
       </div>
     </section>
     <div class="gallery-sort-control gallery-sort-control-section" data-gallery-sort-for="manga-story">
-      <label class="gallery-sort-label">
-        <span data-i18n="label_gallery_sort">表示順</span>
-        <select class="gallery-sort-select" data-gallery-sort>
-          <option value="year" data-i18n="sort_year">制作年度順</option>
-          <option value="size" data-i18n="sort_size">作品サイズ順</option>
-        </select>
-      </label>
+      <div class="gallery-sort-dropdown">
+        <button class="gallery-sort-button" type="button" data-gallery-sort-toggle aria-expanded="false" aria-haspopup="menu">
+          <span class="gallery-sort-icon" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
+          <span class="sr-only" data-i18n="label_gallery_sort">表示順</span>
+          <span class="sr-only" data-gallery-sort-current>制作年度順</span>
+        </button>
+        <div class="gallery-sort-menu" data-gallery-sort-menu hidden>
+          <button class="gallery-sort-option" aria-pressed="false" type="button" data-gallery-sort-option="year" data-i18n="sort_year">制作年度順</button>
+          <button class="gallery-sort-option" aria-pressed="false" type="button" data-gallery-sort-option="size" data-i18n="sort_size">作品サイズ順</button>
+        </div>
+      </div>
     </div>
     <p class="manga-work-label" data-i18n="works_list">作品一覧</p>
     <section class="gallery gallery-grid" data-gallery="manga-story"></section>
@@ -70,7 +74,7 @@
 
   <footer>© Kome Ume</footer>
   <script src="data.js"></script>
-  <script src="app.js"></script>
-  <script src="i18n.js"></script>
+  <script src="app.js?v=20260603d"></script>
+  <script src="i18n.js?v=20260603d"></script>
 </body>
 </html>
