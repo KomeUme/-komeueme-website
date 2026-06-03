@@ -158,7 +158,7 @@ let topCategoryButtonsVisible = false;
 let pendingOpenWorkId = null;
 let pendingOpenEnabled = false;
 let workListLocationRestored = false;
-const detailPageVersion = "20260603y";
+const detailPageVersion = "20260603aa";
 
 function appendPageVersion(href) {
   const text = String(href ?? "").trim();
@@ -1027,6 +1027,9 @@ function attachGallerySortControls() {
     const button = control.querySelector("[data-gallery-sort-toggle]");
     const menu = control.querySelector("[data-gallery-sort-menu]");
     if (!button || !menu) return;
+    const isOpen = control.dataset.sortOpen === "true";
+    const isClosing = control.dataset.sortClosing === "true";
+    if (!isOpen && !isClosing) return;
     const timer = closeTimers.get(control);
     if (timer) {
       window.clearTimeout(timer);
@@ -1040,7 +1043,10 @@ function attachGallerySortControls() {
       menu.hidden = true;
       return;
     }
-    if (menu.hidden) return;
+    if (menu.hidden) {
+      control.dataset.sortClosing = "false";
+      return;
+    }
     const closeTimer = window.setTimeout(() => {
       menu.hidden = true;
       control.dataset.sortClosing = "false";
