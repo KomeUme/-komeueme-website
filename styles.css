@@ -2166,12 +2166,15 @@ footer {
   }
 
   .top-hero-media {
-    min-height: 360px;
-    padding: 10px;
+    min-height: 300px;
+    padding: 6px;
+    overflow: hidden;
   }
 
   .top-hero-media img {
     max-height: 250px;
+    transform: scale(1.35);
+    transform-origin: center center;
   }
 
   .top-selected {
@@ -2419,7 +2422,7 @@ footer {
   }
 
   .top-hero-copy {
-    padding: 20px 16px;
+    padding: 18px 14px;
   }
 
   .top-intro-block {
@@ -2432,12 +2435,15 @@ footer {
   }
 
   .top-hero-media {
-    min-height: 300px;
-    padding: 10px;
+    min-height: 260px;
+    padding: 6px;
+    overflow: hidden;
   }
 
   .top-hero-media img {
     max-height: 220px;
+    transform: scale(1.35);
+    transform-origin: center center;
   }
 
   .top-selected {
