@@ -344,12 +344,12 @@ main {
 
 .top-hero-media {
   display: grid;
-  grid-template-rows: minmax(0, 1.25fr) auto auto minmax(0, 0.45fr);
+  grid-template-rows: minmax(0, 1fr) auto auto minmax(0, 1fr);
   justify-items: center;
   align-items: center;
   height: 100%;
   row-gap: 12px;
-  padding: 12px 12px 6px;
+  padding: 12px;
   border: 1px solid #cdced4;
   background: rgba(255, 255, 255, 0.82);
   margin: 0;
@@ -2196,7 +2196,8 @@ footer {
   }
 
   .top-hero-media {
-    padding: 10px 10px 4px;
+    grid-template-rows: minmax(0, 1.2fr) auto auto minmax(0, 0.8fr);
+    padding: 10px;
     overflow: hidden;
   }
 
@@ -2468,7 +2469,8 @@ footer {
   }
 
   .top-hero-media {
-    padding: 8px 8px 3px;
+    grid-template-rows: minmax(0, 1.15fr) auto auto minmax(0, 0.85fr);
+    padding: 8px;
     overflow: hidden;
   }
 
