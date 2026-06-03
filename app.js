@@ -158,7 +158,7 @@ let topCategoryButtonsVisible = false;
 let pendingOpenWorkId = null;
 let pendingOpenEnabled = false;
 let workListLocationRestored = false;
-const detailPageVersion = "20260603m";
+const detailPageVersion = "20260603x";
 
 function appendPageVersion(href) {
   const text = String(href ?? "").trim();

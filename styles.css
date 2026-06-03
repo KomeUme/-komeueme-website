@@ -726,8 +726,8 @@ main {
 
 .gallery-sort-dropdown {
   position: relative;
-  display: inline-flex;
-  align-items: center;
+  display: inline-block;
+  width: max-content;
   pointer-events: auto;
 }
 
@@ -771,6 +771,11 @@ main {
   outline-offset: 2px;
 }
 
+.gallery-sort-control[data-sort-open="true"] .gallery-sort-button {
+  visibility: hidden;
+  pointer-events: none;
+}
+
 .gallery-sort-icon {
   display: grid;
   grid-template-columns: repeat(2, 6px);
@@ -797,9 +802,10 @@ main {
 
 .gallery-sort-menu {
   position: absolute;
-  top: calc(100% + 6px);
+  bottom: calc(100% + 6px);
   right: 0;
-  min-width: 164px;
+  min-width: 152px;
+  width: max-content;
   padding: 6px;
   border: 1px solid var(--line);
   background: rgba(255, 255, 255, 0.98);
@@ -2029,15 +2035,9 @@ footer {
   }
 
   .gallery-sort-dropdown {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    width: fit-content;
+    display: inline-block;
+    width: max-content;
     max-width: 100%;
-  }
-
-  .gallery-sort-control[data-sort-open="true"] .gallery-sort-button {
-    display: none;
   }
 
   .gallery-sort-control::after {
@@ -2054,16 +2054,10 @@ footer {
   }
 
   .gallery-sort-menu {
-    position: static;
-    right: auto;
-    top: auto;
-    min-width: 0;
-    width: fit-content;
     max-width: 100%;
-    padding: 4px 0 0;
-    border: 0;
-    background: transparent;
-    box-shadow: none;
+    min-width: 152px;
+    width: max-content;
+    padding: 4px 6px 6px;
     display: flex;
     flex-direction: column;
     gap: 4px;
