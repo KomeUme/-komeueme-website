@@ -316,9 +316,10 @@ function renderWorkDetailPage() {
   const technique = workText(work, "technique");
   const size = workText(work, "size");
   const caption = workText(work, "caption");
+  const categoryLabel = getWorkDetailCategoryLabel(work);
 
   const titleText = withFallback(title);
-  const metaValues = [year, technique, size];
+  const metaValues = [year, technique, size, categoryLabel];
 
   const pageTitle = document.querySelector("title");
   if (pageTitle) pageTitle.textContent = `${titleText} | Kome Ume`;
@@ -697,26 +698,53 @@ function getWorkCardClass(work) {
   return classes.join(" ");
 }
 
+function getWorkDetailCategoryKey(work) {
+  if (work?.category === "hanga") {
+    return isCopperTechnique(work.technique) ? "category_copper" : "category_wood";
+  }
+  if (work?.category === "digital") {
+    return work?.subcategory === "mini-chara" ? "category_digital_mini_chara" : "category_digital_illustration";
+  }
+  if (work?.category === "manga") {
+    return isFourPanelMangaWork(work) ? "category_manga_4koma" : "category_manga_story";
+  }
+  return "category_wood";
+}
+
+function getWorkDetailCategoryLabel(work) {
+  const key = getWorkDetailCategoryKey(work);
+  const fallbackMap = {
+    category_wood: "木版画",
+    category_copper: "銅版画",
+    category_digital_illustration: "デジタル",
+    category_digital_mini_chara: "ミニキャラ",
+    category_manga_4koma: "四コマ",
+    category_manga_story: "ストーリー",
+  };
+  return uiT(key, fallbackMap[key] || "—");
+}
+
 function renderFeatureImages() {
   const featureImages = document.querySelectorAll("[data-feature-image]");
   const featureImageLinks = document.querySelectorAll("[data-feature-image-link]");
   const featureDetailLinks = document.querySelectorAll("[data-feature-detail-link]");
   if ((!featureImages.length && !featureImageLinks.length && !featureDetailLinks.length) || !works.length) return;
-  const woodblockPool = works.filter((work) => work
-    && work.category === "hanga"
-    && !isCopperTechnique(work.technique)
-    && (work.image || work.images?.[0]));
-  const largeWoodblockPool = woodblockPool.filter((work) => isMainScaleWork(work));
-  const fallbackPool = works.filter((work) => work && (work.image || work.images?.[0]));
-  const sourcePool = largeWoodblockPool.length ? largeWoodblockPool : (woodblockPool.length ? woodblockPool : fallbackPool);
-  const active = shuffle(sourcePool)[0];
+  const selectedSection = document.querySelector('[data-gallery-id="top-selected"]');
+  const selectedIds = String(selectedSection?.dataset.selectedWorks || "")
+    .split(",")
+    .map((id) => id.trim())
+    .filter(Boolean);
+  const selectedPool = selectedIds.length
+    ? selectedIds.map((id) => works.find((work) => String(work?.id ?? "") === id)).filter((work) => work && (work.image || work.images?.[0]))
+    : works.filter((work) => work && (work.image || work.images?.[0]));
+  const active = shuffle(selectedPool)[0];
   if (!active) return;
   const featureImage = active.image || active.images?.[0] || "";
   const title = workText(active, "title");
   const href = getWorkDetailPagePath(active);
   featureImages.forEach((img) => {
     img.src = featureImage;
-    img.alt = `${title} (${categories[active.category]})`;
+    img.alt = title || "";
   });
   featureImageLinks.forEach((link) => {
     link.href = href;

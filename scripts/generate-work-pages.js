@@ -62,6 +62,32 @@ function isCopperWork(work) {
   return /エッチング|ドライポイント|アクアチント|銅版/.test(String(work?.technique ?? ""));
 }
 
+function getWorkDetailCategoryKey(work) {
+  if (work?.category === "hanga") {
+    return isCopperWork(work) ? "category_copper" : "category_wood";
+  }
+  if (work?.category === "digital") {
+    return work?.subcategory === "mini-chara" ? "category_digital_mini_chara" : "category_digital_illustration";
+  }
+  if (work?.category === "manga") {
+    return isFourPanelMangaWork(work) ? "category_manga_4koma" : "category_manga_story";
+  }
+  return "category_wood";
+}
+
+function getWorkDetailCategoryLabel(work) {
+  const key = getWorkDetailCategoryKey(work);
+  const fallbackMap = {
+    category_wood: "木版画",
+    category_copper: "銅版画",
+    category_digital_illustration: "デジタル",
+    category_digital_mini_chara: "ミニキャラ",
+    category_manga_4koma: "四コマ",
+    category_manga_story: "ストーリー",
+  };
+  return fallbackMap[key] || "—";
+}
+
 function getWorkListPagePath(work) {
   if (work.category === "digital") {
     return work.subcategory === "mini-chara" ? "digital-mini-chara.html" : "digital-illustration.html";
@@ -155,6 +181,7 @@ function buildPage(work, prevWork, nextWork) {
   const technique = withFallback(work.technique);
   const size = withFallback(work.size);
   const caption = withFallback(work.caption);
+  const categoryLabel = getWorkDetailCategoryLabel(work);
   const images = Array.isArray(work.images) && work.images.length ? work.images : [work.image].filter(Boolean);
   const listPage = getWorkListPagePath(work);
 
@@ -184,6 +211,7 @@ ${buildDetailMedia(work, title, images)}
               <p class="caption-meta"><span data-i18n="cap_year">制作年</span><span>${escapeHtml(year)}</span></p>
               <p class="caption-meta"><span data-i18n="cap_technique">技法</span><span>${escapeHtml(technique)}</span></p>
               <p class="caption-meta"><span data-i18n="cap_size">サイズ</span><span>${escapeHtml(size)}</span></p>
+              <p class="caption-meta caption-category-meta"><span data-i18n="cap_category">カテゴリー</span><span data-work-category-label>${escapeHtml(categoryLabel)}</span></p>
             </div>
             <p class="caption-text">${escapeHtml(caption)}</p>
           </div>
