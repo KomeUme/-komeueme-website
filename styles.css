@@ -2276,6 +2276,14 @@ footer {
     padding: 5px;
   }
 
+  .gallery-grid[data-gallery-layout="compact"] .work-image-link img {
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+  }
+
   .gallery-grid[data-gallery-layout="compact"] .work.is-portrait .work-image-link {
     min-height: 180px;
   }
@@ -2288,32 +2296,6 @@ footer {
   .gallery-grid[data-gallery-layout="compact"] .caption-text,
   .gallery-grid[data-gallery-layout="compact"] .caption-toggle {
     display: none !important;
-  }
-
-  /* 4コマは縦長比率が大きい作品があるため、一覧時の画像枠を拡張して重なりを防ぐ */
-  .gallery-grid[data-gallery="manga-4koma"][data-gallery-layout="compact"] .work {
-    display: flex;
-    flex-direction: column;
-    height: auto;
-  }
-
-  .gallery-grid[data-gallery="manga-4koma"][data-gallery-layout="compact"] .work-image-link,
-  .gallery-grid[data-gallery="manga-4koma"][data-gallery-layout="compact"] .work.is-portrait .work-image-link {
-    flex: 0 0 auto;
-    min-height: 280px;
-    height: 280px;
-    overflow: hidden;
-  }
-
-  .gallery-grid[data-gallery="manga-4koma"][data-gallery-layout="compact"] .work img {
-    max-height: 264px;
-  }
-
-  .gallery-grid[data-gallery="manga-4koma"][data-gallery-layout="compact"] .caption {
-    flex: 0 0 auto;
-    height: 40px;
-    min-height: 40px;
-    margin-top: 0;
   }
 
   main {
