@@ -2196,7 +2196,7 @@ footer {
   }
 
   .top-hero-media {
-    grid-template-rows: minmax(0, 3fr) auto auto minmax(0, 0.25fr);
+    grid-template-rows: minmax(0, 3fr) auto auto minmax(0, 3fr);
     padding: 36px 10px 2px;
     overflow: hidden;
   }
@@ -2469,7 +2469,7 @@ footer {
   }
 
   .top-hero-media {
-    grid-template-rows: minmax(0, 2.8fr) auto auto minmax(0, 0.15fr);
+    grid-template-rows: minmax(0, 2.8fr) auto auto minmax(0, 2.8fr);
     padding: 32px 8px 0;
     overflow: hidden;
   }
