@@ -861,6 +861,13 @@ function renderGallery() {
     const outputList = isLoadMore
       ? stableList.slice(0, shownCount)
       : stableList.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+    const compactRatio = outputList.reduce((minRatio, work) => {
+      const ratio = getWorkRatio(work);
+      return Number.isFinite(ratio) && ratio > 0 ? Math.min(minRatio, ratio) : minRatio;
+    }, Infinity);
+    if (galleryId !== "top-selected" && Number.isFinite(compactRatio) && compactRatio > 0) {
+      gallery.style.setProperty("--compact-card-ratio", String(compactRatio));
+    }
     const prevClicks = prev?.clicks || 0;
     galleryState.set(galleryId, {
       arranged: stableList,
