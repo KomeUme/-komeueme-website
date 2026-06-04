@@ -224,9 +224,7 @@ main {
 .top-hero {
   position: relative;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(360px, 46%);
-  gap: 24px;
-  align-items: stretch;
+  grid-template-columns: minmax(0, 1fr);
   margin-bottom: 30px;
 }
 
@@ -340,51 +338,6 @@ main {
 .actions.top-actions {
   justify-content: flex-start;
   margin-top: calc(1.55em * 4);
-}
-
-.top-hero-media {
-  display: grid;
-  grid-template-rows: minmax(0, 1fr) auto auto minmax(0, 1fr);
-  justify-items: center;
-  align-items: center;
-  height: 100%;
-  row-gap: 12px;
-  padding: 12px;
-  border: 1px solid #cdced4;
-  background: rgba(255, 255, 255, 0.82);
-  margin: 0;
-  border-radius: 8px;
-}
-
-.top-hero-image-link {
-  display: block;
-  width: 100%;
-  grid-row: 2;
-}
-
-.top-hero-media img {
-  max-height: 430px;
-  max-width: 100%;
-  width: auto;
-  object-fit: contain;
-  margin: 0 auto;
-}
-
-.top-hero-detail-link {
-  grid-row: 3;
-  justify-self: end;
-  margin-top: 0;
-  color: #4e5460;
-  font-size: 12px;
-  line-height: 1.2;
-  letter-spacing: 0;
-  opacity: 0.78;
-  transition: opacity 0.16s ease, color 0.16s ease;
-}
-
-.top-hero-detail-link:hover {
-  color: #2a2c31;
-  opacity: 1;
 }
 
 .top-links {
@@ -2195,22 +2148,6 @@ footer {
     margin-bottom: 14px;
   }
 
-  .top-hero-media {
-    grid-template-rows: minmax(0, 3fr) auto auto minmax(0, 3fr);
-    padding: 36px 10px 36px;
-    overflow: hidden;
-  }
-
-  .top-hero-media img {
-    max-height: 220px;
-    transform: scale(1.18);
-    transform-origin: center center;
-  }
-
-  .top-hero-detail-link {
-    font-size: 11px;
-  }
-
   .top-selected {
     margin-top: 0;
   }
@@ -2466,22 +2403,6 @@ footer {
 
   .top-hero-lead {
     margin-top: 14px;
-  }
-
-  .top-hero-media {
-    grid-template-rows: minmax(0, 2.8fr) auto auto minmax(0, 2.8fr);
-    padding: 32px 8px 32px;
-    overflow: hidden;
-  }
-
-  .top-hero-media img {
-    max-height: 190px;
-    transform: scale(1.16);
-    transform-origin: center center;
-  }
-
-  .top-hero-detail-link {
-    font-size: 10px;
   }
 
   .top-selected {
