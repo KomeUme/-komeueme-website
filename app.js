@@ -724,6 +724,50 @@ function getWorkDetailCategoryLabel(work) {
   return uiT(key, fallbackMap[key] || "—");
 }
 
+function renderFeatureImages() {
+  const featureImages = document.querySelectorAll("[data-feature-image]");
+  const featureImageLinks = document.querySelectorAll("[data-feature-image-link]");
+  const featureDetailLinks = document.querySelectorAll("[data-feature-detail-link]");
+  if ((!featureImages.length && !featureImageLinks.length && !featureDetailLinks.length) || !works.length) return;
+  const selectedSection = document.querySelector('[data-gallery-id="top-selected"]');
+  const selectedIds = String(selectedSection?.dataset.selectedWorks || "")
+    .split(",")
+    .map((id) => id.trim())
+    .filter(Boolean);
+  const selectedPool = selectedIds.length
+    ? selectedIds.map((id) => works.find((work) => String(work?.id ?? "") === id)).filter((work) => work && (work.image || work.images?.[0]))
+    : works.filter((work) => work && (work.image || work.images?.[0]));
+  const active = shuffle(selectedPool)[0];
+  if (!active) return;
+  const featureImage = active.image || active.images?.[0] || "";
+  const title = workText(active, "title");
+  const href = getWorkDetailPagePath(active);
+  featureImages.forEach((img) => {
+    img.src = featureImage;
+    img.alt = title || "";
+  });
+  featureImageLinks.forEach((link) => {
+    link.href = href;
+    link.dataset.workId = String(active.id ?? "");
+    link.dataset.workPage = href;
+    link.dataset.workSource = "top-hero";
+    link.dataset.workDetailLink = "true";
+    link.onclick = () => {
+      rememberWorkListLocation(active.id, link);
+    };
+  });
+  featureDetailLinks.forEach((link) => {
+    link.href = href;
+    link.dataset.workId = String(active.id ?? "");
+    link.dataset.workPage = href;
+    link.dataset.workSource = "top-hero";
+    link.dataset.workDetailLink = "true";
+    link.onclick = () => {
+      rememberWorkListLocation(active.id, link);
+    };
+  });
+}
+
 function renderGallery() {
   const galleries = document.querySelectorAll("[data-gallery]");
   if (!galleries.length) return;
@@ -1618,6 +1662,7 @@ normalizeInternalPageLinks();
 setupMobileMenu();
 setupWorkDetailBackLink();
 attachImageProtection();
+renderFeatureImages();
 renderGallery();
 attachBackToTopButtons();
 
