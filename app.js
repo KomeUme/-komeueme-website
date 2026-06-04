@@ -791,6 +791,9 @@ function renderGallery() {
     return /4コマ|四コマ|４コマ|四齣/i.test(text);
   };
   galleries.forEach((gallery) => {
+    if (gallery.dataset.galleryId !== "top-selected") {
+      gallery.dataset.galleryLayout = "compact";
+    }
     const category = gallery.dataset.gallery;
     const galleryId = gallery.dataset.galleryId || category;
     let list = [];
@@ -1164,6 +1167,16 @@ function applyImageOrientationClasses() {
     const setClass = () => {
       const work = img.closest(".work");
       if (!work) return;
+      const naturalWidth = Number(img.naturalWidth) || 0;
+      const naturalHeight = Number(img.naturalHeight) || 0;
+      if (naturalWidth > 0 && naturalHeight > 0) {
+        const imageRatio = naturalWidth / naturalHeight;
+        const frameRatio = Math.min(2, Math.max(0.62, imageRatio));
+        work.style.setProperty("--work-image-ratio", String(imageRatio));
+        work.style.setProperty("--work-frame-ratio", String(frameRatio));
+        work.classList.toggle("is-extreme-portrait", imageRatio < 0.42);
+        work.classList.toggle("is-extreme-landscape", imageRatio > 2.4);
+      }
       work.classList.remove("is-portrait", "is-landscape");
       if (img.naturalHeight > img.naturalWidth) {
         work.classList.add("is-portrait");

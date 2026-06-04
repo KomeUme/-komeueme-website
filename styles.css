@@ -37,6 +37,7 @@
 
 body {
   margin: 0;
+  overflow-x: hidden;
   background: var(--paper);
   color: var(--ink);
   font-family: "Helvetica Neue", Arial, "Hiragino Sans", "Yu Gothic", sans-serif;
@@ -1040,12 +1041,16 @@ main {
 .gallery-grid .work {
   display: grid;
   grid-template-rows: auto auto;
+  min-width: 0;
   margin: 0;
 }
 
 .work-image-link {
   display: grid;
   place-items: center;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
   padding: 10px;
   background: rgba(255, 255, 255, 0.84);
   min-height: 440px;
@@ -1081,13 +1086,27 @@ main {
 }
 
 .gallery-grid[data-gallery-layout="compact"] {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 22px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  column-gap: clamp(44px, 4.4vw, 64px);
+  row-gap: 52px;
 }
 
 .gallery-grid[data-gallery="hanga-copper"] .work-image-link,
 .gallery-grid[data-gallery="hanga-copper"] .work.is-portrait .work-image-link {
   min-height: 440px;
+}
+
+.gallery-grid[data-gallery="manga-4koma"][data-gallery-layout="compact"] .work-image-link {
+  overflow: hidden;
+}
+
+.gallery-grid[data-gallery="manga-4koma"][data-gallery-layout="compact"] .work-image-link img {
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  object-fit: cover;
+  object-position: top center;
 }
 
 .work:hover img {
@@ -1098,6 +1117,7 @@ main {
 .caption {
   display: flex;
   flex-direction: column;
+  min-width: 0;
   gap: 8px;
   margin-top: 8px;
   min-height: 280px;
@@ -1112,6 +1132,8 @@ main {
 .caption-title {
   margin: 0;
   display: block;
+  min-width: 0;
+  overflow-wrap: anywhere;
   font-family: "Helvetica Neue", Arial, "Hiragino Sans", "Yu Gothic", sans-serif;
   font-size: 15px;
   font-weight: 400;
@@ -1155,6 +1177,8 @@ main {
 
 .caption-meta span:last-child {
   color: #444;
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .caption-text {
@@ -1446,17 +1470,54 @@ main {
   }
 
   .gallery-grid[data-gallery-layout="compact"] .work-image-link img {
-    width: auto;
-    height: auto;
-    max-width: 100%;
-    max-height: 100%;
+    position: absolute;
+    inset: 18px;
+    width: calc(100% - 36px);
+    height: calc(100% - 36px);
+    max-width: none;
+    max-height: none;
     object-fit: contain;
   }
 
   .gallery-grid[data-gallery-layout="compact"] .work-image-link {
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
     min-height: 0;
     height: auto;
-    aspect-ratio: var(--compact-card-ratio, 1);
+    aspect-ratio: var(--work-frame-ratio, var(--compact-card-ratio, 1));
+  }
+
+  .gallery-grid[data-gallery="manga-4koma"][data-gallery-layout="compact"] .work-image-link {
+    height: 360px;
+    aspect-ratio: auto;
+  }
+
+  .gallery-grid[data-gallery="manga-4koma"][data-gallery-layout="compact"] .work-image-link img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
+    object-fit: cover;
+    object-position: top center;
+  }
+
+  .gallery-grid[data-gallery="manga-4koma"][data-gallery-layout="compact"] .work {
+    grid-template-rows: auto 44px;
+  }
+
+  .gallery-grid[data-gallery="manga-4koma"][data-gallery-layout="compact"] .caption {
+    height: 44px;
+    min-height: 44px;
+    grid-template-rows: 44px;
+  }
+
+  .gallery-grid[data-gallery="manga-4koma"][data-gallery-layout="compact"] .caption-meta-list {
+    display: none;
   }
 }
 
@@ -2267,6 +2328,21 @@ footer {
 
   .gallery-grid[data-gallery-layout="compact"] {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+    width: min(100%, calc(100vw - 56px));
+    min-width: 0;
+    margin-left: auto;
+    margin-right: auto;
+    gap: 10px;
+    align-items: stretch;
+  }
+
+  .gallery-grid[data-gallery]:not([data-gallery-id="top-selected"]) {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    width: min(100%, calc(100vw - 56px));
+    min-width: 0;
+    margin-left: auto;
+    margin-right: auto;
     gap: 10px;
     align-items: stretch;
   }
@@ -2276,17 +2352,80 @@ footer {
     grid-template-rows: auto;
   }
 
+  .gallery-grid[data-gallery]:not([data-gallery-id="top-selected"]) .work {
+    height: 100%;
+    grid-template-rows: auto;
+    min-width: 0;
+  }
+
+  .gallery-grid[data-gallery-layout="compact"] .work.is-extreme-portrait,
+  .gallery-grid[data-gallery-layout="compact"] .work.is-extreme-landscape {
+    grid-column: span 2;
+  }
+
   .gallery-grid[data-gallery-layout="compact"] .work-image-link {
+    position: relative;
+    overflow: hidden;
     min-height: 0;
     height: auto;
     padding: 5px;
-    aspect-ratio: var(--compact-card-ratio, 1);
+    aspect-ratio: var(--work-frame-ratio, var(--compact-card-ratio, 1));
+  }
+
+  .gallery-grid[data-gallery]:not([data-gallery-id="top-selected"]) .work-image-link {
+    position: relative;
+    overflow: hidden;
+    min-height: 0;
+    height: auto;
+    padding: 5px;
+    aspect-ratio: var(--work-frame-ratio, var(--compact-card-ratio, 1));
   }
 
   .gallery-grid[data-gallery-layout="compact"] .work-image-link img {
-    width: 100%;
-    height: 100%;
+    position: absolute;
+    inset: 5px;
+    width: calc(100% - 10px);
+    height: calc(100% - 10px);
+    max-width: none;
+    max-height: none;
     object-fit: contain;
+  }
+
+  .gallery-grid[data-gallery]:not([data-gallery-id="top-selected"]) .work-image-link img {
+    position: absolute;
+    inset: 5px;
+    width: calc(100% - 10px);
+    height: calc(100% - 10px);
+    max-width: none;
+    max-height: none;
+    object-fit: contain;
+  }
+
+  .gallery-grid[data-gallery="manga-4koma"][data-gallery-layout="compact"] .work-image-link {
+    position: relative;
+    height: auto;
+    aspect-ratio: 1;
+    overflow: hidden;
+  }
+
+  .gallery-grid[data-gallery="manga-4koma"][data-gallery-layout="compact"] {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .gallery-grid[data-gallery="manga-4koma"][data-gallery-layout="compact"] .work,
+  .gallery-grid[data-gallery="manga-4koma"][data-gallery-layout="compact"] .work-image-link {
+    min-width: 0;
+  }
+
+  .gallery-grid[data-gallery="manga-4koma"][data-gallery-layout="compact"] .work-image-link img {
+    position: absolute;
+    inset: 5px;
+    width: calc(100% - 10px);
+    height: calc(100% - 10px);
+    max-width: none;
+    max-height: none;
+    object-fit: cover;
+    object-position: top center;
   }
 
   .gallery-grid[data-gallery-layout="compact"] .caption {
