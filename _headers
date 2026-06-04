@@ -1,17 +1,17 @@
 /*.html
-  Cache-Control: no-cache
+  Cache-Control: no-store, max-age=0, must-revalidate
 
 /styles.css
-  Cache-Control: no-cache
+  Cache-Control: no-store, max-age=0, must-revalidate
 
 /app.js
-  Cache-Control: no-cache
+  Cache-Control: no-store, max-age=0, must-revalidate
 
 /data.js
-  Cache-Control: no-cache
+  Cache-Control: no-store, max-age=0, must-revalidate
 
 /i18n.js
-  Cache-Control: no-cache
+  Cache-Control: no-store, max-age=0, must-revalidate
 
 /assets/works/*
-  Cache-Control: no-cache
+  Cache-Control: no-store, max-age=0, must-revalidate
