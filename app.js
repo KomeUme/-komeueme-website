@@ -317,6 +317,8 @@ function renderWorkDetailPage() {
   const size = workText(work, "size");
   const caption = workText(work, "caption");
   const categoryLabel = getWorkDetailCategoryLabel(work);
+  const listPage = getWorkListPagePath(work);
+  const categoryHref = getPageHref(listPage);
 
   const titleText = withFallback(title);
   const metaValues = [year, technique, size, categoryLabel];
@@ -329,10 +331,21 @@ function renderWorkDetailPage() {
 
   const metaRows = article.querySelectorAll(".caption-meta");
   metaRows.forEach((row, index) => {
-    const cells = row.querySelectorAll("span");
+    const cells = row.querySelectorAll("span, a");
     if (!cells.length) return;
-    if (index < metaValues.length) {
+    if (index < metaValues.length - 1) {
       if (cells[1]) cells[1].textContent = withFallback(metaValues[index]);
+      return;
+    }
+    const labelCell = row.querySelector("[data-work-category-link]") || row.querySelector("[data-work-category-label]");
+    const categoryText = withFallback(categoryLabel);
+    if (labelCell) {
+      if (labelCell.tagName === "A") {
+        labelCell.href = categoryHref;
+        labelCell.textContent = categoryText;
+      } else {
+        labelCell.innerHTML = `<a data-work-category-link href="${escapeHtml(categoryHref)}">${escapeHtml(categoryText)}</a>`;
+      }
     }
   });
 

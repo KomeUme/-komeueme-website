@@ -211,7 +211,7 @@ ${buildDetailMedia(work, title, images)}
               <p class="caption-meta"><span data-i18n="cap_year">制作年</span><span>${escapeHtml(year)}</span></p>
               <p class="caption-meta"><span data-i18n="cap_technique">技法</span><span>${escapeHtml(technique)}</span></p>
               <p class="caption-meta"><span data-i18n="cap_size">サイズ</span><span>${escapeHtml(size)}</span></p>
-              <p class="caption-meta caption-category-meta"><span data-i18n="cap_category">カテゴリー</span><span data-work-category-label>${escapeHtml(categoryLabel)}</span></p>
+              <p class="caption-meta caption-category-meta"><span data-i18n="cap_category">カテゴリー</span><a data-work-category-link href="${escapeHtml(getPageHref(listPage))}">${escapeHtml(categoryLabel)}</a></p>
             </div>
             <p class="caption-text">${escapeHtml(caption)}</p>
           </div>
