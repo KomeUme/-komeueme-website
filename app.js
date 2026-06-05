@@ -158,7 +158,7 @@ let topCategoryButtonsVisible = false;
 let pendingOpenWorkId = null;
 let pendingOpenEnabled = false;
 let workListLocationRestored = false;
-const detailPageVersion = "20260605a";
+const detailPageVersion = "20260605e";
 
 function appendPageVersion(href) {
   const text = String(href ?? "").trim();
@@ -381,6 +381,7 @@ function renderWorkDetailPage() {
 
     const mainImage = media.querySelector("[data-work-detail-main-image]");
     const thumbButtons = Array.from(media.querySelectorAll("[data-work-detail-thumb]"));
+    const thumbnailList = media.querySelector("[data-work-detail-thumbnails]");
     const activateIndex = (index) => {
       const safeIndex = Math.min(Math.max(Number(index) || 0, 0), images.length - 1);
       if (mainImage) {
@@ -393,6 +394,14 @@ function renderWorkDetailPage() {
         button.setAttribute("aria-pressed", isActive ? "true" : "false");
       });
     };
+    const activateThumbFromEvent = (event) => {
+      const button = event.target instanceof Element
+        ? event.target.closest("[data-work-detail-thumb]")
+        : null;
+      if (!button || !media.contains(button)) return;
+      event.preventDefault();
+      activateIndex(button.dataset.workIndex || 0);
+    };
 
     thumbButtons.forEach((button) => {
       if (button.dataset.bound === "true") return;
@@ -401,10 +410,59 @@ function renderWorkDetailPage() {
         activateIndex(button.dataset.workIndex || 0);
       });
     });
+    if (thumbnailList && thumbnailList.dataset.bound !== "true") {
+      thumbnailList.dataset.bound = "true";
+      thumbnailList.addEventListener("pointerup", activateThumbFromEvent);
+      thumbnailList.addEventListener("click", activateThumbFromEvent);
+      thumbnailList.addEventListener("keydown", (event) => {
+        if (event.key !== "Enter" && event.key !== " ") return;
+        activateThumbFromEvent(event);
+      });
+    }
   }
 
   const returnState = getWorkListReturnState(workId);
   updateWorkDetailPager(work, returnState);
+}
+
+function attachWorkDetailThumbnailControls() {
+  document.querySelectorAll(".work-detail-media").forEach((media) => {
+    const thumbnailList = media.querySelector("[data-work-detail-thumbnails]");
+    const mainImage = media.querySelector("[data-work-detail-main-image]");
+    const thumbButtons = Array.from(media.querySelectorAll("[data-work-detail-thumb]"));
+    if (!thumbnailList || !mainImage || !thumbButtons.length) return;
+
+    const activateButton = (button) => {
+      const thumbImage = button.querySelector("img");
+      const nextSrc = thumbImage?.getAttribute("src");
+      if (!nextSrc) return;
+      mainImage.setAttribute("src", nextSrc);
+      mainImage.setAttribute("alt", thumbImage.getAttribute("alt") || mainImage.getAttribute("alt") || "");
+      thumbButtons.forEach((thumbButton) => {
+        const isActive = thumbButton === button;
+        thumbButton.classList.toggle("is-active", isActive);
+        thumbButton.setAttribute("aria-pressed", isActive ? "true" : "false");
+      });
+    };
+
+    const activateFromEvent = (event) => {
+      const button = event.target instanceof Element
+        ? event.target.closest("[data-work-detail-thumb]")
+        : null;
+      if (!button || !media.contains(button)) return;
+      event.preventDefault();
+      activateButton(button);
+    };
+
+    if (thumbnailList.dataset.fallbackBound === "true") return;
+    thumbnailList.dataset.fallbackBound = "true";
+    thumbnailList.addEventListener("pointerup", activateFromEvent);
+    thumbnailList.addEventListener("click", activateFromEvent);
+    thumbnailList.addEventListener("keydown", (event) => {
+      if (event.key !== "Enter" && event.key !== " ") return;
+      activateFromEvent(event);
+    });
+  });
 }
 
 function updateWorkDetailPager(work, returnState) {
@@ -1738,14 +1796,37 @@ function attachBackToTopButtons() {
   });
 }
 
-normalizeInternalPageLinks();
-setupMobileMenu();
-setupWorkDetailBackLink();
-attachImageProtection();
-renderFeatureImages();
-renderGallery();
-attachBackToTopButtons();
-
 window.renderWorkDetailPage = renderWorkDetailPage;
 window.renderAboutPage = renderAboutPage;
 window.setupCopyEmailButtons = setupCopyEmailButtons;
+window.renderFeatureImages = renderFeatureImages;
+window.renderGallery = renderGallery;
+window.attachWorkDetailThumbnailControls = attachWorkDetailThumbnailControls;
+
+function runStartupStep(step) {
+  try {
+    step();
+  } catch (error) {
+    console.error("Site startup step failed:", error);
+  }
+}
+
+function initializeSite() {
+  [
+    normalizeInternalPageLinks,
+    setupMobileMenu,
+    setupWorkDetailBackLink,
+    attachImageProtection,
+    renderWorkDetailPage,
+    attachWorkDetailThumbnailControls,
+    renderFeatureImages,
+    renderGallery,
+    attachBackToTopButtons,
+  ].forEach(runStartupStep);
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initializeSite, { once: true });
+} else {
+  initializeSite();
+}

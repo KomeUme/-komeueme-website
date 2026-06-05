@@ -309,6 +309,7 @@ function applyLang(lang) {
   if (typeof window.renderGallery === "function") window.renderGallery();
   if (typeof window.renderFeatureImages === "function") window.renderFeatureImages();
   if (typeof window.renderWorkDetailPage === "function") window.renderWorkDetailPage();
+  if (typeof window.attachWorkDetailThumbnailControls === "function") window.attachWorkDetailThumbnailControls();
   if (typeof window.renderAboutPage === "function") window.renderAboutPage();
   updateProfileNavDate();
 }
