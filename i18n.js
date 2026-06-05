@@ -281,6 +281,13 @@ function updateProfileNavDate() {
 
 function applyLang(lang) {
   const dict = I18N[lang] || I18N.ja;
+  const runLangStep = (step) => {
+    try {
+      step();
+    } catch (error) {
+      console.error("Language update step failed:", error);
+    }
+  };
   document.documentElement.lang = lang === "en" ? "en" : "ja";
   document.querySelectorAll("[data-i18n]").forEach((el) => {
     const key = el.dataset.i18n;
@@ -300,12 +307,12 @@ function applyLang(lang) {
   } catch (_) {
     // ignore storage failures
   }
-  if (typeof window.renderGallery === "function") window.renderGallery();
-  if (typeof window.renderFeatureImages === "function") window.renderFeatureImages();
-  if (typeof window.renderWorkDetailPage === "function") window.renderWorkDetailPage();
-  if (typeof window.attachWorkDetailThumbnailControls === "function") window.attachWorkDetailThumbnailControls();
-  if (typeof window.renderAboutPage === "function") window.renderAboutPage();
-  updateProfileNavDate();
+  if (typeof window.renderGallery === "function") runLangStep(window.renderGallery);
+  if (typeof window.renderFeatureImages === "function") runLangStep(window.renderFeatureImages);
+  if (typeof window.renderWorkDetailPage === "function") runLangStep(window.renderWorkDetailPage);
+  if (typeof window.attachWorkDetailThumbnailControls === "function") runLangStep(window.attachWorkDetailThumbnailControls);
+  if (typeof window.renderAboutPage === "function") runLangStep(window.renderAboutPage);
+  runLangStep(updateProfileNavDate);
 }
 
 function setupContactLinks() {
@@ -394,7 +401,7 @@ function showAutoTranslationNotice(lang) {
   }, 3000);
 }
 
-document.addEventListener("DOMContentLoaded", () => {
+function initializeI18n() {
   let initial = "ja";
   try {
     initial = localStorage.getItem("site-lang") || "ja";
@@ -418,6 +425,12 @@ document.addEventListener("DOMContentLoaded", () => {
       showAutoTranslationNotice(next);
     });
   }
-});
+}
 
 window.I18N = I18N;
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initializeI18n, { once: true });
+} else {
+  initializeI18n();
+}

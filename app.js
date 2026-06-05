@@ -291,6 +291,10 @@ function getWorkPagePath(work) {
   return "index.html";
 }
 
+function getWorkListPagePath(work) {
+  return getWorkPagePath(work);
+}
+
 function getVersionedWorkPagePath(work) {
   return appendPageVersion(getWorkPagePath(work));
 }
@@ -326,7 +330,7 @@ function renderWorkDetailPage() {
   const caption = workText(work, "caption");
   const categoryLabel = getWorkDetailCategoryLabel(work);
   const listPage = getWorkListPagePath(work);
-  const categoryHref = getPageHref(listPage);
+  const categoryHref = appendPageVersion(listPage);
 
   const titleText = withFallback(title);
   const metaValues = [year, technique, size, categoryLabel];
