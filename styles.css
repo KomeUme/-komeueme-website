@@ -2362,6 +2362,10 @@ footer {
     grid-column: span 2;
   }
 
+  .gallery-grid[data-gallery="hanga-copper"][data-gallery-layout="compact"] .work.is-wide-landscape {
+    grid-column: span 2;
+  }
+
   .gallery-grid[data-gallery-layout="compact"] .work-image-link {
     position: relative;
     overflow: hidden;
