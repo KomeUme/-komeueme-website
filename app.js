@@ -158,7 +158,7 @@ let topCategoryButtonsVisible = false;
 let pendingOpenWorkId = null;
 let pendingOpenEnabled = false;
 let workListLocationRestored = false;
-const detailPageVersion = "20260604a";
+const detailPageVersion = "20260605a";
 
 function appendPageVersion(href) {
   const text = String(href ?? "").trim();
@@ -290,6 +290,11 @@ function getWorkPagePath(work) {
 
 function getVersionedWorkPagePath(work) {
   return appendPageVersion(getWorkPagePath(work));
+}
+
+function getWorkListImagePath(imagePath) {
+  const path = String(imagePath || "");
+  return path.replace(/^assets\/works\//, "assets/works/list/");
 }
 
 function getWorkDetailPagePath(work, workIds = null) {
@@ -507,6 +512,25 @@ function renderAboutPage() {
   }
 
   setupCopyEmailButtons();
+}
+
+function setupCopyEmailButtons() {
+  const buttons = document.querySelectorAll("[data-copy-email]");
+  buttons.forEach((button) => {
+    if (button.dataset.bound === "true") return;
+    button.dataset.bound = "true";
+    const email = button.dataset.copyEmail || "";
+    button.addEventListener("click", async () => {
+      if (!email) return;
+      try {
+        await navigator.clipboard.writeText(email);
+      } catch (_) {
+        return;
+      }
+      button.classList.add("is-copied");
+      window.setTimeout(() => button.classList.remove("is-copied"), 1400);
+    });
+  });
 }
 
 function rememberWorkListLocation(workId, link = null) {
@@ -886,11 +910,11 @@ function renderGallery() {
 
     if (galleryId === "top-selected") {
       gallery.classList.add("top-selected-row");
-    gallery.innerHTML = outputList.map((work) => {
-      const firstImage = work.images?.[0] || work.image;
-      const title = workText(work, "title");
-      const orderedIds = stableList.map((item) => String(item?.id ?? "")).filter(Boolean);
-      return `
+      gallery.innerHTML = outputList.map((work) => {
+        const firstImage = work.images?.[0] || work.image;
+        const title = workText(work, "title");
+        const orderedIds = stableList.map((item) => String(item?.id ?? "")).filter(Boolean);
+        return `
       <article class="top-selected-item" data-work-id="${escapeHtml(work.id)}">
         <a class="top-selected-link js-work-link" href="${escapeHtml(getWorkDetailPagePath(work, orderedIds))}" data-work-id="${escapeHtml(work.id)}" data-work-page="${escapeHtml(getWorkDetailPagePath(work, orderedIds))}" data-work-source="top-selected" data-work-detail-link="true">
           <span class="top-selected-image-wrap">
@@ -924,6 +948,7 @@ function renderGallery() {
 
     gallery.innerHTML = outputList.map((work) => {
       const firstImage = work.images?.[0] || work.image;
+      const listImage = getWorkListImagePath(firstImage);
       const title = workText(work, "title");
       const year = workText(work, "year");
       const technique = workText(work, "technique");
@@ -933,7 +958,7 @@ function renderGallery() {
       return `
       <article class="${getWorkCardClass(work)}" data-work-id="${escapeHtml(work.id)}">
         <a class="work-image-link js-work-link" href="${escapeHtml(getWorkDetailPagePath(work, orderedIds))}" data-work-id="${escapeHtml(work.id)}" data-work-page="${escapeHtml(getWorkDetailPagePath(work, orderedIds))}" data-work-detail-link="true">
-          <img src="${escapeHtml(firstImage)}" alt="${escapeHtml(title)}" loading="lazy">
+          <img src="${escapeHtml(listImage)}" alt="${escapeHtml(title)}" loading="lazy">
         </a>
         <div class="caption">
           <h3 class="caption-title">${escapeHtml(title)}</h3>
