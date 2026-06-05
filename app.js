@@ -684,6 +684,17 @@ function hasGallerySortControls(galleryId) {
   return Boolean(document.querySelector(`[data-gallery-sort-for="${CSS.escape(galleryId)}"]`));
 }
 
+function syncGalleryAvailability(gallery, galleryId, hasWorks) {
+  if (!gallery || !galleryId) return;
+  gallery.hidden = !hasWorks;
+  document.querySelectorAll(`[data-gallery-sort-for="${CSS.escape(galleryId)}"]`).forEach((control) => {
+    control.hidden = !hasWorks;
+  });
+  if (!hasWorks) {
+    removePaginationControls(gallery, galleryId);
+  }
+}
+
 function getGallerySortMode(gallery, galleryId, prev) {
   if (prev?.sortMode) return prev.sortMode;
   if (galleryId === "hanga" || galleryId.startsWith("hanga-")) return "size";
@@ -847,6 +858,13 @@ function renderGallery() {
     if (selectedIds.length) {
       const byId = new Map(list.map((work) => [String(work.id), work]));
       list = selectedIds.map((id) => byId.get(id)).filter(Boolean);
+    }
+
+    syncGalleryAvailability(gallery, galleryId, list.length > 0);
+    if (!list.length) {
+      gallery.innerHTML = "";
+      galleryState.delete(galleryId);
+      return;
     }
 
     const limit = Number.parseInt(gallery.dataset.limit || "", 10);

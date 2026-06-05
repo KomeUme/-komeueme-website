@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title data-i18n="page_title_manga_4koma">四コマ | Kome Ume</title>
+  <title data-i18n="page_title_manga">漫画 | Kome Ume</title>
   <link rel="stylesheet" href="styles.css?v=20260605a">
 </head>
 <body>
@@ -40,25 +40,27 @@
   </header>
 
   <main>
-    <div class="gallery-page-head">
-      <section class="intro">
-        <h1 data-i18n="nav_manga">漫画</h1>
-      </section>
-      <div class="gallery-sort-control gallery-sort-control-section" data-gallery-sort-for="manga-4koma">
-        <div class="gallery-sort-dropdown">
-          <button class="gallery-sort-button" type="button" data-gallery-sort-toggle aria-expanded="false" aria-haspopup="menu">
-            <span class="gallery-sort-icon" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
-            <span class="sr-only" data-i18n="label_gallery_sort">表示順</span>
-            <span class="sr-only" data-gallery-sort-current>制作年度順</span>
-          </button>
-          <div class="gallery-sort-menu" data-gallery-sort-menu hidden>
-            <button class="gallery-sort-option" aria-pressed="false" type="button" data-gallery-sort-option="size" data-i18n="sort_size">作品サイズ順</button>
-            <button class="gallery-sort-option" aria-pressed="false" type="button" data-gallery-sort-option="year" data-i18n="sort_year">制作年度順</button>
-          </div>
+    <section class="intro">
+      <h1 data-i18n="nav_manga">漫画</h1>
+      <div class="subcategory-links" aria-label="漫画カテゴリ">
+        <a class="subcategory-link" href="manga-4koma.html?v=20260605a" data-i18n="nav_manga_4koma">四コマ</a>
+        <a class="subcategory-link" href="manga-story.html?v=20260605a" data-i18n="nav_manga_story">ストーリー</a>
+      </div>
+    </section>
+    <h2 class="section-title" data-i18n="nav_manga_4koma">四コマ</h2>
+    <div class="gallery-sort-control gallery-sort-control-section" data-gallery-sort-for="manga-4koma">
+      <div class="gallery-sort-dropdown">
+        <button class="gallery-sort-button" type="button" data-gallery-sort-toggle aria-expanded="false" aria-haspopup="menu">
+          <span class="gallery-sort-icon" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
+          <span class="sr-only" data-i18n="label_gallery_sort">表示順</span>
+          <span class="sr-only" data-gallery-sort-current>制作年度順</span>
+        </button>
+        <div class="gallery-sort-menu" data-gallery-sort-menu hidden>
+          <button class="gallery-sort-option" aria-pressed="false" type="button" data-gallery-sort-option="year" data-i18n="sort_year">制作年度順</button>
+          <button class="gallery-sort-option" aria-pressed="false" type="button" data-gallery-sort-option="size" data-i18n="sort_size">作品サイズ順</button>
         </div>
       </div>
     </div>
-    <p class="manga-work-label" data-i18n="works_list">作品一覧</p>
     <section class="gallery gallery-grid" data-gallery="manga-4koma"></section>
     <section class="site-mini-contact">
       <div><strong class="label-sns" data-i18n="label_sns">SNS</strong> <a href="https://www.instagram.com/komeume1121/" target="_blank" rel="noopener noreferrer">@komeume1121</a></div>
