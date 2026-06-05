@@ -1201,6 +1201,7 @@ function applyImageOrientationClasses() {
         work.style.setProperty("--work-frame-ratio", String(frameRatio));
         work.classList.toggle("is-extreme-portrait", imageRatio < 0.42);
         work.classList.toggle("is-extreme-landscape", imageRatio > 2.4);
+        work.classList.toggle("is-wide-landscape", imageRatio > 1.2);
       }
       work.classList.remove("is-portrait", "is-landscape");
       if (img.naturalHeight > img.naturalWidth) {

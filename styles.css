@@ -1091,11 +1091,6 @@ main {
   row-gap: 52px;
 }
 
-.gallery-grid[data-gallery="hanga-copper"] .work-image-link,
-.gallery-grid[data-gallery="hanga-copper"] .work.is-portrait .work-image-link {
-  min-height: 440px;
-}
-
 .gallery-grid[data-gallery="manga-4koma"][data-gallery-layout="compact"] .work-image-link {
   overflow: hidden;
 }
@@ -1488,6 +1483,10 @@ main {
     min-height: 0;
     height: auto;
     aspect-ratio: var(--work-frame-ratio, var(--compact-card-ratio, 1));
+  }
+
+  .gallery-grid[data-gallery="hanga-copper"][data-gallery-layout="compact"] .work.is-wide-landscape {
+    grid-column: span 2;
   }
 
   .gallery-grid[data-gallery="manga-4koma"][data-gallery-layout="compact"] .work-image-link {
