@@ -244,11 +244,12 @@ main {
 
 .top-name-block {
   display: grid;
+  margin-top: 6px;
 }
 
 .top-intro-block {
   position: relative;
-  margin-top: 22px;
+  margin-top: 16px;
   padding-top: 18px;
 }
 
@@ -2315,7 +2316,7 @@ footer {
   }
 
   .top-intro-block {
-    margin-top: 22px;
+    margin-top: 16px;
     padding-top: 18px;
   }
 
@@ -2719,7 +2720,7 @@ footer {
   }
 
   .top-intro-block {
-    margin-top: 22px;
+    margin-top: 16px;
     padding-top: 18px;
   }
 
