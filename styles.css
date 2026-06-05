@@ -2609,6 +2609,19 @@ footer {
     max-height: 560px;
   }
 
+  .work-detail.is-four-panel-manga-detail .work-detail-main {
+    padding: 18px 22px;
+  }
+
+  .work-detail.is-four-panel-manga-detail .work-detail-main-image {
+    max-width: 86%;
+    max-height: 540px;
+  }
+
+  .work-detail.is-four-panel-manga-detail .work-detail-thumbnails {
+    margin-top: 4px;
+  }
+
   .work-detail-caption {
     position: static;
     padding-top: 0;

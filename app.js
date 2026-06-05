@@ -322,6 +322,7 @@ function renderWorkDetailPage() {
   const workId = String(article.dataset.workId || "");
   const work = works.find((item) => String(item?.id ?? "") === workId);
   if (!work) return;
+  article.classList.toggle("is-four-panel-manga-detail", isFourPanelMangaWork(work));
 
   const title = workText(work, "title");
   const year = workText(work, "year");
