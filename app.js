@@ -237,7 +237,10 @@ function getWorkArea(work) {
 function getYearScore(value) {
   const nums = String(value ?? "").match(/\d{4}/g);
   if (!nums || !nums.length) return 0;
-  return Math.max(...nums.map(Number));
+  const years = nums.map(Number).filter(Number.isFinite);
+  const latestYear = Math.max(...years);
+  const isRange = years.length > 1;
+  return latestYear * 10 + (isRange ? 0 : 1);
 }
 
 function getIdScore(value) {
@@ -787,7 +790,7 @@ function renderFeatureImages() {
     : works.filter((work) => work && (work.image || work.images?.[0]));
   const active = shuffle(selectedPool)[0];
   if (!active) return;
-  const featureImage = active.image || active.images?.[0] || "";
+  const featureImage = getWorkListImagePath(active.image || active.images?.[0] || "");
   const title = workText(active, "title");
   const href = getWorkDetailPagePath(active);
   featureImages.forEach((img) => {
@@ -929,7 +932,7 @@ function renderGallery() {
     if (galleryId === "top-selected") {
       gallery.classList.add("top-selected-row");
       gallery.innerHTML = outputList.map((work) => {
-        const firstImage = work.images?.[0] || work.image;
+        const firstImage = getWorkListImagePath(work.images?.[0] || work.image);
         const title = workText(work, "title");
         const orderedIds = stableList.map((item) => String(item?.id ?? "")).filter(Boolean);
         return `
