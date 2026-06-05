@@ -242,16 +242,8 @@ main {
   border-radius: 8px;
 }
 
-.top-eyebrow {
-  margin: 0;
-  font-size: 12px;
-  color: #353942;
-  font-weight: 600;
-}
-
 .top-name-block {
   display: grid;
-  gap: 6px;
 }
 
 .top-intro-block {
@@ -270,7 +262,7 @@ main {
 }
 
 .top-hero h1 {
-  margin: 14px 0 0;
+  margin: 0;
   font-family: "Didot", "Bodoni 72", "Times New Roman", "Hiragino Mincho ProN", "Yu Mincho", serif;
   font-size: clamp(43px, 4.7vw, 54px);
   font-weight: 400;
@@ -282,15 +274,6 @@ main {
   display: inline-flex;
   flex-direction: row;
   align-items: flex-end;
-  gap: 10px;
-}
-
-.name-ruby {
-  font-size: 0.28em;
-  line-height: 1.3;
-  letter-spacing: 0.06em;
-  text-transform: lowercase;
-  transform: translateY(-0.08em);
 }
 
 .name-main {
@@ -2398,10 +2381,6 @@ footer {
     background: var(--selected-scrollbar-thumb-hover);
   }
 
-  .name-ruby {
-    font-size: 0.34em;
-  }
-
   .top-links {
     grid-template-columns: 1fr 1fr;
   }
@@ -2706,10 +2685,6 @@ footer {
 
   .top-hero h1 .archive-line {
     font-size: 1.2em;
-  }
-
-  .name-ruby {
-    font-size: 0.38em;
   }
 
   .top-lead {
