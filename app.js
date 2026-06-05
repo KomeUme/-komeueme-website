@@ -158,7 +158,7 @@ let topCategoryButtonsVisible = false;
 let pendingOpenWorkId = null;
 let pendingOpenEnabled = false;
 let workListLocationRestored = false;
-const detailPageVersion = "20260605e";
+const detailPageVersion = "20260605h";
 
 function appendPageVersion(href) {
   const text = String(href ?? "").trim();
@@ -364,6 +364,9 @@ function renderWorkDetailPage() {
   const captionText = article.querySelector(".caption-text");
   if (captionText) captionText.textContent = withFallback(caption);
 
+  const returnState = getWorkListReturnState(workId);
+  renderSelectedWorksCategoryCta(article, work, returnState);
+
   const images = Array.isArray(work.images) && work.images.length
     ? work.images.map((image) => String(image ?? "")).filter(Boolean)
     : [work.image].map((image) => String(image ?? "")).filter(Boolean);
@@ -425,8 +428,46 @@ function renderWorkDetailPage() {
     }
   }
 
-  const returnState = getWorkListReturnState(workId);
   updateWorkDetailPager(work, returnState);
+}
+
+function getCategoryListLabel(key, fallback) {
+  const listKey = String(key || "").replace(/^category_/, "category_list_");
+  return uiT(listKey, fallback);
+}
+
+function getMoreCategoryWorksLabel(work, categoryLabel) {
+  const key = getWorkDetailCategoryKey(work);
+  const categoryListLabel = getCategoryListLabel(key, categoryLabel);
+  return getCurrentLang() === "en"
+    ? `More ${withFallback(categoryListLabel)}`
+    : `${withFallback(categoryLabel)}の作品一覧を見る`;
+}
+
+function renderSelectedWorksCategoryCta(article, work, returnState) {
+  const caption = article.querySelector(".caption");
+  if (!caption) return;
+
+  const existing = caption.querySelector("[data-selected-category-cta]");
+  if (returnState?.galleryId !== "top-selected") {
+    if (existing) existing.remove();
+    return;
+  }
+
+  const categoryLabel = getWorkDetailCategoryLabel(work);
+  const href = appendPageVersion(getWorkListPagePath(work));
+  const label = getMoreCategoryWorksLabel(work, categoryLabel);
+  const link = existing || document.createElement("a");
+  link.className = "work-detail-category-cta";
+  link.dataset.selectedCategoryCta = "true";
+  link.href = href;
+  link.textContent = `${label} →`;
+
+  const captionText = caption.querySelector(".caption-text");
+  if (!existing) {
+    if (captionText) captionText.insertAdjacentElement("afterend", link);
+    else caption.appendChild(link);
+  }
 }
 
 function attachWorkDetailThumbnailControls() {

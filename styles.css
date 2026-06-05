@@ -1384,14 +1384,34 @@ main {
 }
 
 .work-detail .caption-category-meta a {
-  color: #6f7580;
+  color: #555c68;
   text-decoration: underline;
-  text-underline-offset: 2px;
+  text-underline-offset: 3px;
   text-decoration-thickness: 1px;
   transition: color 0.15s ease, text-decoration-thickness 0.15s ease;
 }
 
 .work-detail .caption-category-meta a:hover {
+  color: #1d2026;
+  text-decoration-thickness: 2px;
+}
+
+.work-detail-category-cta {
+  display: inline-block;
+  margin-top: 22px;
+  padding-top: 12px;
+  border-top: 1px solid #e1e4e8;
+  color: #606873;
+  font-size: 12px;
+  line-height: 1.45;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+  transition: color 0.15s ease, border-color 0.15s ease, text-decoration-thickness 0.15s ease;
+}
+
+.work-detail-category-cta:hover {
+  border-top-color: #c8cdd4;
   color: #1d2026;
   text-decoration-thickness: 2px;
 }
