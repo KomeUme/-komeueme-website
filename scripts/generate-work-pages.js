@@ -130,7 +130,7 @@ function buildHeader(work) {
         </div>
       </div>
       <div class="nav-item nav-dropdown">
-        <a${dropdownTriggerClass(isManga)} href="${getPageHref("manga.html")}" data-i18n="nav_manga">漫画</a>
+        <a${dropdownTriggerClass(isManga)} href="${getPageHref("manga-4koma.html")}" data-i18n="nav_manga">漫画</a>
         <div class="nav-submenu">
           <a${navClass(listPage === "manga-4koma.html")} href="${getPageHref("manga-4koma.html")}" data-i18n="nav_manga_4koma">四コマ</a>
           <a${navClass(listPage === "manga-story.html")} href="${getPageHref("manga-story.html")}" data-i18n="nav_manga_story">ストーリー</a>
