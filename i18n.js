@@ -235,9 +235,9 @@ const I18N = {
 
 function updateProfileNavDate() {
   const profileTitle = document.querySelector('summary h2[data-i18n="card_profile_title"]');
-  const profileDesc = document.querySelector('p[data-i18n="profile_desc"]');
+  const profileUpdatedTarget = document.querySelector("[data-profile-updated-date]");
   const introTitle = document.querySelector(".top-intro-title");
-  if (!profileTitle && !profileDesc && !introTitle) return;
+  if (!profileTitle && !profileUpdatedTarget && !introTitle) return;
 
   let lang = "ja";
   try {
@@ -262,14 +262,9 @@ function updateProfileNavDate() {
 
   const profileUpdated = dict.profile_history_body_updated || I18N.ja.profile_history_body_updated || "";
   const profileDateLabel = formatUpdatedLabel(profileUpdated);
-  if (profileDesc) {
-    let dateEl = profileDesc.querySelector(".profile-updated-date");
-    if (!dateEl) {
-      dateEl = document.createElement("span");
-      dateEl.className = "profile-updated-date";
-      profileDesc.appendChild(dateEl);
-    }
-    dateEl.textContent = wrapUpdatedLabel(profileDateLabel);
+  if (profileUpdatedTarget) {
+    profileUpdatedTarget.textContent = profileDateLabel;
+    profileUpdatedTarget.hidden = !profileDateLabel;
   }
 
   if (introTitle) {
