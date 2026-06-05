@@ -1541,12 +1541,14 @@ main {
     height: calc(100% - (var(--wide-landscape-block-pad) * 2));
   }
 
-  .gallery-grid[data-gallery="manga-4koma"][data-gallery-layout="compact"] .work-image-link {
+  .gallery-grid[data-gallery="manga-4koma"][data-gallery-layout="compact"] .work-image-link,
+  .gallery-grid[data-gallery="manga-story"][data-gallery-layout="compact"] .work-image-link {
     height: 360px;
     aspect-ratio: auto;
   }
 
-  .gallery-grid[data-gallery="manga-4koma"][data-gallery-layout="compact"] .work-image-link img {
+  .gallery-grid[data-gallery="manga-4koma"][data-gallery-layout="compact"] .work-image-link img,
+  .gallery-grid[data-gallery="manga-story"][data-gallery-layout="compact"] .work-image-link img {
     position: absolute;
     inset: 0;
     width: 100%;
@@ -1557,17 +1559,20 @@ main {
     object-position: top center;
   }
 
-  .gallery-grid[data-gallery="manga-4koma"][data-gallery-layout="compact"] .work {
+  .gallery-grid[data-gallery="manga-4koma"][data-gallery-layout="compact"] .work,
+  .gallery-grid[data-gallery="manga-story"][data-gallery-layout="compact"] .work {
     grid-template-rows: auto 44px;
   }
 
-  .gallery-grid[data-gallery="manga-4koma"][data-gallery-layout="compact"] .caption {
+  .gallery-grid[data-gallery="manga-4koma"][data-gallery-layout="compact"] .caption,
+  .gallery-grid[data-gallery="manga-story"][data-gallery-layout="compact"] .caption {
     height: 44px;
     min-height: 44px;
     grid-template-rows: 44px;
   }
 
-  .gallery-grid[data-gallery="manga-4koma"][data-gallery-layout="compact"] .caption-meta-list {
+  .gallery-grid[data-gallery="manga-4koma"][data-gallery-layout="compact"] .caption-meta-list,
+  .gallery-grid[data-gallery="manga-story"][data-gallery-layout="compact"] .caption-meta-list {
     display: none;
   }
 }
@@ -2540,6 +2545,32 @@ footer {
 
   .gallery-grid[data-gallery-layout="compact"] .caption {
     display: none;
+  }
+
+  .gallery-grid[data-gallery="manga-4koma"][data-gallery-layout="compact"] .caption,
+  .gallery-grid[data-gallery="manga-story"][data-gallery-layout="compact"] .caption {
+    display: block;
+    min-height: 0;
+    height: 34px;
+    margin-top: 7px;
+    padding-top: 0;
+    border-top: 0;
+    text-align: center;
+  }
+
+  .gallery-grid[data-gallery="manga-4koma"][data-gallery-layout="compact"] .caption-title,
+  .gallery-grid[data-gallery="manga-story"][data-gallery-layout="compact"] .caption-title {
+    display: -webkit-box;
+    margin: 0;
+    color: #555c68;
+    font-size: 11px;
+    font-weight: 400;
+    line-height: 1.35;
+    letter-spacing: 0;
+    overflow: hidden;
+    overflow-wrap: anywhere;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
   }
 
   .gallery-grid[data-gallery-layout="compact"] .caption-meta-list,
