@@ -31,7 +31,6 @@ const I18N = {
     top_hero_lead: "私は制作を通し、自身の価値観の可視化を目的としている。\n過去、現在、未来において同じモチーフを見たとしても、自身の感性や周りの環境の変化により、そのモチーフから受け取る情報の異なることが往々にしてある。\nその為、作品制作を通し今現在の自身の価値観を測り、自身が何を重要視しているのか、その移り変わりを観察している。",
     intro_statement_title: "はじめに",
     intro_statement_body: "私は制作を通し、自身の価値観の可視化を目的としている。過去、現在、未来において同じモチーフを見たとしても、自身の感性や周りの環境の変化により、そのモチーフから受け取る情報の異なることが往々にしてある。その為、作品制作を通し今現在の自身の価値観を測り、自身が何を重要視しているのか、その移り変わりを観察している。",
-    intro_block_updated: "2026.06.02",
     btn_view_wood: "木版画を見る",
     btn_view_copper: "銅版画を見る",
     card_wood_desc: "大型作品を含む木版画作品一覧",
@@ -57,6 +56,7 @@ const I18N = {
     profile_title: "Profile",
     profile_desc: "略歴情報。",
     profile_history_body_updated: "2026.06.02",
+    site_updated_label: "サイト更新日",
     profile_edu_title: "学歴",
     profile_award_title: "受賞歴",
     profile_exhibition_title: "展示歴",
@@ -144,7 +144,6 @@ const I18N = {
     top_hero_lead: "Through making work, I aim to visualize my own values.\nEven when looking at the same motif across past, present, and future, what I perceive can differ as my sensibility and surrounding environment change.\nBy creating works, I observe my current values, what I prioritize, and how those priorities shift over time.",
     intro_statement_title: "Introduction",
     intro_statement_body: "Through making work, I aim to visualize my own values. Even when looking at the same motif across past, present, and future, what I perceive can differ as my sensibility and surrounding environment change. By creating works, I observe my current values, what I prioritize, and how those priorities shift over time.",
-    intro_block_updated: "2026.06.02",
     btn_view_wood: "View Woodblock",
     btn_view_copper: "View Intaglio",
     card_wood_desc: "Woodblock works including large-format pieces",
@@ -170,6 +169,7 @@ const I18N = {
     profile_title: "Profile",
     profile_desc: "Biographical information",
     profile_history_body_updated: "2026.06.02",
+    site_updated_label: "Site updated",
     profile_edu_title: "Education",
     profile_award_title: "Awards",
     profile_exhibition_title: "Exhibitions",
@@ -236,8 +236,8 @@ const I18N = {
 function updateProfileNavDate() {
   const profileTitle = document.querySelector('summary h2[data-i18n="card_profile_title"]');
   const profileUpdatedTarget = document.querySelector("[data-profile-updated-date]");
-  const introTitle = document.querySelector(".top-intro-title");
-  if (!profileTitle && !profileUpdatedTarget && !introTitle) return;
+  const siteUpdatedTarget = document.querySelector("[data-site-updated-date]");
+  if (!profileTitle && !profileUpdatedTarget && !siteUpdatedTarget) return;
 
   let lang = "ja";
   try {
@@ -250,9 +250,13 @@ function updateProfileNavDate() {
     if (!date) return "";
     return lang === "en" ? `Updated ${date}` : `${date}更新`;
   };
-  const wrapUpdatedLabel = (label) => {
-    if (!label) return "";
-    return lang === "en" ? ` (${label})` : `（${label}）`;
+  const formatDate = (value) => {
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return "";
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}.${month}.${day}`;
   };
 
   if (profileTitle) {
@@ -267,16 +271,13 @@ function updateProfileNavDate() {
     profileUpdatedTarget.hidden = !profileDateLabel;
   }
 
-  if (introTitle) {
-    const introUpdated = dict.intro_block_updated || I18N.ja.intro_block_updated || "";
-    const introDateLabel = formatUpdatedLabel(introUpdated);
-    let dateEl = introTitle.querySelector(".profile-updated-date");
-    if (!dateEl) {
-      dateEl = document.createElement("span");
-      dateEl.className = "profile-updated-date";
-      introTitle.appendChild(dateEl);
-    }
-    dateEl.textContent = wrapUpdatedLabel(introDateLabel);
+  if (siteUpdatedTarget) {
+    const siteUpdated = formatDate(document.lastModified);
+    const siteUpdatedLabel = dict.site_updated_label || I18N.ja.site_updated_label || "";
+    siteUpdatedTarget.textContent = siteUpdated && siteUpdatedLabel
+      ? `${siteUpdatedLabel} ${siteUpdated}`
+      : "";
+    siteUpdatedTarget.hidden = !siteUpdatedTarget.textContent;
   }
 }
 
