@@ -1345,6 +1345,51 @@ main {
   -webkit-user-drag: none;
 }
 
+.story-page-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: -4px;
+}
+
+.story-page-button,
+.story-page-select {
+  min-height: 34px;
+  border: 1px solid #d7d9de;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.92);
+  color: #3f4650;
+  font-family: "Helvetica Neue", Arial, "Hiragino Sans", "Yu Gothic", sans-serif;
+  font-size: 13px;
+  line-height: 1;
+}
+
+.story-page-button {
+  width: 38px;
+  padding: 0;
+  cursor: pointer;
+}
+
+.story-page-button:disabled {
+  color: #b5bac2;
+  cursor: default;
+  opacity: 0.54;
+}
+
+.story-page-picker {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #8a9099;
+  font-size: 12px;
+}
+
+.story-page-select {
+  min-width: 58px;
+  padding: 0 8px;
+}
+
 .work-detail-caption {
   position: sticky;
   top: 24px;

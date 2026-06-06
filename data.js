@@ -647,6 +647,29 @@ const works = [
     ]
   },
   {
+    "id": "53",
+    "category": "manga",
+    "subcategory": "story",
+    "title": "カエル_ ネーム",
+    "year": "",
+    "technique": "",
+    "size": "",
+    "caption": "",
+    "image": "assets/works/work-53-01.jpg",
+    "images": [
+      "assets/works/work-53-01.jpg",
+      "assets/works/work-53-02.jpg",
+      "assets/works/work-53-03.jpg",
+      "assets/works/work-53-04.jpg",
+      "assets/works/work-53-05.jpg",
+      "assets/works/work-53-06.jpg",
+      "assets/works/work-53-07.jpg",
+      "assets/works/work-53-08.jpg",
+      "assets/works/work-53-09.jpg",
+      "assets/works/work-53-10.jpg"
+    ]
+  },
+  {
     "id": "33",
     "category": "manga",
     "subcategory": "4koma",

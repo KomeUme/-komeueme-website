@@ -158,7 +158,7 @@ let topCategoryButtonsVisible = false;
 let pendingOpenWorkId = null;
 let pendingOpenEnabled = false;
 let workListLocationRestored = false;
-const detailPageVersion = "20260605h";
+const detailPageVersion = "20260606i";
 
 function appendPageVersion(href) {
   const text = String(href ?? "").trim();
@@ -279,6 +279,10 @@ function isFourPanelMangaWork(work) {
   return /4コマ|四コマ|４コマ|四齣/i.test(text);
 }
 
+function isStoryMangaWork(work) {
+  return work?.category === "manga" && !isFourPanelMangaWork(work);
+}
+
 function getWorkPagePath(work) {
   if (work.category === "digital") {
     return work.subcategory === "mini-chara" ? "digital-mini-chara.html" : "digital-illustration.html";
@@ -323,6 +327,7 @@ function renderWorkDetailPage() {
   const work = works.find((item) => String(item?.id ?? "") === workId);
   if (!work) return;
   article.classList.toggle("is-four-panel-manga-detail", isFourPanelMangaWork(work));
+  article.classList.toggle("is-story-manga-detail", isStoryMangaWork(work));
 
   const title = workText(work, "title");
   const year = workText(work, "year");
@@ -374,10 +379,27 @@ function renderWorkDetailPage() {
   const media = article.querySelector(".work-detail-media");
   if (media && images.length) {
     const thumbnailLabel = uiT("detail_thumbnails", "作品画像一覧");
+    const isStoryViewer = isStoryMangaWork(work) && images.length > 1;
+    const pageControls = isStoryViewer
+      ? `
+      <div class="story-page-controls" data-story-page-controls aria-label="${escapeHtml(uiT("story_page_select", "ページ選択"))}">
+        <button class="story-page-button" type="button" data-story-page-prev aria-label="${escapeHtml(uiT("story_page_prev", "前のページ"))}">‹</button>
+        <label class="story-page-picker">
+          <span class="sr-only">${escapeHtml(uiT("story_page_select", "ページ選択"))}</span>
+          <select class="story-page-select" data-story-page-select>
+            ${images.map((_, index) => `<option value="${index}">${index + 1}</option>`).join("")}
+          </select>
+          <span class="story-page-total">/ ${images.length}</span>
+        </label>
+        <button class="story-page-button" type="button" data-story-page-next aria-label="${escapeHtml(uiT("story_page_next", "次のページ"))}">›</button>
+      </div>
+      `
+      : "";
     media.innerHTML = `
       <figure class="work-detail-main">
         <img class="work-detail-main-image" data-work-detail-main-image src="${escapeHtml(encodeImageSrc(images[0]))}" alt="${escapeHtml(images.length > 1 ? `${titleText} 1` : titleText)}">
       </figure>
+      ${pageControls}
       <div class="work-detail-thumbnails" data-work-detail-thumbnails aria-label="${escapeHtml(thumbnailLabel)}">
         ${images.map((imagePath, index) => `
           <button class="work-detail-thumb${index === 0 ? " is-active" : ""}" type="button" data-work-detail-thumb data-work-index="${index}" aria-pressed="${index === 0 ? "true" : "false"}">
@@ -390,6 +412,9 @@ function renderWorkDetailPage() {
     const mainImage = media.querySelector("[data-work-detail-main-image]");
     const thumbButtons = Array.from(media.querySelectorAll("[data-work-detail-thumb]"));
     const thumbnailList = media.querySelector("[data-work-detail-thumbnails]");
+    const storyPrevButton = media.querySelector("[data-story-page-prev]");
+    const storyNextButton = media.querySelector("[data-story-page-next]");
+    const storyPageSelect = media.querySelector("[data-story-page-select]");
     const activateIndex = (index) => {
       const safeIndex = Math.min(Math.max(Number(index) || 0, 0), images.length - 1);
       if (mainImage) {
@@ -401,6 +426,15 @@ function renderWorkDetailPage() {
         button.classList.toggle("is-active", isActive);
         button.setAttribute("aria-pressed", isActive ? "true" : "false");
       });
+      if (storyPageSelect) storyPageSelect.value = String(safeIndex);
+      if (storyPrevButton) storyPrevButton.disabled = safeIndex === 0;
+      if (storyNextButton) storyNextButton.disabled = safeIndex === images.length - 1;
+      const activeThumb = thumbButtons.find((button) => Number(button.dataset.workIndex || "-1") === safeIndex);
+      if (activeThumb) activeThumb.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+    };
+    const stepStoryPage = (offset) => {
+      const current = Number(storyPageSelect?.value || 0);
+      activateIndex(current + offset);
     };
     const activateThumbFromEvent = (event) => {
       const button = event.target instanceof Element
@@ -427,6 +461,26 @@ function renderWorkDetailPage() {
         activateThumbFromEvent(event);
       });
     }
+    if (storyPrevButton) storyPrevButton.addEventListener("click", () => stepStoryPage(-1));
+    if (storyNextButton) storyNextButton.addEventListener("click", () => stepStoryPage(1));
+    if (storyPageSelect) storyPageSelect.addEventListener("change", () => activateIndex(storyPageSelect.value));
+    if (isStoryViewer && mainImage) {
+      let swipeStartX = null;
+      mainImage.addEventListener("pointerdown", (event) => {
+        swipeStartX = event.clientX;
+      });
+      mainImage.addEventListener("pointerup", (event) => {
+        if (swipeStartX === null) return;
+        const deltaX = event.clientX - swipeStartX;
+        swipeStartX = null;
+        if (Math.abs(deltaX) < 44) return;
+        stepStoryPage(deltaX < 0 ? 1 : -1);
+      });
+      mainImage.addEventListener("pointercancel", () => {
+        swipeStartX = null;
+      });
+    }
+    activateIndex(0);
   }
 
   updateWorkDetailPager(work, returnState);
@@ -551,9 +605,9 @@ function updateWorkDetailPager(work, returnState) {
       const prevWork = works.find((item) => String(item?.id ?? "") === prevId);
       if (prevWork) {
         prevLink.setAttribute("href", getWorkDetailPagePath(prevWork));
-        const key = isSameMangaSeriesNavigation(work, prevWork) ? "prev_episode" : "prev_work";
+        const key = getMangaSeriesPagerLabelKey(work, prevWork, "prev_work");
         prevLink.dataset.i18n = key;
-        prevLink.textContent = uiT(key, key === "prev_episode" ? "前の話" : "前の作品");
+        prevLink.textContent = getPagerLabelText(key);
       }
       prevLink.hidden = false;
       prevLink.style.visibility = "visible";
@@ -572,9 +626,9 @@ function updateWorkDetailPager(work, returnState) {
       const nextWork = works.find((item) => String(item?.id ?? "") === nextId);
       if (nextWork) {
         nextLink.setAttribute("href", getWorkDetailPagePath(nextWork));
-        const key = isSameMangaSeriesNavigation(work, nextWork) ? "next_episode" : "next_work";
+        const key = getMangaSeriesPagerLabelKey(work, nextWork, "next_work");
         nextLink.dataset.i18n = key;
-        nextLink.textContent = uiT(key, key === "next_episode" ? "次の話" : "次の作品");
+        nextLink.textContent = getPagerLabelText(key);
       }
       nextLink.hidden = false;
       nextLink.style.visibility = "visible";
@@ -835,6 +889,31 @@ function isSameMangaSeriesNavigation(currentWork, targetWork) {
   const currentSeries = String(currentWork?.series ?? "").trim();
   const targetSeries = String(targetWork?.series ?? "").trim();
   return Boolean(currentSeries) && currentSeries === targetSeries;
+}
+
+function getSeriesOrderValue(work) {
+  const value = Number(work?.seriesOrder);
+  return Number.isFinite(value) ? value : null;
+}
+
+function getMangaSeriesPagerLabelKey(currentWork, targetWork, fallbackKey) {
+  if (!isSameMangaSeriesNavigation(currentWork, targetWork)) return fallbackKey;
+  const currentOrder = getSeriesOrderValue(currentWork);
+  const targetOrder = getSeriesOrderValue(targetWork);
+  if (currentOrder !== null && targetOrder !== null && currentOrder !== targetOrder) {
+    return targetOrder < currentOrder ? "prev_episode" : "next_episode";
+  }
+  return fallbackKey === "prev_work" ? "prev_episode" : "next_episode";
+}
+
+function getPagerLabelText(key) {
+  const fallbackMap = {
+    prev_episode: "前の話",
+    next_episode: "次の話",
+    prev_work: "前の作品",
+    next_work: "次の作品",
+  };
+  return uiT(key, fallbackMap[key] || "作品");
 }
 
 function sortWorks(list, sortMode, category) {
@@ -1327,14 +1406,12 @@ function attachGallerySortControls() {
         control.dataset.sortOpen = "true";
         control.dataset.sortClosing = "false";
         button.setAttribute("aria-expanded", "true");
-        {
-          const timer = closeTimers.get(control);
-          if (timer) {
-            window.clearTimeout(timer);
-            closeTimers.delete(control);
-          }
-          menu.hidden = false;
+        const timer = closeTimers.get(control);
+        if (timer) {
+          window.clearTimeout(timer);
+          closeTimers.delete(control);
         }
+        menu.hidden = false;
       });
     }
 
