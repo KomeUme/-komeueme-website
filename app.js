@@ -895,7 +895,7 @@ function getGalleryTitleHtml(work) {
   const title = workText(work, "title");
   const episodeNumber = getMangaEpisodeNumber(work);
   if (!episodeNumber) return escapeHtml(title);
-  return `<span class="caption-episode">#${escapeHtml(String(episodeNumber))}</span> ${escapeHtml(title)}`;
+  return `<span class="caption-episode">${escapeHtml(String(episodeNumber))}</span> ${escapeHtml(title)}`;
 }
 
 function groupMangaWorks(list) {
