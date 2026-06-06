@@ -885,19 +885,6 @@ function getMangaGroupLabel(groupKey) {
     : uiT("manga_group_single", "単作");
 }
 
-function getMangaEpisodeNumber(work) {
-  if (getMangaGroupKey(work) !== "sisters") return null;
-  const value = Number(work?.seriesOrder);
-  return Number.isFinite(value) && value > 0 ? value : null;
-}
-
-function getGalleryTitleHtml(work) {
-  const title = workText(work, "title");
-  const episodeNumber = getMangaEpisodeNumber(work);
-  if (!episodeNumber) return escapeHtml(title);
-  return `<span class="caption-episode">${escapeHtml(String(episodeNumber))}</span> ${escapeHtml(title)}`;
-}
-
 function groupMangaWorks(list) {
   const groups = [
     { key: "sisters", works: [] },
@@ -915,7 +902,6 @@ function renderGalleryWorkCard(work, orderedIds) {
   const firstImage = work.images?.[0] || work.image;
   const listImage = getWorkListImagePath(firstImage);
   const title = workText(work, "title");
-  const titleHtml = getGalleryTitleHtml(work);
   const year = workText(work, "year");
   const technique = workText(work, "technique");
   const size = workText(work, "size");
@@ -927,7 +913,7 @@ function renderGalleryWorkCard(work, orderedIds) {
           <img src="${escapeHtml(listImage)}" alt="${escapeHtml(title)}" loading="lazy">
         </a>
         <div class="caption">
-          <h3 class="caption-title">${titleHtml}</h3>
+          <h3 class="caption-title">${escapeHtml(title)}</h3>
           <div class="caption-meta-list">
             <p class="caption-meta"><span>${escapeHtml(uiT("cap_year", "制作年"))}</span><span>${escapeHtml(withFallback(year))}</span></p>
             <p class="caption-meta"><span>${escapeHtml(uiT("cap_technique", "技法"))}</span><span>${escapeHtml(withFallback(technique))}</span></p>
