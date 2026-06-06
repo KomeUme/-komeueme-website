@@ -804,12 +804,32 @@ function syncGalleryAvailability(gallery, galleryId, hasWorks) {
 
 function getGallerySortMode(gallery, galleryId, prev) {
   if (prev?.sortMode) return prev.sortMode;
+  if (galleryId === "manga-4koma") return "story-asc";
   if (galleryId === "hanga" || galleryId.startsWith("hanga-")) return "size";
   if (hasGallerySortControls(galleryId)) return "year";
   return gallery.dataset.sort || "default";
 }
 
+function getSeriesOrderScore(work) {
+  const value = Number(work?.seriesOrder);
+  return Number.isFinite(value) ? value : Number.POSITIVE_INFINITY;
+}
+
+function getMangaGroupPriority(work) {
+  return getMangaGroupKey(work) === "sisters" ? 0 : 1;
+}
+
 function sortWorks(list, sortMode, category) {
+  if (sortMode === "story-asc" || sortMode === "story-desc") {
+    const direction = sortMode === "story-desc" ? -1 : 1;
+    return [...list].sort((a, b) => {
+      const groupDiff = getMangaGroupPriority(a) - getMangaGroupPriority(b);
+      if (groupDiff) return groupDiff;
+      const orderDiff = getSeriesOrderScore(a) - getSeriesOrderScore(b);
+      if (orderDiff) return orderDiff * direction;
+      return getIdScore(a.id) - getIdScore(b.id);
+    });
+  }
   if (sortMode === "year" || sortMode === "recent") {
     return [...list].sort((a, b) => {
       if (sortMode === "recent" && category === "digital-mini-chara") {
@@ -835,6 +855,8 @@ function sortWorks(list, sortMode, category) {
 }
 
 function getGallerySortLabel(sortMode) {
+  if (sortMode === "story-asc") return uiT("sort_story_asc", "第一話から");
+  if (sortMode === "story-desc") return uiT("sort_story_desc", "最新話から");
   if (sortMode === "size") return uiT("sort_size", "作品サイズ順");
   return uiT("sort_year", "制作年度順");
 }
@@ -851,6 +873,71 @@ function getWorkCardClass(work) {
     classes.push("is-compact");
   }
   return classes.join(" ");
+}
+
+function getMangaGroupKey(work) {
+  return String(work?.series ?? "") === "sisters" ? "sisters" : "single";
+}
+
+function getMangaGroupLabel(groupKey) {
+  return groupKey === "sisters"
+    ? uiT("manga_group_sisters", "姉妹")
+    : uiT("manga_group_single", "単作");
+}
+
+function getMangaEpisodeNumber(work) {
+  if (getMangaGroupKey(work) !== "sisters") return null;
+  const value = Number(work?.seriesOrder);
+  return Number.isFinite(value) && value > 0 ? value : null;
+}
+
+function getGalleryTitleHtml(work) {
+  const title = workText(work, "title");
+  const episodeNumber = getMangaEpisodeNumber(work);
+  if (!episodeNumber) return escapeHtml(title);
+  return `<span class="caption-episode">#${escapeHtml(String(episodeNumber))}</span> ${escapeHtml(title)}`;
+}
+
+function groupMangaWorks(list) {
+  const groups = [
+    { key: "sisters", works: [] },
+    { key: "single", works: [] },
+  ];
+  const groupMap = new Map(groups.map((group) => [group.key, group]));
+  list.forEach((work) => {
+    const group = groupMap.get(getMangaGroupKey(work)) || groupMap.get("single");
+    group.works.push(work);
+  });
+  return groups.filter((group) => group.works.length);
+}
+
+function renderGalleryWorkCard(work, orderedIds) {
+  const firstImage = work.images?.[0] || work.image;
+  const listImage = getWorkListImagePath(firstImage);
+  const title = workText(work, "title");
+  const titleHtml = getGalleryTitleHtml(work);
+  const year = workText(work, "year");
+  const technique = workText(work, "technique");
+  const size = workText(work, "size");
+  const caption = workText(work, "caption");
+  const detailPath = getWorkDetailPagePath(work, orderedIds);
+  return `
+      <article class="${getWorkCardClass(work)}" data-work-id="${escapeHtml(work.id)}">
+        <a class="work-image-link js-work-link" href="${escapeHtml(detailPath)}" data-work-id="${escapeHtml(work.id)}" data-work-page="${escapeHtml(detailPath)}" data-work-detail-link="true">
+          <img src="${escapeHtml(listImage)}" alt="${escapeHtml(title)}" loading="lazy">
+        </a>
+        <div class="caption">
+          <h3 class="caption-title">${titleHtml}</h3>
+          <div class="caption-meta-list">
+            <p class="caption-meta"><span>${escapeHtml(uiT("cap_year", "制作年"))}</span><span>${escapeHtml(withFallback(year))}</span></p>
+            <p class="caption-meta"><span>${escapeHtml(uiT("cap_technique", "技法"))}</span><span>${escapeHtml(withFallback(technique))}</span></p>
+            <p class="caption-meta"><span>${escapeHtml(uiT("cap_size", "サイズ"))}</span><span>${escapeHtml(withFallback(size))}</span></p>
+          </div>
+          <p class="caption-text">${escapeHtml(withFallback(caption))}</p>
+          <button class="caption-toggle" type="button" hidden>${escapeHtml(uiT("caption_more", "続きを読む"))}</button>
+        </div>
+      </article>
+    `;
 }
 
 function getWorkDetailCategoryKey(work) {
@@ -1071,33 +1158,19 @@ function renderGallery() {
       return;
     }
 
-    gallery.innerHTML = outputList.map((work) => {
-      const firstImage = work.images?.[0] || work.image;
-      const listImage = getWorkListImagePath(firstImage);
-      const title = workText(work, "title");
-      const year = workText(work, "year");
-      const technique = workText(work, "technique");
-      const size = workText(work, "size");
-      const caption = workText(work, "caption");
-      const orderedIds = stableList.map((item) => String(item?.id ?? "")).filter(Boolean);
-      return `
-      <article class="${getWorkCardClass(work)}" data-work-id="${escapeHtml(work.id)}">
-        <a class="work-image-link js-work-link" href="${escapeHtml(getWorkDetailPagePath(work, orderedIds))}" data-work-id="${escapeHtml(work.id)}" data-work-page="${escapeHtml(getWorkDetailPagePath(work, orderedIds))}" data-work-detail-link="true">
-          <img src="${escapeHtml(listImage)}" alt="${escapeHtml(title)}" loading="lazy">
-        </a>
-        <div class="caption">
-          <h3 class="caption-title">${escapeHtml(title)}</h3>
-          <div class="caption-meta-list">
-            <p class="caption-meta"><span>${escapeHtml(uiT("cap_year", "制作年"))}</span><span>${escapeHtml(withFallback(year))}</span></p>
-            <p class="caption-meta"><span>${escapeHtml(uiT("cap_technique", "技法"))}</span><span>${escapeHtml(withFallback(technique))}</span></p>
-            <p class="caption-meta"><span>${escapeHtml(uiT("cap_size", "サイズ"))}</span><span>${escapeHtml(withFallback(size))}</span></p>
-          </div>
-          <p class="caption-text">${escapeHtml(withFallback(caption))}</p>
-          <button class="caption-toggle" type="button" hidden>${escapeHtml(uiT("caption_more", "続きを読む"))}</button>
+    const orderedIds = stableList.map((item) => String(item?.id ?? "")).filter(Boolean);
+    if (category === "manga-4koma") {
+      gallery.classList.add("gallery-grid-sectioned");
+      gallery.innerHTML = groupMangaWorks(outputList).map((group) => `
+        <div class="gallery-group-heading">
+          <h2>${escapeHtml(getMangaGroupLabel(group.key))}</h2>
         </div>
-      </article>
-    `;
-    }).join("");
+        ${group.works.map((work) => renderGalleryWorkCard(work, orderedIds)).join("")}
+      `).join("");
+    } else {
+      gallery.classList.remove("gallery-grid-sectioned");
+      gallery.innerHTML = outputList.map((work) => renderGalleryWorkCard(work, orderedIds)).join("");
+    }
 
     if (!isLoadMore && stableList.length > pageSize) {
       renderPaginationControls(gallery, galleryId, currentPage, totalPages);

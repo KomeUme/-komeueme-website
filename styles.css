@@ -718,6 +718,10 @@ main {
   margin: 0 0 16px;
 }
 
+.gallery-sort-control[data-gallery-sort-for="manga-4koma"] {
+  margin-bottom: 8px;
+}
+
 .gallery-sort-control::after {
   content: "";
   flex: 0 0 100%;
@@ -726,6 +730,10 @@ main {
   margin-top: 16px;
   background: #d0d4da;
   pointer-events: none;
+}
+
+.gallery-sort-control[data-gallery-sort-for="manga-4koma"]::after {
+  display: none;
 }
 
 .gallery-sort-dropdown {
@@ -1084,6 +1092,32 @@ main {
   grid-column: span 2;
 }
 
+.gallery-grid-sectioned {
+  align-items: start;
+}
+
+.gallery-group-heading {
+  grid-column: 1 / -1;
+  margin: 8px 0 10px;
+  padding-bottom: 7px;
+  border-bottom: 1px solid var(--line);
+}
+
+.gallery-group-heading:not(:first-child) {
+  margin-top: 30px;
+}
+
+.gallery-group-heading h2 {
+  margin: 0;
+  color: #3f4650;
+  font-family: "Helvetica Neue", Arial, "Hiragino Sans", "Yu Gothic", sans-serif;
+  font-size: clamp(14px, 1.8vw, 17px);
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: 0;
+  text-align: left;
+}
+
 .gallery-grid[data-gallery="manga-4koma"][data-gallery-layout="compact"] .work-image-link {
   overflow: hidden;
 }
@@ -1128,6 +1162,12 @@ main {
   letter-spacing: -.01em;
   color: var(--ink);
   margin-bottom: 6px;
+}
+
+.caption-episode {
+  color: #a2a8b0;
+  font-size: 0.92em;
+  font-weight: 400;
 }
 
 .caption-meta-list {
