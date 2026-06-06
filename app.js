@@ -549,7 +549,12 @@ function updateWorkDetailPager(work, returnState) {
   if (prevLink) {
     if (prevId) {
       const prevWork = works.find((item) => String(item?.id ?? "") === prevId);
-      if (prevWork) prevLink.setAttribute("href", getWorkDetailPagePath(prevWork));
+      if (prevWork) {
+        prevLink.setAttribute("href", getWorkDetailPagePath(prevWork));
+        const key = isSameMangaSeriesNavigation(work, prevWork) ? "prev_episode" : "prev_work";
+        prevLink.dataset.i18n = key;
+        prevLink.textContent = uiT(key, key === "prev_episode" ? "前の話" : "前の作品");
+      }
       prevLink.hidden = false;
       prevLink.style.visibility = "visible";
       prevLink.style.pointerEvents = "";
@@ -565,7 +570,12 @@ function updateWorkDetailPager(work, returnState) {
   if (nextLink) {
     if (nextId) {
       const nextWork = works.find((item) => String(item?.id ?? "") === nextId);
-      if (nextWork) nextLink.setAttribute("href", getWorkDetailPagePath(nextWork));
+      if (nextWork) {
+        nextLink.setAttribute("href", getWorkDetailPagePath(nextWork));
+        const key = isSameMangaSeriesNavigation(work, nextWork) ? "next_episode" : "next_work";
+        nextLink.dataset.i18n = key;
+        nextLink.textContent = uiT(key, key === "next_episode" ? "次の話" : "次の作品");
+      }
       nextLink.hidden = false;
       nextLink.style.visibility = "visible";
       nextLink.style.pointerEvents = "";
@@ -817,6 +827,14 @@ function getSeriesOrderScore(work) {
 
 function getMangaGroupPriority(work) {
   return getMangaGroupKey(work) === "sisters" ? 0 : 1;
+}
+
+function isSameMangaSeriesNavigation(currentWork, targetWork) {
+  if (!currentWork || !targetWork) return false;
+  if (!isFourPanelMangaWork(currentWork) || !isFourPanelMangaWork(targetWork)) return false;
+  const currentSeries = String(currentWork?.series ?? "").trim();
+  const targetSeries = String(targetWork?.series ?? "").trim();
+  return Boolean(currentSeries) && currentSeries === targetSeries;
 }
 
 function sortWorks(list, sortMode, category) {
