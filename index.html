@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title data-i18n="page_title_index">Kome Ume portfolio</title>
-  <link rel="stylesheet" href="styles.css?v=20260606m">
+  <link rel="stylesheet" href="styles.css?v=20260606n">
 </head>
 <body>
   <button class="lang-switch" data-lang-switch type="button">EN</button>
@@ -85,6 +85,22 @@
       </a>
     </section>
 
+    <section class="newsletter-signup" aria-labelledby="newsletter-title">
+      <div class="newsletter-copy">
+        <h2 id="newsletter-title" data-i18n="newsletter_title">展示・販売のお知らせを受け取る</h2>
+        <p data-i18n="newsletter_desc">展示、新商品、大きな新作公開など、重要なお知らせをメールでお送りします。</p>
+      </div>
+      <form class="newsletter-form" data-mailchimp-form data-mailchimp-action="" novalidate>
+        <label class="sr-only" for="newsletter-email" data-i18n="newsletter_email_label">メールアドレス</label>
+        <div class="newsletter-fields">
+          <input id="newsletter-email" name="EMAIL" type="email" autocomplete="email" inputmode="email" placeholder="メールアドレス" data-i18n-placeholder="newsletter_email_placeholder" required>
+          <button type="submit" data-i18n="newsletter_submit">登録する</button>
+        </div>
+        <p class="newsletter-note" data-i18n="newsletter_note">頻繁な配信は行いません。いつでも解除できます。</p>
+        <p class="newsletter-status" data-newsletter-status aria-live="polite"></p>
+      </form>
+    </section>
+
     <p class="site-page-updated" data-site-updated-date hidden></p>
 
     <section class="site-mini-contact">
@@ -94,8 +110,8 @@
   </main>
 
   <footer>© Kome Ume</footer>
-  <script src="data.js?v=20260606c"></script>
-  <script src="app.js?v=20260606i"></script>
-  <script src="i18n.js?v=20260606e"></script>
+  <script src="data.js?v=20260606d"></script>
+  <script src="app.js?v=20260606l"></script>
+  <script src="i18n.js?v=20260606h"></script>
 </body>
 </html>

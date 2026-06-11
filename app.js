@@ -16,6 +16,11 @@ function withFallback(value) {
   return text || "—";
 }
 
+function cleanWorkInfoValue(value) {
+  const text = String(value ?? "").trim();
+  return /^(?:技法|サイズ|キャプション)：?$/.test(text) ? "" : text;
+}
+
 function uiT(key, fallback) {
   const lang = getCurrentLang();
   const dict = window.I18N?.[lang] || window.I18N?.ja || {};
@@ -158,7 +163,7 @@ let topCategoryButtonsVisible = false;
 let pendingOpenWorkId = null;
 let pendingOpenEnabled = false;
 let workListLocationRestored = false;
-const detailPageVersion = "20260606i";
+const detailPageVersion = "20260606j";
 
 function appendPageVersion(href) {
   const text = String(href ?? "").trim();
@@ -330,10 +335,10 @@ function renderWorkDetailPage() {
   article.classList.toggle("is-story-manga-detail", isStoryMangaWork(work));
 
   const title = workText(work, "title");
-  const year = workText(work, "year");
-  const technique = workText(work, "technique");
-  const size = workText(work, "size");
-  const caption = workText(work, "caption");
+  const year = cleanWorkInfoValue(workText(work, "year"));
+  const technique = cleanWorkInfoValue(workText(work, "technique"));
+  const size = cleanWorkInfoValue(workText(work, "size"));
+  const caption = cleanWorkInfoValue(workText(work, "caption"));
   const categoryLabel = getWorkDetailCategoryLabel(work);
   const listPage = getWorkListPagePath(work);
   const categoryHref = appendPageVersion(listPage);
@@ -868,7 +873,6 @@ function syncGalleryAvailability(gallery, galleryId, hasWorks) {
 
 function getGallerySortMode(gallery, galleryId, prev) {
   if (prev?.sortMode) return prev.sortMode;
-  if (galleryId === "manga-4koma") return "story-asc";
   if (galleryId === "hanga" || galleryId.startsWith("hanga-")) return "size";
   if (hasGallerySortControls(galleryId)) return "year";
   return gallery.dataset.sort || "default";
@@ -917,6 +921,26 @@ function getPagerLabelText(key) {
 }
 
 function sortWorks(list, sortMode, category) {
+  if (sortMode === "page") {
+    if (category === "manga-4koma") {
+      return [...list].sort((a, b) => {
+        const groupDiff = getMangaGroupPriority(a) - getMangaGroupPriority(b);
+        if (groupDiff) return groupDiff;
+        const orderDiff = getSeriesOrderScore(a) - getSeriesOrderScore(b);
+        if (orderDiff) return orderDiff;
+        return getIdScore(a.id) - getIdScore(b.id);
+      });
+    }
+    if (category === "manga-story") {
+      return [...list].sort((a, b) => {
+        const pageDiff = getWorkPageCount(b) - getWorkPageCount(a);
+        if (pageDiff) return pageDiff;
+        const yearDiff = getYearScore(b.year) - getYearScore(a.year);
+        if (yearDiff) return yearDiff;
+        return getIdScore(b.id) - getIdScore(a.id);
+      });
+    }
+  }
   if (sortMode === "story-asc" || sortMode === "story-desc") {
     const direction = sortMode === "story-desc" ? -1 : 1;
     return [...list].sort((a, b) => {
@@ -935,6 +959,8 @@ function sortWorks(list, sortMode, category) {
       }
       const yearDiff = getYearScore(b.year) - getYearScore(a.year);
       if (yearDiff) return yearDiff;
+      const areaDiff = getWorkArea(b) - getWorkArea(a);
+      if (areaDiff) return areaDiff;
       return getIdScore(b.id) - getIdScore(a.id);
     });
   }
@@ -952,10 +978,16 @@ function sortWorks(list, sortMode, category) {
 }
 
 function getGallerySortLabel(sortMode) {
+  if (sortMode === "page") return uiT("sort_page", "ページ順");
   if (sortMode === "story-asc") return uiT("sort_story_asc", "第一話から");
   if (sortMode === "story-desc") return uiT("sort_story_desc", "最新話から");
   if (sortMode === "size") return uiT("sort_size", "作品サイズ順");
   return uiT("sort_year", "制作年度順");
+}
+
+function getWorkPageCount(work) {
+  if (Array.isArray(work?.images) && work.images.length) return work.images.length;
+  return work?.image ? 1 : 0;
 }
 
 function getWorkCardClass(work) {
@@ -999,10 +1031,10 @@ function renderGalleryWorkCard(work, orderedIds) {
   const firstImage = work.images?.[0] || work.image;
   const listImage = getWorkListImagePath(firstImage);
   const title = workText(work, "title");
-  const year = workText(work, "year");
-  const technique = workText(work, "technique");
-  const size = workText(work, "size");
-  const caption = workText(work, "caption");
+  const year = cleanWorkInfoValue(workText(work, "year"));
+  const technique = cleanWorkInfoValue(workText(work, "technique"));
+  const size = cleanWorkInfoValue(workText(work, "size"));
+  const caption = cleanWorkInfoValue(workText(work, "caption"));
   const detailPath = getWorkDetailPagePath(work, orderedIds);
   return `
       <article class="${getWorkCardClass(work)}" data-work-id="${escapeHtml(work.id)}">
@@ -1996,6 +2028,120 @@ function attachBackToTopButtons() {
   });
 }
 
+function getMailchimpJsonpUrl(action, email, callbackName) {
+  const rawAction = String(action ?? "").trim().replace(/&amp;/g, "&");
+  if (!rawAction) return "";
+  const jsonpAction = rawAction.includes("/post-json")
+    ? rawAction
+    : rawAction.replace("/post?", "/post-json?");
+  if (!jsonpAction.includes("/post-json")) return "";
+  try {
+    const url = new URL(jsonpAction);
+    url.searchParams.set("EMAIL", email);
+    url.searchParams.set("c", callbackName);
+    return url.toString();
+  } catch (_) {
+    return "";
+  }
+}
+
+function requestMailchimpSubscribe(action, email) {
+  return new Promise((resolve, reject) => {
+    const callbackName = `mailchimpCallback_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+    let script = null;
+    let finished = false;
+    const cleanup = () => {
+      finished = true;
+      if (script) script.remove();
+      try {
+        delete window[callbackName];
+      } catch (_) {
+        window[callbackName] = undefined;
+      }
+    };
+    const timeout = window.setTimeout(() => {
+      if (finished) return;
+      cleanup();
+      reject(new Error("timeout"));
+    }, 10000);
+
+    window[callbackName] = (response) => {
+      if (finished) return;
+      window.clearTimeout(timeout);
+      cleanup();
+      if (response?.result === "success") {
+        resolve(response);
+        return;
+      }
+      const error = new Error(response?.msg || "mailchimp_error");
+      error.name = "MailchimpResponseError";
+      reject(error);
+    };
+
+    const url = getMailchimpJsonpUrl(action, email, callbackName);
+    if (!url) {
+      window.clearTimeout(timeout);
+      cleanup();
+      reject(new Error("missing_mailchimp_action"));
+      return;
+    }
+
+    script = document.createElement("script");
+    script.src = url;
+    script.async = true;
+    script.onerror = () => {
+      if (finished) return;
+      window.clearTimeout(timeout);
+      cleanup();
+      reject(new Error("network_error"));
+    };
+    document.body.appendChild(script);
+  });
+}
+
+function setupNewsletterSignup() {
+  const forms = document.querySelectorAll("[data-mailchimp-form]");
+  forms.forEach((form) => {
+    if (!(form instanceof HTMLFormElement) || form.dataset.bound === "true") return;
+    form.dataset.bound = "true";
+    const input = form.querySelector('input[name="EMAIL"]');
+    const button = form.querySelector('button[type="submit"]');
+    const status = form.querySelector("[data-newsletter-status]");
+    const setStatus = (key, fallback, type = "") => {
+      if (!status) return;
+      status.textContent = uiT(key, fallback);
+      status.classList.toggle("is-success", type === "success");
+      status.classList.toggle("is-error", type === "error");
+    };
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      if (!(input instanceof HTMLInputElement)) return;
+      const email = input.value.trim();
+      if (!email || !input.checkValidity()) {
+        setStatus("newsletter_invalid", "メールアドレスを確認してください。", "error");
+        return;
+      }
+
+      if (button instanceof HTMLButtonElement) button.disabled = true;
+      setStatus("", "", "");
+      try {
+        await requestMailchimpSubscribe(form.dataset.mailchimpAction || form.action, email);
+        form.reset();
+        setStatus("newsletter_success", "登録ありがとうございます。", "success");
+      } catch (error) {
+        const key = error?.name === "MailchimpResponseError" ? "newsletter_invalid" : "newsletter_error";
+        const fallback = key === "newsletter_invalid"
+          ? "メールアドレスを確認してください。"
+          : "登録できませんでした。時間をおいて再度お試しください。";
+        setStatus(key, fallback, "error");
+      } finally {
+        if (button instanceof HTMLButtonElement) button.disabled = false;
+      }
+    });
+  });
+}
+
 window.renderWorkDetailPage = renderWorkDetailPage;
 window.renderAboutPage = renderAboutPage;
 window.setupCopyEmailButtons = setupCopyEmailButtons;
@@ -2021,6 +2167,7 @@ function initializeSite() {
     attachWorkDetailThumbnailControls,
     renderFeatureImages,
     renderGallery,
+    setupNewsletterSignup,
     attachBackToTopButtons,
   ].forEach(runStartupStep);
 }

@@ -56,6 +56,7 @@ const I18N = {
     profile_desc: "略歴情報。",
     profile_history_body_updated: "2026.06.02",
     site_updated_label: "サイト更新日",
+    site_updated_date: "2026.06.11",
     profile_edu_title: "学歴",
     profile_award_title: "受賞歴",
     profile_exhibition_title: "展示歴",
@@ -78,12 +79,22 @@ const I18N = {
     btn_unset_url: "URL未設定",
     label_sns: "SNS",
     label_contact: "Contact",
+    newsletter_title: "展示・販売のお知らせを受け取る",
+    newsletter_desc: "展示、新商品、大きな新作公開など、重要なお知らせをメールでお送りします。",
+    newsletter_email_label: "メールアドレス",
+    newsletter_email_placeholder: "メールアドレス",
+    newsletter_submit: "登録する",
+    newsletter_note: "頻繁な配信は行いません。いつでも解除できます。",
+    newsletter_success: "登録ありがとうございます。",
+    newsletter_invalid: "メールアドレスを確認してください。",
+    newsletter_error: "登録できませんでした。時間をおいて再度お試しください。",
     label_mini_chara_layout: "表示サイズ",
     mini_chara_layout_compact: "一覧",
     mini_chara_layout_standard: "標準",
     mini_chara_layout_large: "拡大",
     label_gallery_sort: "表示順",
     sort_year: "制作年度順",
+    sort_page: "ページ順",
     sort_size: "作品サイズ順",
     sort_story_asc: "第一話から",
     sort_story_desc: "最新話から",
@@ -183,6 +194,7 @@ const I18N = {
     profile_desc: "Biographical information",
     profile_history_body_updated: "2026.06.02",
     site_updated_label: "Site updated",
+    site_updated_date: "2026.06.11",
     profile_edu_title: "Education",
     profile_award_title: "Awards",
     profile_exhibition_title: "Exhibitions",
@@ -205,12 +217,22 @@ const I18N = {
     btn_unset_url: "Not Set",
     label_sns: "SNS",
     label_contact: "Contact",
+    newsletter_title: "Receive exhibition and shop updates",
+    newsletter_desc: "Important updates such as exhibitions, new shop items, and major work releases will be sent by email.",
+    newsletter_email_label: "Email address",
+    newsletter_email_placeholder: "Email address",
+    newsletter_submit: "Subscribe",
+    newsletter_note: "Emails are infrequent. You can unsubscribe at any time.",
+    newsletter_success: "Thank you for subscribing.",
+    newsletter_invalid: "Please check your email address.",
+    newsletter_error: "Subscription failed. Please try again later.",
     label_mini_chara_layout: "View",
     mini_chara_layout_compact: "List",
     mini_chara_layout_standard: "Std",
     mini_chara_layout_large: "Large",
     label_gallery_sort: "Sort",
     sort_year: "Year",
+    sort_page: "Page order",
     sort_size: "Size",
     sort_story_asc: "First episode",
     sort_story_desc: "Latest episode",
@@ -294,7 +316,7 @@ function updateProfileNavDate() {
   }
 
   if (siteUpdatedTarget) {
-    const siteUpdated = formatDate(document.lastModified);
+    const siteUpdated = dict.site_updated_date || I18N.ja.site_updated_date || "";
     const siteUpdatedLabel = dict.site_updated_label || I18N.ja.site_updated_label || "";
     siteUpdatedTarget.textContent = siteUpdated && siteUpdatedLabel
       ? `${siteUpdatedLabel} ${siteUpdated}`
@@ -320,6 +342,10 @@ function applyLang(lang) {
   document.querySelectorAll("[data-i18n-html]").forEach((el) => {
     const key = el.dataset.i18nHtml;
     if (dict[key]) el.innerHTML = dict[key];
+  });
+  document.querySelectorAll("[data-i18n-placeholder]").forEach((el) => {
+    const key = el.dataset.i18nPlaceholder;
+    if (dict[key]) el.setAttribute("placeholder", dict[key]);
   });
   document.querySelectorAll(".copy-done-label").forEach((el) => {
     el.textContent = dict.copy_done || I18N.ja.copy_done;

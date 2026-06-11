@@ -1722,6 +1722,112 @@ footer {
   text-align: right;
 }
 
+.newsletter-signup {
+  margin: 54px 0 0;
+  padding: 26px 28px;
+  border: 1px solid var(--line);
+  background: #fbfbfa;
+  color: #2e333b;
+}
+
+.newsletter-copy {
+  max-width: 620px;
+}
+
+.newsletter-copy h2 {
+  margin: 0 0 10px;
+  color: #1d2128;
+  font-family: "Hiragino Mincho ProN", "Yu Mincho", "Times New Roman", serif;
+  font-size: clamp(20px, 2.5vw, 28px);
+  font-weight: 400;
+  line-height: 1.45;
+  letter-spacing: 0;
+}
+
+.newsletter-copy p {
+  margin: 0;
+  color: #666d77;
+  font-size: 13px;
+  line-height: 1.8;
+}
+
+.newsletter-form {
+  margin-top: 20px;
+}
+
+.newsletter-fields {
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+}
+
+.newsletter-fields input {
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 13px;
+  border: 1px solid #cfd3d8;
+  border-radius: 0;
+  background: #fff;
+  color: #242933;
+  font: inherit;
+  font-size: 14px;
+  line-height: 1.4;
+  letter-spacing: 0;
+}
+
+.newsletter-fields input:focus {
+  border-color: #8f969f;
+  outline: 1px solid #8f969f;
+  outline-offset: 0;
+}
+
+.newsletter-fields button {
+  min-height: 44px;
+  padding: 10px 22px;
+  border: 1px solid #2b3038;
+  border-radius: 999px;
+  background: transparent;
+  color: #1f242c;
+  font: inherit;
+  font-size: 13px;
+  line-height: 1.4;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.newsletter-fields button:hover,
+.newsletter-fields button:focus-visible {
+  background: #242933;
+  color: #fff;
+}
+
+.newsletter-fields button:disabled {
+  cursor: wait;
+  opacity: 0.58;
+}
+
+.newsletter-note,
+.newsletter-status {
+  margin: 10px 0 0;
+  color: #8d949d;
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.newsletter-status {
+  min-height: 1.6em;
+}
+
+.newsletter-status.is-success {
+  color: #54645a;
+}
+
+.newsletter-status.is-error {
+  color: #8a4d4d;
+}
+
 .site-mini-contact > div + div {
   margin-top: 12px;
 }
@@ -2675,6 +2781,24 @@ footer {
 
   .caption-toggle {
     font-size: 11px;
+  }
+
+  .newsletter-signup {
+    margin-top: 44px;
+    padding: 22px 20px;
+  }
+
+  .newsletter-copy h2 {
+    font-size: 21px;
+  }
+
+  .newsletter-fields {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .newsletter-fields button {
+    width: 100%;
   }
 
   .work-detail-header {
