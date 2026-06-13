@@ -1462,6 +1462,7 @@ function attachGallerySortControls() {
         galleryState.set(galleryId, {
           ...latest,
           sortMode,
+          currentPage: 1,
           revealFromIndex: null,
         });
         closeAll();
