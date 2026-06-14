@@ -313,7 +313,7 @@ function getWorkListImagePath(imagePath) {
   return path.replace(/^assets\/works\//, "assets/works/list/");
 }
 
-function getWorkDetailPagePath(work, workIds = null) {
+function getWorkDetailPagePath(work, workIds = null, source = "") {
   const id = String(work?.id ?? "").replace(/[^a-zA-Z0-9_-]/g, "");
   const basePath = id ? `work-${id}.html` : getWorkPagePath(work);
   const orderedIds = Array.isArray(workIds)
@@ -322,6 +322,8 @@ function getWorkDetailPagePath(work, workIds = null) {
   const params = new URLSearchParams();
   params.set("v", detailPageVersion);
   if (orderedIds.length) params.set("list", orderedIds.join(","));
+  const sourceText = String(source ?? "").trim();
+  if (sourceText) params.set("source", sourceText);
   return `${basePath}?${params.toString()}`;
 }
 
@@ -509,7 +511,7 @@ function renderSelectedWorksCategoryCta(article, work, returnState) {
   if (!caption) return;
 
   const existing = caption.querySelector("[data-selected-category-cta]");
-  if (returnState?.galleryId !== "top-selected") {
+  if (!isTopPageWorkDetailContext(returnState)) {
     if (existing) existing.remove();
     return;
   }
@@ -720,18 +722,22 @@ function rememberWorkListLocation(workId, link = null) {
 
     const gallery = link?.closest?.("[data-gallery]");
     const galleryId = gallery?.dataset.galleryId || gallery?.dataset.gallery || "";
+    const source = String(link?.dataset?.workSource || "").trim();
     const state = galleryId ? galleryState.get(galleryId) : null;
-    if (galleryId && state) {
+    if ((galleryId && state) || isTopPageWorkSource(source)) {
       const payload = {
         url,
         workId: String(workId || ""),
         galleryId,
-        currentPage: state.currentPage || 1,
-        shownCount: state.shownCount || 0,
+        source,
+        currentPage: state?.currentPage || 1,
+        shownCount: state?.shownCount || 0,
         scroll: Number(scroll) || 0,
       };
-      if (Array.isArray(state.arranged)) {
+      if (Array.isArray(state?.arranged)) {
         payload.workIds = state.arranged.map((work) => String(work?.id ?? "")).filter(Boolean);
+      } else if (isTopPageWorkSource(source)) {
+        payload.workIds = getTopSelectedWorkIds();
       }
       const serialized = JSON.stringify(payload);
       sessionStorage.setItem("work-list-return-state", serialized);
@@ -754,6 +760,24 @@ function getWorkListReturnState(workId = "") {
   } catch (_) {
     return null;
   }
+}
+
+function getWorkDetailSourceParam() {
+  try {
+    return new URLSearchParams(window.location.search).get("source") || "";
+  } catch (_) {
+    return "";
+  }
+}
+
+function isTopPageWorkSource(source) {
+  return source === "top-selected" || source === "top-hero";
+}
+
+function isTopPageWorkDetailContext(returnState) {
+  return returnState?.galleryId === "top-selected"
+    || isTopPageWorkSource(String(returnState?.source || ""))
+    || isTopPageWorkSource(getWorkDetailSourceParam());
 }
 
 function getTopSelectedWorkIds() {
@@ -1098,7 +1122,7 @@ function renderFeatureImages() {
   if (!active) return;
   const featureImage = getWorkListImagePath(active.image || active.images?.[0] || "");
   const title = workText(active, "title");
-  const href = getWorkDetailPagePath(active);
+  const href = getWorkDetailPagePath(active, null, "top-hero");
   featureImages.forEach((img) => {
     img.src = featureImage;
     img.alt = title || "";
@@ -1241,9 +1265,10 @@ function renderGallery() {
         const firstImage = getWorkListImagePath(work.images?.[0] || work.image);
         const title = workText(work, "title");
         const orderedIds = stableList.map((item) => String(item?.id ?? "")).filter(Boolean);
+        const detailPath = getWorkDetailPagePath(work, orderedIds, "top-selected");
         return `
       <article class="top-selected-item" data-work-id="${escapeHtml(work.id)}">
-        <a class="top-selected-link js-work-link" href="${escapeHtml(getWorkDetailPagePath(work, orderedIds))}" data-work-id="${escapeHtml(work.id)}" data-work-page="${escapeHtml(getWorkDetailPagePath(work, orderedIds))}" data-work-source="top-selected" data-work-detail-link="true">
+        <a class="top-selected-link js-work-link" href="${escapeHtml(detailPath)}" data-work-id="${escapeHtml(work.id)}" data-work-page="${escapeHtml(detailPath)}" data-work-source="top-selected" data-work-detail-link="true">
           <span class="top-selected-image-wrap">
             <img src="${escapeHtml(firstImage)}" alt="${escapeHtml(title)}" loading="lazy">
           </span>
