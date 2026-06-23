@@ -1726,7 +1726,7 @@ footer {
   box-sizing: border-box;
   width: 100%;
   min-width: 0;
-  margin: 78px 0 0;
+  margin: 24px 0 0;
   padding: 0;
   border: 1px solid #e1e4e8;
   background: #fbfbfa;
@@ -2845,7 +2845,7 @@ footer {
   .newsletter-signup {
     width: 100%;
     max-width: calc(100vw - 40px);
-    margin-top: 70px;
+    margin-top: 22px;
     padding: 0;
   }
 
