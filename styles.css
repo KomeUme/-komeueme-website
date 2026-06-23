@@ -1479,6 +1479,23 @@ main {
   text-decoration-thickness: 2px;
 }
 
+.work-detail-shop-cta {
+  display: inline-block;
+  margin-top: 18px;
+  color: #555c68;
+  font-size: 12px;
+  line-height: 1.45;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+  transition: color 0.15s ease, text-decoration-thickness 0.15s ease;
+}
+
+.work-detail-shop-cta:hover {
+  color: #1d2026;
+  text-decoration-thickness: 2px;
+}
+
 .work-detail-pager {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);

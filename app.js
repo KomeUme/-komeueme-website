@@ -163,7 +163,7 @@ let topCategoryButtonsVisible = false;
 let pendingOpenWorkId = null;
 let pendingOpenEnabled = false;
 let workListLocationRestored = false;
-const detailPageVersion = "20260606j";
+const detailPageVersion = "20260606k";
 
 function appendPageVersion(href) {
   const text = String(href ?? "").trim();
@@ -304,6 +304,11 @@ function getWorkListPagePath(work) {
   return getWorkPagePath(work);
 }
 
+function getWorkShopUrl(work) {
+  const url = String(work?.shopUrl ?? work?.shop_url ?? "").trim();
+  return /^https?:\/\//i.test(url) ? url : "";
+}
+
 function getVersionedWorkPagePath(work) {
   return appendPageVersion(getWorkPagePath(work));
 }
@@ -379,6 +384,7 @@ function renderWorkDetailPage() {
 
   const returnState = getWorkListReturnState(workId);
   renderSelectedWorksCategoryCta(article, work, returnState);
+  renderWorkShopCta(article, work);
 
   const images = Array.isArray(work.images) && work.images.length
     ? work.images.map((image) => String(image ?? "")).filter(Boolean)
@@ -528,6 +534,35 @@ function renderSelectedWorksCategoryCta(article, work, returnState) {
   const captionText = caption.querySelector(".caption-text");
   if (!existing) {
     if (captionText) captionText.insertAdjacentElement("afterend", link);
+    else caption.appendChild(link);
+  }
+}
+
+function renderWorkShopCta(article, work) {
+  const caption = article.querySelector(".caption");
+  if (!caption) return;
+
+  const existing = caption.querySelector("[data-work-shop-cta]");
+  const shopUrl = getWorkShopUrl(work);
+  if (!shopUrl) {
+    if (existing) existing.remove();
+    return;
+  }
+
+  const link = existing || document.createElement("a");
+  link.className = "work-detail-shop-cta";
+  link.dataset.workShopCta = "true";
+  link.dataset.i18n = "work_shop_cta";
+  link.href = shopUrl;
+  link.target = "_blank";
+  link.rel = "noopener noreferrer";
+  link.textContent = uiT("work_shop_cta", "販売ページを見る →");
+
+  const categoryCta = caption.querySelector("[data-selected-category-cta]");
+  const captionText = caption.querySelector(".caption-text");
+  if (!existing) {
+    if (categoryCta) categoryCta.insertAdjacentElement("beforebegin", link);
+    else if (captionText) captionText.insertAdjacentElement("afterend", link);
     else caption.appendChild(link);
   }
 }
