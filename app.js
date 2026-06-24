@@ -1334,7 +1334,7 @@ function renderShopPage() {
   if (!page) return;
   const worksContainer = page.querySelector("[data-shop-works]");
   const goodsContainer = page.querySelector("[data-shop-goods]");
-  const filterMode = page.dataset.shopFilter || "all";
+  const filterMode = page.dataset.shopFilter || "available";
   const activePanel = page.dataset.shopPanel || "works";
 
   page.querySelectorAll("[data-shop-tab]").forEach((button) => {
