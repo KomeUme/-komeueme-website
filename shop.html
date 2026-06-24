@@ -42,7 +42,6 @@
   <main>
     <section class="intro shop-intro">
       <h1 data-i18n="intro_shop">販売</h1>
-      <p data-i18n="shop_page_desc">現在販売中の作品を掲載しています。</p>
     </section>
 
     <section class="shop-page" data-shop-page>
@@ -52,9 +51,33 @@
       </div>
 
       <section class="shop-panel is-active" data-shop-panel="works">
-        <div class="shop-toolbar" aria-label="販売作品の表示順">
-          <button class="shop-sort-button is-active" type="button" data-shop-sort="category" data-i18n="shop_sort_category">カテゴリー順</button>
-          <button class="shop-sort-button" type="button" data-shop-sort="recent" data-i18n="shop_sort_recent">新着順</button>
+        <div class="shop-toolbar">
+          <div class="gallery-sort-control shop-sort-control" data-shop-sort-control>
+            <div class="gallery-sort-dropdown">
+              <button class="gallery-sort-button" type="button" data-shop-sort-toggle aria-expanded="false" aria-haspopup="menu">
+                <span class="gallery-sort-icon" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
+                <span class="sr-only" data-i18n="label_gallery_sort">表示順</span>
+                <span class="sr-only" data-shop-sort-current>カテゴリー順</span>
+              </button>
+              <div class="gallery-sort-menu" data-shop-sort-menu hidden>
+                <button class="gallery-sort-option is-active" aria-pressed="true" type="button" data-shop-sort-option="category" data-i18n="shop_sort_category">カテゴリー順</button>
+                <button class="gallery-sort-option" aria-pressed="false" type="button" data-shop-sort-option="recent" data-i18n="shop_sort_recent">新着順</button>
+              </div>
+            </div>
+          </div>
+          <div class="gallery-sort-control shop-sort-control" data-shop-filter-control>
+            <div class="gallery-sort-dropdown">
+              <button class="gallery-sort-button" type="button" data-shop-filter-toggle aria-expanded="false" aria-haspopup="menu">
+                <span class="gallery-sort-icon" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
+                <span class="sr-only" data-i18n="shop_filter_label">販売状態</span>
+                <span class="sr-only" data-shop-filter-current>すべて表示</span>
+              </button>
+              <div class="gallery-sort-menu" data-shop-filter-menu hidden>
+                <button class="gallery-sort-option" aria-pressed="false" type="button" data-shop-filter-option="available" data-i18n="shop_filter_available">販売中のみ</button>
+                <button class="gallery-sort-option is-active" aria-pressed="true" type="button" data-shop-filter-option="all" data-i18n="shop_filter_all">すべて表示</button>
+              </div>
+            </div>
+          </div>
         </div>
         <div class="shop-list" data-shop-works></div>
       </section>

@@ -1202,19 +1202,22 @@ function getShopUrlScore(url) {
 function getShopWorkItems() {
   if (!Array.isArray(works)) return [];
   return works
-    .filter((work) => getWorkShopStatus(work) === "available" && getWorkShopUrl(work))
     .map((work) => {
       const shopUrl = getWorkShopUrl(work);
+      const shopStatus = getWorkShopStatus(work);
       return {
         type: "work",
         id: String(work?.id ?? ""),
         title: workText(work, "title"),
         image: getWorkListImagePath(work.images?.[0] || work.image || ""),
         url: shopUrl,
+        detailUrl: getWorkDetailPagePath(work),
+        status: shopStatus,
         categoryKey: getWorkDetailCategoryKey(work),
         sortScore: getShopUrlScore(shopUrl),
       };
-    });
+    })
+    .filter((item) => item.title && item.image);
 }
 
 function getShopGoodsItems() {
@@ -1240,13 +1243,34 @@ function getShopGoodsCategoryLabel(key) {
 }
 
 function renderShopCard(item) {
-  return `
-      <article class="shop-item" data-shop-item-id="${escapeHtml(item.id)}">
-        <a class="shop-item-link" href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer">
+  const statusKey = item.status === "sold_out"
+    ? "work_shop_sold_out"
+    : item.status === "available"
+      ? "work_shop_available_short"
+      : "work_shop_preparing";
+  const statusFallback = item.status === "sold_out"
+    ? "Sold out"
+    : item.status === "available"
+      ? "販売中"
+      : "販売準備中";
+  const imageMarkup = `
           <span class="shop-item-image-wrap">
             <img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.title)}" loading="lazy">
           </span>
           <span class="shop-item-title">${escapeHtml(item.title)}</span>
+          <span class="shop-item-status" data-i18n="${escapeHtml(statusKey)}">${escapeHtml(uiT(statusKey, statusFallback))}</span>`;
+  if (!item.url) {
+    return `
+      <article class="shop-item is-${escapeHtml(item.status || "preparing")}" data-shop-item-id="${escapeHtml(item.id)}">
+        <span class="shop-item-link is-disabled">
+${imageMarkup}
+        </span>
+      </article>`;
+  }
+  return `
+      <article class="shop-item is-${escapeHtml(item.status || "available")}" data-shop-item-id="${escapeHtml(item.id)}">
+        <a class="shop-item-link" href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer">
+${imageMarkup}
         </a>
       </article>`;
 }
@@ -1294,6 +1318,7 @@ function renderShopPage() {
   const worksContainer = page.querySelector("[data-shop-works]");
   const goodsContainer = page.querySelector("[data-shop-goods]");
   const sortMode = page.dataset.shopSort || "category";
+  const filterMode = page.dataset.shopFilter || "all";
   const activePanel = page.dataset.shopPanel || "works";
 
   page.querySelectorAll("[data-shop-tab]").forEach((button) => {
@@ -1313,20 +1338,59 @@ function renderShopPage() {
     panel.classList.toggle("is-active", isActive);
     panel.hidden = !isActive;
   });
-  page.querySelectorAll("[data-shop-sort]").forEach((button) => {
-    const isActive = button.dataset.shopSort === sortMode;
-    button.classList.toggle("is-active", isActive);
-    if (button.dataset.bound !== "true") {
-      button.dataset.bound = "true";
-      button.addEventListener("click", () => {
-        page.dataset.shopSort = button.dataset.shopSort || "category";
-        renderShopPage();
+  const setupShopDropdown = (controlSelector, toggleSelector, menuSelector, optionSelector, currentSelector, value, datasetKey) => {
+    page.querySelectorAll(controlSelector).forEach((control) => {
+      const toggle = control.querySelector(toggleSelector);
+      const menu = control.querySelector(menuSelector);
+      const current = control.querySelector(currentSelector);
+      if (!(toggle instanceof HTMLButtonElement) || !menu) return;
+      const options = Array.from(control.querySelectorAll(optionSelector));
+      const activeOption = options.find((option) => option.dataset[datasetKey] === value) || options[0];
+      options.forEach((option) => {
+        const isActive = option === activeOption;
+        option.classList.toggle("is-active", isActive);
+        option.setAttribute("aria-pressed", isActive ? "true" : "false");
       });
-    }
-  });
+      if (current && activeOption) current.textContent = activeOption.textContent || "";
+      if (toggle.dataset.bound !== "true") {
+        toggle.dataset.bound = "true";
+        toggle.addEventListener("click", () => {
+          const isOpen = control.dataset.sortOpen === "true";
+          page.querySelectorAll("[data-shop-sort-control], [data-shop-filter-control]").forEach((item) => {
+            item.dataset.sortOpen = "false";
+            const itemMenu = item.querySelector("[data-shop-sort-menu], [data-shop-filter-menu]");
+            const itemToggle = item.querySelector("[data-shop-sort-toggle], [data-shop-filter-toggle]");
+            if (itemMenu) itemMenu.hidden = true;
+            if (itemToggle) itemToggle.setAttribute("aria-expanded", "false");
+          });
+          control.dataset.sortOpen = isOpen ? "false" : "true";
+          menu.hidden = isOpen;
+          toggle.setAttribute("aria-expanded", isOpen ? "false" : "true");
+        });
+      }
+      options.forEach((option) => {
+        if (option.dataset.bound === "true") return;
+        option.dataset.bound = "true";
+        option.addEventListener("click", () => {
+          const selected = option.dataset[datasetKey] || value;
+          if (datasetKey === "shopSortOption") page.dataset.shopSort = selected;
+          if (datasetKey === "shopFilterOption") page.dataset.shopFilter = selected;
+          control.dataset.sortOpen = "false";
+          menu.hidden = true;
+          toggle.setAttribute("aria-expanded", "false");
+          renderShopPage();
+        });
+      });
+    });
+  };
+
+  setupShopDropdown("[data-shop-sort-control]", "[data-shop-sort-toggle]", "[data-shop-sort-menu]", "[data-shop-sort-option]", "[data-shop-sort-current]", sortMode, "shopSortOption");
+  setupShopDropdown("[data-shop-filter-control]", "[data-shop-filter-toggle]", "[data-shop-filter-menu]", "[data-shop-filter-option]", "[data-shop-filter-current]", filterMode, "shopFilterOption");
 
   if (worksContainer) {
-    const workItems = getShopWorkItems();
+    const workItems = getShopWorkItems().filter((item) => (
+      filterMode === "all" ? true : item.status === "available"
+    ));
     if (sortMode === "recent") {
       const sorted = [...workItems].sort((a, b) => b.sortScore - a.sortScore || b.id.localeCompare(a.id));
       renderShopFlat(worksContainer, sorted);
