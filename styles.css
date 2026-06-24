@@ -1471,6 +1471,7 @@ main {
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.84);
   min-width: 0;
+  touch-action: pan-y;
 }
 
 .work-detail-main-image {

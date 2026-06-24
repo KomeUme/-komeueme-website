@@ -485,22 +485,6 @@ function renderWorkDetailPage() {
     if (storyPrevButton) storyPrevButton.addEventListener("click", () => stepStoryPage(-1));
     if (storyNextButton) storyNextButton.addEventListener("click", () => stepStoryPage(1));
     if (storyPageSelect) storyPageSelect.addEventListener("change", () => activateIndex(storyPageSelect.value));
-    if (isStoryViewer && mainImage) {
-      let swipeStartX = null;
-      mainImage.addEventListener("pointerdown", (event) => {
-        swipeStartX = event.clientX;
-      });
-      mainImage.addEventListener("pointerup", (event) => {
-        if (swipeStartX === null) return;
-        const deltaX = event.clientX - swipeStartX;
-        swipeStartX = null;
-        if (Math.abs(deltaX) < 44) return;
-        stepStoryPage(deltaX < 0 ? 1 : -1);
-      });
-      mainImage.addEventListener("pointercancel", () => {
-        swipeStartX = null;
-      });
-    }
     activateIndex(0);
   }
 
@@ -609,14 +593,24 @@ function renderWorkShopCta(article, work) {
 function attachWorkDetailThumbnailControls() {
   document.querySelectorAll(".work-detail-media").forEach((media) => {
     const thumbnailList = media.querySelector("[data-work-detail-thumbnails]");
+    const mainArea = media.querySelector(".work-detail-main");
     const mainImage = media.querySelector("[data-work-detail-main-image]");
     const thumbButtons = Array.from(media.querySelectorAll("[data-work-detail-thumb]"));
+    const storyPrevButton = media.querySelector("[data-story-page-prev]");
+    const storyNextButton = media.querySelector("[data-story-page-next]");
+    const storyPageSelect = media.querySelector("[data-story-page-select]");
     if (!thumbnailList || !mainImage || !thumbButtons.length) return;
+
+    const getActiveIndex = () => {
+      const activeIndex = thumbButtons.findIndex((button) => button.classList.contains("is-active"));
+      return activeIndex >= 0 ? activeIndex : 0;
+    };
 
     const activateButton = (button) => {
       const thumbImage = button.querySelector("img");
       const nextSrc = thumbImage?.getAttribute("src");
       if (!nextSrc) return;
+      const nextIndex = Math.max(thumbButtons.indexOf(button), 0);
       mainImage.setAttribute("src", nextSrc);
       mainImage.setAttribute("alt", thumbImage.getAttribute("alt") || mainImage.getAttribute("alt") || "");
       thumbButtons.forEach((thumbButton) => {
@@ -624,6 +618,15 @@ function attachWorkDetailThumbnailControls() {
         thumbButton.classList.toggle("is-active", isActive);
         thumbButton.setAttribute("aria-pressed", isActive ? "true" : "false");
       });
+      if (storyPageSelect) storyPageSelect.value = String(nextIndex);
+      if (storyPrevButton) storyPrevButton.disabled = nextIndex === 0;
+      if (storyNextButton) storyNextButton.disabled = nextIndex === thumbButtons.length - 1;
+    };
+
+    const activateIndex = (index) => {
+      const safeIndex = Math.min(Math.max(Number(index) || 0, 0), thumbButtons.length - 1);
+      const button = thumbButtons[safeIndex];
+      if (button) activateButton(button);
     };
 
     const activateFromEvent = (event) => {
@@ -643,6 +646,63 @@ function attachWorkDetailThumbnailControls() {
       if (event.key !== "Enter" && event.key !== " ") return;
       activateFromEvent(event);
     });
+
+    if (mainArea && thumbButtons.length > 1 && mainArea.dataset.swipeBound !== "true") {
+      mainArea.dataset.swipeBound = "true";
+      let touchStartX = 0;
+      let touchStartY = 0;
+      let touchLastX = 0;
+      let touchLastY = 0;
+      let isTrackingTouch = false;
+      let isHorizontalTouch = false;
+
+      const resetTouch = () => {
+        touchStartX = 0;
+        touchStartY = 0;
+        touchLastX = 0;
+        touchLastY = 0;
+        isTrackingTouch = false;
+        isHorizontalTouch = false;
+      };
+
+      mainArea.addEventListener("touchstart", (event) => {
+        if (event.touches.length !== 1) {
+          resetTouch();
+          return;
+        }
+        const touch = event.touches[0];
+        touchStartX = touch.clientX;
+        touchStartY = touch.clientY;
+        touchLastX = touch.clientX;
+        touchLastY = touch.clientY;
+        isTrackingTouch = true;
+        isHorizontalTouch = false;
+      }, { passive: true });
+
+      mainArea.addEventListener("touchmove", (event) => {
+        if (!isTrackingTouch || event.touches.length !== 1) return;
+        const touch = event.touches[0];
+        touchLastX = touch.clientX;
+        touchLastY = touch.clientY;
+        const deltaX = touchLastX - touchStartX;
+        const deltaY = touchLastY - touchStartY;
+        if (!isHorizontalTouch && Math.abs(deltaX) > 14 && Math.abs(deltaX) > Math.abs(deltaY) * 1.35) {
+          isHorizontalTouch = true;
+        }
+        if (isHorizontalTouch) event.preventDefault();
+      }, { passive: false });
+
+      mainArea.addEventListener("touchend", () => {
+        if (!isTrackingTouch) return;
+        const deltaX = touchLastX - touchStartX;
+        const deltaY = touchLastY - touchStartY;
+        const isSwipe = Math.abs(deltaX) >= 44 && Math.abs(deltaX) > Math.abs(deltaY) * 1.35;
+        if (isSwipe) activateIndex(getActiveIndex() + (deltaX < 0 ? 1 : -1));
+        resetTouch();
+      });
+
+      mainArea.addEventListener("touchcancel", resetTouch);
+    }
   });
 }
 
