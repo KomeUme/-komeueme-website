@@ -1214,6 +1214,7 @@ function getShopWorkItems() {
         detailUrl: getWorkDetailPagePath(work),
         status: shopStatus,
         categoryKey: getWorkDetailCategoryKey(work),
+        area: getWorkArea(work),
         sortScore: getShopUrlScore(shopUrl),
       };
     })
@@ -1243,22 +1244,11 @@ function getShopGoodsCategoryLabel(key) {
 }
 
 function renderShopCard(item) {
-  const statusKey = item.status === "sold_out"
-    ? "work_shop_sold_out"
-    : item.status === "available"
-      ? "work_shop_available_short"
-      : "work_shop_preparing";
-  const statusFallback = item.status === "sold_out"
-    ? "Sold out"
-    : item.status === "available"
-      ? "販売中"
-      : "販売準備中";
   const imageMarkup = `
           <span class="shop-item-image-wrap">
             <img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.title)}" loading="lazy">
           </span>
-          <span class="shop-item-title">${escapeHtml(item.title)}</span>
-          <span class="shop-item-status" data-i18n="${escapeHtml(statusKey)}">${escapeHtml(uiT(statusKey, statusFallback))}</span>`;
+          <span class="shop-item-title">${escapeHtml(item.title)}</span>`;
   if (!item.url) {
     return `
       <article class="shop-item is-${escapeHtml(item.status || "preparing")}" data-shop-item-id="${escapeHtml(item.id)}">
@@ -1287,6 +1277,11 @@ function renderShopGroups(container, items, getLabel, order) {
     if (!groups.has(key)) groups.set(key, []);
     groups.get(key).push(item);
   });
+  const sortGroupItems = (groupItems) => [...groupItems].sort((a, b) => {
+    const areaDiff = (Number(b.area) || 0) - (Number(a.area) || 0);
+    if (areaDiff) return areaDiff;
+    return String(a.title || "").localeCompare(String(b.title || ""), "ja");
+  });
   const sortedGroups = [...groups.entries()].sort(([a], [b]) => {
     const orderDiff = (orderMap.get(a) ?? 999) - (orderMap.get(b) ?? 999);
     if (orderDiff) return orderDiff;
@@ -1296,7 +1291,7 @@ function renderShopGroups(container, items, getLabel, order) {
     <section class="shop-category-group">
       <h2>${escapeHtml(getLabel(key))}</h2>
       <div class="shop-item-grid">
-${groupItems.map(renderShopCard).join("")}
+${sortGroupItems(groupItems).map(renderShopCard).join("")}
       </div>
     </section>
   `).join("");
@@ -1312,12 +1307,33 @@ ${items.map(renderShopCard).join("")}
     </div>`;
 }
 
+function applyShopItemOrientationClasses(root = document) {
+  root.querySelectorAll(".shop-item img").forEach((img) => {
+    const setClass = () => {
+      const item = img.closest(".shop-item");
+      if (!item) return;
+      const naturalWidth = Number(img.naturalWidth) || 0;
+      const naturalHeight = Number(img.naturalHeight) || 0;
+      item.classList.remove("is-wide-landscape", "is-extreme-landscape", "is-extreme-portrait");
+      if (!naturalWidth || !naturalHeight) return;
+      const imageRatio = naturalWidth / naturalHeight;
+      item.classList.toggle("is-extreme-portrait", imageRatio < 0.42);
+      item.classList.toggle("is-extreme-landscape", imageRatio > 2.4);
+      item.classList.toggle("is-wide-landscape", imageRatio > 1.2);
+    };
+    if (img.complete) {
+      setClass();
+    } else {
+      img.addEventListener("load", setClass, { once: true });
+    }
+  });
+}
+
 function renderShopPage() {
   const page = document.querySelector("[data-shop-page]");
   if (!page) return;
   const worksContainer = page.querySelector("[data-shop-works]");
   const goodsContainer = page.querySelector("[data-shop-goods]");
-  const sortMode = page.dataset.shopSort || "category";
   const filterMode = page.dataset.shopFilter || "all";
   const activePanel = page.dataset.shopPanel || "works";
 
@@ -1384,29 +1400,24 @@ function renderShopPage() {
     });
   };
 
-  setupShopDropdown("[data-shop-sort-control]", "[data-shop-sort-toggle]", "[data-shop-sort-menu]", "[data-shop-sort-option]", "[data-shop-sort-current]", sortMode, "shopSortOption");
   setupShopDropdown("[data-shop-filter-control]", "[data-shop-filter-toggle]", "[data-shop-filter-menu]", "[data-shop-filter-option]", "[data-shop-filter-current]", filterMode, "shopFilterOption");
 
   if (worksContainer) {
     const workItems = getShopWorkItems().filter((item) => (
       filterMode === "all" ? true : item.status === "available"
     ));
-    if (sortMode === "recent") {
-      const sorted = [...workItems].sort((a, b) => b.sortScore - a.sortScore || b.id.localeCompare(a.id));
-      renderShopFlat(worksContainer, sorted);
-    } else {
-      renderShopGroups(
-        worksContainer,
-        workItems,
-        (key) => getCategoryListLabel(key, getWorkDetailCategoryLabel({ category: "hanga" })),
-        shopWorkCategoryOrder,
-      );
-    }
+    renderShopGroups(
+      worksContainer,
+      workItems,
+      (key) => getCategoryListLabel(key, getWorkDetailCategoryLabel({ category: "hanga" })),
+      shopWorkCategoryOrder,
+    );
   }
 
   if (goodsContainer) {
     renderShopGroups(goodsContainer, getShopGoodsItems(), getShopGoodsCategoryLabel, shopGoodsCategoryOrder);
   }
+  applyShopItemOrientationClasses(page);
 }
 
 function renderFeatureImages() {
