@@ -82,6 +82,27 @@
       <div><strong class="label-contact" data-i18n="label_contact">Contact</strong> <a href="mailto:komeume1121@gmail.com">komeume1121@gmail.com</a></div>
     </section>
 
+    <details class="newsletter-signup">
+      <summary>
+        <h2 id="newsletter-title" data-i18n="newsletter_title">展示・販売のお知らせを受け取る</h2>
+        <span class="newsletter-toggle-mark" aria-hidden="true"><span class="newsletter-toggle-plus">+</span><span class="newsletter-toggle-minus">−</span></span>
+      </summary>
+      <div class="newsletter-body" aria-labelledby="newsletter-title">
+        <div class="newsletter-copy">
+          <p data-i18n="newsletter_desc">展示、新商品、大きな新作公開など、重要なお知らせをメールでお送りします。</p>
+        </div>
+        <form class="newsletter-form" data-mailchimp-form data-mailchimp-action="" novalidate>
+          <label class="sr-only" for="newsletter-email" data-i18n="newsletter_email_label">メールアドレス</label>
+          <div class="newsletter-fields">
+            <input id="newsletter-email" name="EMAIL" type="email" autocomplete="email" inputmode="email" placeholder="メールアドレス" data-i18n-placeholder="newsletter_email_placeholder" required>
+            <button type="submit" data-i18n="newsletter_submit">登録する</button>
+          </div>
+          <p class="newsletter-note" data-i18n="newsletter_note">頻繁な配信は行いません。いつでも解除できます。</p>
+          <p class="newsletter-status" data-newsletter-status aria-live="polite"></p>
+        </form>
+      </div>
+    </details>
+
     <div class="back-to-top-wrap">
       <button class="button-load-more-inline back-to-top-btn" type="button" data-back-to-top data-i18n="back_to_top">ページ先頭へ</button>
     </div>
