@@ -210,7 +210,7 @@ function buildShopBlock(work) {
   if (shopStatus !== "available" || !shopUrl) {
     return `            <div class="work-detail-shop" data-work-shop><span class="work-detail-shop-status is-preparing" data-work-shop-cta data-i18n="work_shop_preparing">販売準備中</span></div>`;
   }
-  return `            <div class="work-detail-shop" data-work-shop><a class="work-detail-shop-cta" href="${escapeHtml(shopUrl)}" target="_blank" rel="noopener noreferrer" data-work-shop-cta data-i18n="work_shop_available">販売中 →</a></div>`;
+  return `            <div class="work-detail-shop" data-work-shop><a class="work-detail-shop-cta" href="${escapeHtml(shopUrl)}" target="_blank" rel="noopener noreferrer" data-work-shop-cta data-i18n="work_shop_available">販売ページ →</a></div>`;
 }
 
 function buildDetailMedia(work, title, images) {
