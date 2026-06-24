@@ -163,7 +163,7 @@ let topCategoryButtonsVisible = false;
 let pendingOpenWorkId = null;
 let pendingOpenEnabled = false;
 let workListLocationRestored = false;
-const detailPageVersion = "20260606k";
+const detailPageVersion = "20260624a";
 
 function appendPageVersion(href) {
   const text = String(href ?? "").trim();
@@ -307,6 +307,14 @@ function getWorkListPagePath(work) {
 function getWorkShopUrl(work) {
   const url = String(work?.shopUrl ?? work?.shop_url ?? "").trim();
   return /^https?:\/\//i.test(url) ? url : "";
+}
+
+function getWorkShopStatus(work) {
+  const raw = String(work?.shopStatus ?? work?.shop_status ?? "").trim().toLowerCase();
+  if (["sold_out", "sold-out", "soldout", "sold"].includes(raw)) return "sold_out";
+  if (["available", "on_sale", "sale", "public"].includes(raw)) return "available";
+  if (["preparing", "private", "hidden", "none"].includes(raw)) return "preparing";
+  return getWorkShopUrl(work) ? "available" : "preparing";
 }
 
 function getVersionedWorkPagePath(work) {
@@ -542,29 +550,60 @@ function renderWorkShopCta(article, work) {
   const caption = article.querySelector(".caption");
   if (!caption) return;
 
-  const existing = caption.querySelector("[data-work-shop-cta]");
+  article.querySelectorAll(".caption-shop-meta, .work-detail-caption > [data-work-shop]").forEach((node) => {
+    node.remove();
+  });
+
+  let shopBlock = caption.querySelector(":scope > [data-work-shop]");
+  if (!shopBlock) {
+    shopBlock = document.createElement("div");
+    shopBlock.className = "work-detail-shop";
+    shopBlock.dataset.workShop = "true";
+  }
+
   const shopUrl = getWorkShopUrl(work);
-  if (!shopUrl) {
-    if (existing) existing.remove();
+  const shopStatus = getWorkShopStatus(work);
+  shopBlock.innerHTML = "";
+  const placeShopBlock = () => {
+    const categoryCta = caption.querySelector("[data-selected-category-cta]");
+    const captionText = caption.querySelector(".caption-text");
+    if (categoryCta) categoryCta.insertAdjacentElement("afterend", shopBlock);
+    else if (captionText) captionText.insertAdjacentElement("afterend", shopBlock);
+    else caption.appendChild(shopBlock);
+  };
+
+  if (shopStatus === "sold_out") {
+    const status = document.createElement("span");
+    status.className = "work-detail-shop-status is-sold-out";
+    status.dataset.workShopCta = "true";
+    status.dataset.i18n = "work_shop_sold_out";
+    status.textContent = uiT("work_shop_sold_out", "Sold out");
+    shopBlock.appendChild(status);
+    placeShopBlock();
     return;
   }
 
-  const link = existing || document.createElement("a");
+  if (shopStatus !== "available" || !shopUrl) {
+    const status = document.createElement("span");
+    status.className = "work-detail-shop-status is-preparing";
+    status.dataset.workShopCta = "true";
+    status.dataset.i18n = "work_shop_preparing";
+    status.textContent = uiT("work_shop_preparing", "販売準備中");
+    shopBlock.appendChild(status);
+    placeShopBlock();
+    return;
+  }
+
+  const link = document.createElement("a");
   link.className = "work-detail-shop-cta";
   link.dataset.workShopCta = "true";
-  link.dataset.i18n = "work_shop_cta";
+  link.dataset.i18n = "work_shop_available";
   link.href = shopUrl;
   link.target = "_blank";
   link.rel = "noopener noreferrer";
-  link.textContent = uiT("work_shop_cta", "販売ページを見る →");
-
-  const categoryCta = caption.querySelector("[data-selected-category-cta]");
-  const captionText = caption.querySelector(".caption-text");
-  if (!existing) {
-    if (categoryCta) categoryCta.insertAdjacentElement("beforebegin", link);
-    else if (captionText) captionText.insertAdjacentElement("afterend", link);
-    else caption.appendChild(link);
-  }
+  link.textContent = uiT("work_shop_available", "販売中 →");
+  shopBlock.appendChild(link);
+  placeShopBlock();
 }
 
 function attachWorkDetailThumbnailControls() {
@@ -1138,6 +1177,172 @@ function getWorkDetailCategoryLabel(work) {
     category_manga_story: "ストーリー",
   };
   return uiT(key, fallbackMap[key] || "—");
+}
+
+const shopWorkCategoryOrder = [
+  "category_wood",
+  "category_copper",
+  "category_digital_illustration",
+  "category_digital_mini_chara",
+  "category_manga_4koma",
+  "category_manga_story",
+];
+
+const shopGoodsCategoryOrder = [
+  "wood-accessory",
+  "acrylic-keychain",
+  "other",
+];
+
+function getShopUrlScore(url) {
+  const match = String(url ?? "").match(/\/items\/(\d+)/);
+  return match ? Number(match[1]) : 0;
+}
+
+function getShopWorkItems() {
+  if (!Array.isArray(works)) return [];
+  return works
+    .filter((work) => getWorkShopStatus(work) === "available" && getWorkShopUrl(work))
+    .map((work) => {
+      const shopUrl = getWorkShopUrl(work);
+      return {
+        type: "work",
+        id: String(work?.id ?? ""),
+        title: workText(work, "title"),
+        image: getWorkListImagePath(work.images?.[0] || work.image || ""),
+        url: shopUrl,
+        categoryKey: getWorkDetailCategoryKey(work),
+        sortScore: getShopUrlScore(shopUrl),
+      };
+    });
+}
+
+function getShopGoodsItems() {
+  const items = Array.isArray(typeof shopItems !== "undefined" ? shopItems : null) ? shopItems : [];
+  return items.map((item) => ({
+    type: "goods",
+    id: String(item?.id ?? item?.shopUrl ?? item?.title ?? ""),
+    title: workText(item, "title"),
+    image: getWorkListImagePath(item?.image || item?.images?.[0] || ""),
+    url: String(item?.shopUrl ?? item?.shop_url ?? "").trim(),
+    categoryKey: String(item?.goodsCategory ?? item?.goods_category ?? "other").trim() || "other",
+    sortScore: getShopUrlScore(item?.shopUrl ?? item?.shop_url),
+  })).filter((item) => item.title && item.image && /^https?:\/\//i.test(item.url));
+}
+
+function getShopGoodsCategoryLabel(key) {
+  const labels = {
+    "wood-accessory": uiT("shop_goods_wood_accessory", "木版画アクセサリー"),
+    "acrylic-keychain": uiT("shop_goods_acrylic_keychain", "アクリルキーホルダー"),
+    other: uiT("shop_goods_other", "その他"),
+  };
+  return labels[key] || labels.other;
+}
+
+function renderShopCard(item) {
+  return `
+      <article class="shop-item" data-shop-item-id="${escapeHtml(item.id)}">
+        <a class="shop-item-link" href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer">
+          <span class="shop-item-image-wrap">
+            <img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.title)}" loading="lazy">
+          </span>
+          <span class="shop-item-title">${escapeHtml(item.title)}</span>
+        </a>
+      </article>`;
+}
+
+function renderShopGroups(container, items, getLabel, order) {
+  if (!items.length) {
+    container.innerHTML = `<p class="shop-empty" data-i18n="shop_empty">${escapeHtml(uiT("shop_empty", "現在表示できる商品はありません。"))}</p>`;
+    return;
+  }
+  const orderMap = new Map(order.map((key, index) => [key, index]));
+  const groups = new Map();
+  items.forEach((item) => {
+    const key = item.categoryKey || "other";
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(item);
+  });
+  const sortedGroups = [...groups.entries()].sort(([a], [b]) => {
+    const orderDiff = (orderMap.get(a) ?? 999) - (orderMap.get(b) ?? 999);
+    if (orderDiff) return orderDiff;
+    return a.localeCompare(b);
+  });
+  container.innerHTML = sortedGroups.map(([key, groupItems]) => `
+    <section class="shop-category-group">
+      <h2>${escapeHtml(getLabel(key))}</h2>
+      <div class="shop-item-grid">
+${groupItems.map(renderShopCard).join("")}
+      </div>
+    </section>
+  `).join("");
+}
+
+function renderShopFlat(container, items) {
+  if (!items.length) {
+    container.innerHTML = `<p class="shop-empty" data-i18n="shop_empty">${escapeHtml(uiT("shop_empty", "現在表示できる商品はありません。"))}</p>`;
+    return;
+  }
+  container.innerHTML = `<div class="shop-item-grid shop-item-grid-flat">
+${items.map(renderShopCard).join("")}
+    </div>`;
+}
+
+function renderShopPage() {
+  const page = document.querySelector("[data-shop-page]");
+  if (!page) return;
+  const worksContainer = page.querySelector("[data-shop-works]");
+  const goodsContainer = page.querySelector("[data-shop-goods]");
+  const sortMode = page.dataset.shopSort || "category";
+  const activePanel = page.dataset.shopPanel || "works";
+
+  page.querySelectorAll("[data-shop-tab]").forEach((button) => {
+    const isActive = button.dataset.shopTab === activePanel;
+    button.classList.toggle("is-active", isActive);
+    button.setAttribute("aria-selected", isActive ? "true" : "false");
+    if (button.dataset.bound !== "true") {
+      button.dataset.bound = "true";
+      button.addEventListener("click", () => {
+        page.dataset.shopPanel = button.dataset.shopTab || "works";
+        renderShopPage();
+      });
+    }
+  });
+  page.querySelectorAll("[data-shop-panel]").forEach((panel) => {
+    const isActive = panel.dataset.shopPanel === activePanel;
+    panel.classList.toggle("is-active", isActive);
+    panel.hidden = !isActive;
+  });
+  page.querySelectorAll("[data-shop-sort]").forEach((button) => {
+    const isActive = button.dataset.shopSort === sortMode;
+    button.classList.toggle("is-active", isActive);
+    if (button.dataset.bound !== "true") {
+      button.dataset.bound = "true";
+      button.addEventListener("click", () => {
+        page.dataset.shopSort = button.dataset.shopSort || "category";
+        renderShopPage();
+      });
+    }
+  });
+
+  if (worksContainer) {
+    const workItems = getShopWorkItems();
+    if (sortMode === "recent") {
+      const sorted = [...workItems].sort((a, b) => b.sortScore - a.sortScore || b.id.localeCompare(a.id));
+      renderShopFlat(worksContainer, sorted);
+    } else {
+      renderShopGroups(
+        worksContainer,
+        workItems,
+        (key) => getCategoryListLabel(key, getWorkDetailCategoryLabel({ category: "hanga" })),
+        shopWorkCategoryOrder,
+      );
+    }
+  }
+
+  if (goodsContainer) {
+    renderShopGroups(goodsContainer, getShopGoodsItems(), getShopGoodsCategoryLabel, shopGoodsCategoryOrder);
+  }
 }
 
 function renderFeatureImages() {
@@ -2208,6 +2413,7 @@ window.renderAboutPage = renderAboutPage;
 window.setupCopyEmailButtons = setupCopyEmailButtons;
 window.renderFeatureImages = renderFeatureImages;
 window.renderGallery = renderGallery;
+window.renderShopPage = renderShopPage;
 window.attachWorkDetailThumbnailControls = attachWorkDetailThumbnailControls;
 
 function runStartupStep(step) {
@@ -2228,6 +2434,7 @@ function initializeSite() {
     attachWorkDetailThumbnailControls,
     renderFeatureImages,
     renderGallery,
+    renderShopPage,
     setupNewsletterSignup,
     attachBackToTopButtons,
   ].forEach(runStartupStep);

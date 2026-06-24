@@ -61,6 +61,15 @@ const I18N = {
     profile_award_title: "受賞歴",
     profile_exhibition_title: "展示歴",
     intro_shop_desc: "販売サイトへのリンクをまとめています。",
+    shop_page_desc: "現在販売中の作品を掲載しています。",
+    shop_tab_works: "作品",
+    shop_tab_goods: "関連グッズ",
+    shop_sort_category: "カテゴリー順",
+    shop_sort_recent: "新着順",
+    shop_goods_wood_accessory: "木版画アクセサリー",
+    shop_goods_acrylic_keychain: "アクリルキーホルダー",
+    shop_goods_other: "その他",
+    shop_empty: "現在表示できる商品はありません。",
     card_shop_title: "Online Shop",
     card_shop_desc: "販売サイトのURLまとめ。",
     card_works_title: "Original Works",
@@ -105,6 +114,9 @@ const I18N = {
     cap_size: "サイズ",
     cap_category: "カテゴリー",
     work_shop_cta: "販売ページを見る →",
+    work_shop_available: "販売中 →",
+    work_shop_preparing: "販売準備中",
+    work_shop_sold_out: "Sold out",
     detail_thumbnails: "作品画像一覧",
     story_page_select: "ページ選択",
     story_page_prev: "前のページ",
@@ -200,6 +212,15 @@ const I18N = {
     profile_award_title: "Awards",
     profile_exhibition_title: "Exhibitions",
     intro_shop_desc: "Sales links are collected here.",
+    shop_page_desc: "Currently available items are listed here.",
+    shop_tab_works: "Works",
+    shop_tab_goods: "Related goods",
+    shop_sort_category: "Category",
+    shop_sort_recent: "New arrivals",
+    shop_goods_wood_accessory: "Woodblock accessories",
+    shop_goods_acrylic_keychain: "Acrylic keychains",
+    shop_goods_other: "Other",
+    shop_empty: "There are no items to display right now.",
     card_shop_title: "Online Shop",
     card_shop_desc: "Set sales links such as BASE, BOOTH, STORES, and SUZURI.",
     card_works_title: "Original Works",
@@ -244,6 +265,9 @@ const I18N = {
     cap_size: "Size",
     cap_category: "Category",
     work_shop_cta: "View sales page →",
+    work_shop_available: "Available →",
+    work_shop_preparing: "Sales page coming soon",
+    work_shop_sold_out: "Sold out",
     detail_thumbnails: "Artwork images",
     story_page_select: "Page",
     story_page_prev: "Previous page",
@@ -360,6 +384,7 @@ function applyLang(lang) {
     // ignore storage failures
   }
   if (typeof window.renderGallery === "function") runLangStep(window.renderGallery);
+  if (typeof window.renderShopPage === "function") runLangStep(window.renderShopPage);
   if (typeof window.renderFeatureImages === "function") runLangStep(window.renderFeatureImages);
   if (typeof window.renderWorkDetailPage === "function") runLangStep(window.renderWorkDetailPage);
   if (typeof window.attachWorkDetailThumbnailControls === "function") runLangStep(window.attachWorkDetailThumbnailControls);
