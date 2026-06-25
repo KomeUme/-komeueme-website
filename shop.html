@@ -41,19 +41,44 @@
 
   <main>
     <section class="intro shop-intro">
-      <h1 data-i18n="intro_shop">販売</h1>
+      <h1 data-i18n="intro_shop_print">版画</h1>
     </section>
 
-    <section class="shop-page">
-      <div class="shop-choice-list">
-        <a class="shop-choice-card" href="shop-print.html?v=20260624a">
-          <span data-i18n="shop_choice_print">版画</span>
-        </a>
-        <a class="shop-choice-card" href="shop-digital.html?v=20260624a">
-          <span data-i18n="shop_choice_digital">デジタル</span>
-        </a>
+    <section class="shop-page" data-shop-page data-shop-scope="print">
+      <div class="shop-view-tabs" role="tablist" aria-label="販売種別">
+        <button class="shop-view-tab is-active" type="button" data-shop-tab="works" data-i18n="shop_tab_works" aria-selected="true">作品</button>
+        <button class="shop-view-tab" type="button" data-shop-tab="goods" data-i18n="shop_tab_goods" aria-selected="false">関連グッズ</button>
       </div>
+
+      <section class="shop-panel is-active" data-shop-panel="works">
+        <div class="shop-toolbar">
+          <div class="gallery-sort-control shop-sort-control" data-shop-filter-control>
+            <div class="gallery-sort-dropdown">
+              <button class="gallery-sort-button" type="button" data-shop-filter-toggle aria-expanded="false" aria-haspopup="menu">
+                <span class="gallery-sort-icon" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
+                <span class="sr-only" data-i18n="shop_filter_label">販売状態</span>
+                <span class="sr-only" data-shop-filter-current>販売中のみ</span>
+              </button>
+              <div class="gallery-sort-menu" data-shop-filter-menu hidden>
+                <button class="gallery-sort-option is-active" aria-pressed="true" type="button" data-shop-filter-option="available" data-i18n="shop_filter_available">販売中のみ</button>
+                <button class="gallery-sort-option" aria-pressed="false" type="button" data-shop-filter-option="all" data-i18n="shop_filter_all">すべて表示</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="shop-list" data-shop-works></div>
+      </section>
+
+      <section class="shop-panel" data-shop-panel="goods" hidden>
+        <div class="shop-list" data-shop-goods></div>
+      </section>
     </section>
+
+    <p class="shop-print-note" data-i18n-html="shop_print_note">※ 画像は参考作品です。エディションにより刷りの風合い・色味に個体差があります。<br>※ 受注生産の場合、発送まで1か月ほどお時間をいただくことがあります。</p>
+
+    <div class="shop-related-nav">
+      <a href="shop-digital.html?v=20260624a" data-i18n="shop_to_digital">デジタル販売ページ →</a>
+    </div>
 
     <section class="site-mini-contact">
       <div><strong class="label-sns" data-i18n="label_sns">SNS</strong> <a href="https://www.instagram.com/komeume1121/" target="_blank" rel="noopener noreferrer">@komeume1121</a></div>

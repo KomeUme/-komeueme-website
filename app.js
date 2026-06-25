@@ -60,6 +60,8 @@ function detectSiteBasePath() {
     "about",
     "profile",
     "shop",
+    "shop-print",
+    "shop-digital",
   ];
   const path = window.location.pathname;
   if (/\/work-[^/]+\.html$/.test(path)) {
@@ -87,6 +89,36 @@ function normalizeInternalPageLinks() {
     const base = detectSiteBasePath();
     link.setAttribute("href", appendPageVersion(`${base}${page}`));
   });
+}
+
+function setupShopNavDropdown() {
+  const nav = document.querySelector(".site-header .nav");
+  const shopLink = nav?.querySelector(":scope > a.shop-link");
+  if (!nav || !shopLink || shopLink.closest(".nav-dropdown")) return;
+
+  const base = detectSiteBasePath();
+  const path = window.location.pathname;
+  const isShopPage = /\/shop(?:-print|-digital)?\.html$/.test(path);
+  const isDigitalShop = /\/shop-digital\.html$/.test(path);
+  const isPrintShop = isShopPage && !isDigitalShop;
+
+  const wrapper = document.createElement("div");
+  wrapper.className = "nav-item nav-dropdown";
+
+  shopLink.classList.add("nav-trigger");
+  shopLink.classList.toggle("active", isShopPage);
+  shopLink.setAttribute("href", appendPageVersion(`${base}shop.html`));
+
+  const submenu = document.createElement("div");
+  submenu.className = "nav-submenu";
+  submenu.innerHTML = `
+          <a${isPrintShop ? ' class="active"' : ""} href="${escapeHtml(appendPageVersion(`${base}shop.html`))}" data-i18n="shop_choice_print">版画</a>
+          <a${isDigitalShop ? ' class="active"' : ""} href="${escapeHtml(appendPageVersion(`${base}shop-digital.html`))}" data-i18n="shop_choice_digital">デジタル</a>
+        `;
+
+  shopLink.insertAdjacentElement("beforebegin", wrapper);
+  wrapper.appendChild(shopLink);
+  wrapper.appendChild(submenu);
 }
 
 function setupMobileMenu() {
@@ -2598,6 +2630,7 @@ function runStartupStep(step) {
 function initializeSite() {
   [
     normalizeInternalPageLinks,
+    setupShopNavDropdown,
     setupMobileMenu,
     setupWorkDetailBackLink,
     attachImageProtection,
