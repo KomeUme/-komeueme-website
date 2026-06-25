@@ -1244,8 +1244,6 @@ const shopWorkCategoryOrder = [
   "category_copper",
   "category_digital_illustration",
   "category_digital_mini_chara",
-  "category_manga_4koma",
-  "category_manga_story",
 ];
 
 const shopGoodsCategoryOrder = [
@@ -1253,6 +1251,23 @@ const shopGoodsCategoryOrder = [
   "acrylic-keychain",
   "other",
 ];
+
+function getShopWorkScope(categoryKey) {
+  if (["category_wood", "category_copper"].includes(categoryKey)) return "print";
+  if (["category_digital_illustration", "category_digital_mini_chara"].includes(categoryKey)) return "digital";
+  return "other";
+}
+
+function getShopGoodsScope(categoryKey) {
+  if (categoryKey === "wood-accessory") return "print";
+  if (categoryKey === "acrylic-keychain") return "digital";
+  return "other";
+}
+
+function matchesShopScope(item, scope) {
+  if (!scope || scope === "all") return true;
+  return item.scope === scope;
+}
 
 function getShopUrlScore(url) {
   const match = String(url ?? "").match(/\/items\/(\d+)/);
@@ -1278,6 +1293,8 @@ function getShopWorkItems() {
         sortScore: getShopUrlScore(shopUrl),
       };
     })
+    .filter((item) => !["category_manga_4koma", "category_manga_story"].includes(item.categoryKey))
+    .map((item) => ({ ...item, scope: getShopWorkScope(item.categoryKey) }))
     .filter((item) => item.title && item.image);
 }
 
@@ -1291,16 +1308,27 @@ function getShopGoodsItems() {
     url: String(item?.shopUrl ?? item?.shop_url ?? "").trim(),
     categoryKey: String(item?.goodsCategory ?? item?.goods_category ?? "other").trim() || "other",
     sortScore: getShopUrlScore(item?.shopUrl ?? item?.shop_url),
-  })).filter((item) => item.title && item.image && /^https?:\/\//i.test(item.url));
+  })).map((item) => ({ ...item, scope: getShopGoodsScope(item.categoryKey) }))
+    .filter((item) => item.title && item.image && /^https?:\/\//i.test(item.url));
 }
 
 function getShopGoodsCategoryLabel(key) {
   const labels = {
-    "wood-accessory": uiT("shop_goods_wood_accessory", "木版画アクセサリー"),
-    "acrylic-keychain": uiT("shop_goods_acrylic_keychain", "アクリルキーホルダー"),
+    "wood-accessory": uiT("shop_goods_related", "関連グッズ"),
+    "acrylic-keychain": uiT("shop_goods_related", "関連グッズ"),
     other: uiT("shop_goods_other", "その他"),
   };
   return labels[key] || labels.other;
+}
+
+function getShopWorkCategoryLabel(key) {
+  const scopedLabels = {
+    category_digital_illustration: uiT("section_digital_illustration", "イラスト"),
+    category_digital_mini_chara: uiT("section_digital_mini_chara", "ミニキャラ"),
+  };
+  if (scopedLabels[key]) return scopedLabels[key];
+  const label = getCategoryListLabel(key, getWorkDetailCategoryLabel({ category: "hanga" }));
+  return String(label || "").replace(/\s*作品$/u, "").replace(/\s+works$/i, "");
 }
 
 function renderShopCard(item) {
@@ -1309,7 +1337,7 @@ function renderShopCard(item) {
             <img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.title)}" loading="lazy">
           </span>
           <span class="shop-item-title">${escapeHtml(item.title)}</span>`;
-  if (!item.url) {
+  if (!item.url || item.status !== "available") {
     return `
       <article class="shop-item is-${escapeHtml(item.status || "preparing")}" data-shop-item-id="${escapeHtml(item.id)}">
         <span class="shop-item-link is-disabled">
@@ -1396,6 +1424,7 @@ function renderShopPage() {
   const goodsContainer = page.querySelector("[data-shop-goods]");
   const filterMode = page.dataset.shopFilter || "available";
   const activePanel = page.dataset.shopPanel || "works";
+  const shopScope = page.dataset.shopScope || "all";
 
   page.querySelectorAll("[data-shop-tab]").forEach((button) => {
     const isActive = button.dataset.shopTab === activePanel;
@@ -1463,19 +1492,26 @@ function renderShopPage() {
   setupShopDropdown("[data-shop-filter-control]", "[data-shop-filter-toggle]", "[data-shop-filter-menu]", "[data-shop-filter-option]", "[data-shop-filter-current]", filterMode, "shopFilterOption");
 
   if (worksContainer) {
-    const workItems = getShopWorkItems().filter((item) => (
-      filterMode === "all" ? true : item.status === "available"
-    ));
+    const workItems = getShopWorkItems()
+      .filter((item) => matchesShopScope(item, shopScope))
+      .filter((item) => (
+        filterMode === "all" ? true : item.status === "available"
+      ));
     renderShopGroups(
       worksContainer,
       workItems,
-      (key) => getCategoryListLabel(key, getWorkDetailCategoryLabel({ category: "hanga" })),
+      getShopWorkCategoryLabel,
       shopWorkCategoryOrder,
     );
   }
 
   if (goodsContainer) {
-    renderShopGroups(goodsContainer, getShopGoodsItems(), getShopGoodsCategoryLabel, shopGoodsCategoryOrder);
+    renderShopGroups(
+      goodsContainer,
+      getShopGoodsItems().filter((item) => matchesShopScope(item, shopScope)),
+      getShopGoodsCategoryLabel,
+      shopGoodsCategoryOrder,
+    );
   }
   applyShopItemOrientationClasses(page);
 }

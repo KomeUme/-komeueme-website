@@ -217,7 +217,9 @@ const works = [
     "images": [
       "assets/works/work-24-01.jpg",
       "assets/works/work-24-02.jpg"
-    ]
+    ],
+    "shopUrl": "https://komeume1121.base.shop/items/148228493",
+    "shopStatus": "available"
   },
   {
     "id": "23",
@@ -232,7 +234,9 @@ const works = [
     "images": [
       "assets/works/work-23-01.jpg",
       "assets/works/work-40-01.png"
-    ]
+    ],
+    "shopUrl": "https://komeume1121.base.shop/items/148228504",
+    "shopStatus": "available"
   },
   {
     "id": "22",
@@ -259,7 +263,9 @@ const works = [
     "image": "assets/works/work-16-01.jpg",
     "images": [
       "assets/works/work-16-01.jpg"
-    ]
+    ],
+    "shopUrl": "https://komeume1121.base.shop/items/148228519",
+    "shopStatus": "available"
   },
   {
     "id": "17",
@@ -272,7 +278,9 @@ const works = [
     "image": "assets/works/work-17-01.jpg",
     "images": [
       "assets/works/work-17-01.jpg"
-    ]
+    ],
+    "shopUrl": "https://komeume1121.base.shop/items/148228526",
+    "shopStatus": "available"
   },
   {
     "id": "18",
@@ -286,7 +294,9 @@ const works = [
     "images": [
       "assets/works/work-18-01.jpg",
       "assets/works/work-18-02.jpg"
-    ]
+    ],
+    "shopUrl": "https://komeume1121.base.shop/items/148228529",
+    "shopStatus": "available"
   },
   {
     "id": "08",
@@ -300,7 +310,9 @@ const works = [
     "images": [
       "assets/works/work-08-01.jpg",
       "assets/works/work-08-02.jpg"
-    ]
+    ],
+    "shopUrl": "https://komeume1121.base.shop/items/148228540",
+    "shopStatus": "available"
   },
   {
     "id": "14",
@@ -314,7 +326,9 @@ const works = [
     "images": [
       "assets/works/work-14-01.jpg",
       "assets/works/work-14-02.jpg"
-    ]
+    ],
+    "shopUrl": "https://komeume1121.base.shop/items/148228544",
+    "shopStatus": "available"
   },
   {
     "id": "02",
@@ -344,9 +358,7 @@ const works = [
     "images": [
       "assets/works/work-13-01.jpg",
       "assets/works/work-13-02.jpg"
-    ],
-    "shopUrl": "https://komeume1121.base.shop/items/120963187",
-    "shopStatus": "available"
+    ]
   },
   {
     "id": "03",
@@ -359,7 +371,9 @@ const works = [
     "image": "assets/works/work-03-01.jpg",
     "images": [
       "assets/works/work-03-01.jpg"
-    ]
+    ],
+    "shopUrl": "https://komeume1121.base.shop/items/148228554",
+    "shopStatus": "available"
   },
   {
     "id": "04",
@@ -421,7 +435,9 @@ const works = [
     "images": [
       "assets/works/work-21-01.jpg",
       "assets/works/work-21-02.jpg"
-    ]
+    ],
+    "shopUrl": "https://komeume1121.base.shop/items/148228562",
+    "shopStatus": "available"
   },
   {
     "id": "12",
@@ -451,7 +467,9 @@ const works = [
     "images": [
       "assets/works/work-05-01.jpg",
       "assets/works/work-05-02.jpg"
-    ]
+    ],
+    "shopUrl": "https://komeume1121.base.shop/items/148228570",
+    "shopStatus": "available"
   },
   {
     "id": "19",
@@ -478,7 +496,9 @@ const works = [
     "image": "assets/works/work-09-01.jpg",
     "images": [
       "assets/works/work-09-01.jpg"
-    ]
+    ],
+    "shopUrl": "https://komeume1121.base.shop/items/148228593",
+    "shopStatus": "available"
   },
   {
     "id": "15",
@@ -551,7 +571,9 @@ const works = [
     "image": "assets/works/work-11-01.jpg",
     "images": [
       "assets/works/work-11-01.jpg"
-    ]
+    ],
+    "shopUrl": "https://komeume1121.base.shop/items/148228611",
+    "shopStatus": "available"
   },
   {
     "id": "25",
@@ -564,7 +586,9 @@ const works = [
     "image": "assets/works/work-25-01.jpg",
     "images": [
       "assets/works/work-25-01.jpg"
-    ]
+    ],
+    "shopUrl": "https://komeume1121.base.shop/items/148228621",
+    "shopStatus": "available"
   },
   {
     "id": "26",
@@ -578,7 +602,9 @@ const works = [
     "images": [
       "assets/works/work-26-01.jpg",
       "assets/works/work-26-02.jpg"
-    ]
+    ],
+    "shopUrl": "https://komeume1121.base.shop/items/148228632",
+    "shopStatus": "available"
   },
   {
     "id": "27",
@@ -608,7 +634,9 @@ const works = [
     "images": [
       "assets/works/work-28-01.jpg",
       "assets/works/work-28-02.jpg"
-    ]
+    ],
+    "shopUrl": "https://komeume1121.base.shop/items/148228647",
+    "shopStatus": "available"
   },
   {
     "id": "29",
@@ -638,7 +666,9 @@ const works = [
     "images": [
       "assets/works/work-30-01.jpg",
       "assets/works/work-30-02.jpg"
-    ]
+    ],
+    "shopUrl": "https://komeume1121.base.shop/items/148228654",
+    "shopStatus": "available"
   },
   {
     "id": "31",
@@ -652,7 +682,9 @@ const works = [
     "images": [
       "assets/works/work-31-01.jpg",
       "assets/works/work-31-02.jpg"
-    ]
+    ],
+    "shopUrl": "https://komeume1121.base.shop/items/148228661",
+    "shopStatus": "available"
   },
   {
     "id": "32",
@@ -666,7 +698,9 @@ const works = [
     "images": [
       "assets/works/work-32-01.jpg",
       "assets/works/work-32-02.jpg"
-    ]
+    ],
+    "shopUrl": "https://komeume1121.base.shop/items/148228675",
+    "shopStatus": "available"
   },
   {
     "id": "53",

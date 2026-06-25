@@ -44,34 +44,15 @@
       <h1 data-i18n="intro_shop">販売</h1>
     </section>
 
-    <section class="shop-page" data-shop-page>
-      <div class="shop-view-tabs" role="tablist" aria-label="販売種別">
-        <button class="shop-view-tab is-active" type="button" data-shop-tab="works" data-i18n="shop_tab_works" aria-selected="true">作品</button>
-        <button class="shop-view-tab" type="button" data-shop-tab="goods" data-i18n="shop_tab_goods" aria-selected="false">関連グッズ</button>
+    <section class="shop-page">
+      <div class="shop-choice-list">
+        <a class="shop-choice-card" href="shop-print.html?v=20260624a">
+          <span data-i18n="shop_choice_print">版画</span>
+        </a>
+        <a class="shop-choice-card" href="shop-digital.html?v=20260624a">
+          <span data-i18n="shop_choice_digital">デジタル</span>
+        </a>
       </div>
-
-      <section class="shop-panel is-active" data-shop-panel="works">
-        <div class="shop-toolbar">
-          <div class="gallery-sort-control shop-sort-control" data-shop-filter-control>
-            <div class="gallery-sort-dropdown">
-              <button class="gallery-sort-button" type="button" data-shop-filter-toggle aria-expanded="false" aria-haspopup="menu">
-                <span class="gallery-sort-icon" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
-                <span class="sr-only" data-i18n="shop_filter_label">販売状態</span>
-                <span class="sr-only" data-shop-filter-current>販売中のみ</span>
-              </button>
-              <div class="gallery-sort-menu" data-shop-filter-menu hidden>
-                <button class="gallery-sort-option is-active" aria-pressed="true" type="button" data-shop-filter-option="available" data-i18n="shop_filter_available">販売中のみ</button>
-                <button class="gallery-sort-option" aria-pressed="false" type="button" data-shop-filter-option="all" data-i18n="shop_filter_all">すべて表示</button>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="shop-list" data-shop-works></div>
-      </section>
-
-      <section class="shop-panel" data-shop-panel="goods" hidden>
-        <div class="shop-list" data-shop-goods></div>
-      </section>
     </section>
 
     <section class="site-mini-contact">
