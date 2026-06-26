@@ -97,28 +97,57 @@ function setupShopNavDropdown() {
   if (!nav || !shopLink || shopLink.closest(".nav-dropdown")) return;
 
   const base = detectSiteBasePath();
-  const path = window.location.pathname;
-  const isShopPage = /\/shop(?:-print|-digital)?\.html$/.test(path);
-  const isDigitalShop = /\/shop-digital\.html$/.test(path);
-  const isPrintShop = isShopPage && !isDigitalShop;
 
   const wrapper = document.createElement("div");
   wrapper.className = "nav-item nav-dropdown";
 
   shopLink.classList.add("nav-trigger");
-  shopLink.classList.toggle("active", isShopPage);
   shopLink.setAttribute("href", appendPageVersion(`${base}shop.html`));
 
   const submenu = document.createElement("div");
   submenu.className = "nav-submenu";
   submenu.innerHTML = `
-          <a${isPrintShop ? ' class="active"' : ""} href="${escapeHtml(appendPageVersion(`${base}shop.html`))}" data-i18n="shop_choice_print">版画</a>
-          <a${isDigitalShop ? ' class="active"' : ""} href="${escapeHtml(appendPageVersion(`${base}shop-digital.html`))}" data-i18n="shop_choice_digital">デジタル</a>
+          <a href="${escapeHtml(appendPageVersion(`${base}shop.html`))}" data-i18n="shop_choice_print">版画</a>
+          <a href="${escapeHtml(appendPageVersion(`${base}shop-digital.html`))}" data-i18n="shop_choice_digital">デジタル</a>
         `;
 
   shopLink.insertAdjacentElement("beforebegin", wrapper);
   wrapper.appendChild(shopLink);
   wrapper.appendChild(submenu);
+}
+
+function getNavPageKey(url) {
+  try {
+    const parsed = new URL(url, window.location.href);
+    let path = parsed.pathname.replace(/\/+$/, "");
+    const file = path.split("/").pop() || "index";
+    return file.replace(/\.html$/i, "") || "index";
+  } catch (error) {
+    return "";
+  }
+}
+
+function syncNavActiveLinks() {
+  const nav = document.querySelector(".site-header .nav");
+  if (!nav) return;
+
+  const currentKey = getNavPageKey(window.location.href);
+  const navLinks = Array.from(nav.querySelectorAll("a[href]"));
+  navLinks.forEach((link) => {
+    const isCurrent = getNavPageKey(link.href) === currentKey;
+    if (isCurrent) {
+      link.classList.add("active");
+      link.setAttribute("aria-current", "page");
+    } else {
+      link.removeAttribute("aria-current");
+    }
+  });
+
+  nav.querySelectorAll(".nav-item.nav-dropdown").forEach((dropdown) => {
+    const trigger = dropdown.querySelector(":scope > .nav-trigger");
+    const hasActiveSubmenu = Boolean(dropdown.querySelector(".nav-submenu .active"));
+    if (trigger) trigger.classList.toggle("active", hasActiveSubmenu || trigger.classList.contains("active"));
+  });
 }
 
 function setupMobileMenu() {
@@ -2631,6 +2660,7 @@ function initializeSite() {
   [
     normalizeInternalPageLinks,
     setupShopNavDropdown,
+    syncNavActiveLinks,
     setupMobileMenu,
     setupWorkDetailBackLink,
     attachImageProtection,
