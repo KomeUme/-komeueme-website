@@ -2555,7 +2555,8 @@ footer {
     z-index: 3001;
   }
 
-  body.menu-open::before {
+  body.menu-open::before,
+  body.shop-menu-open::before {
     content: "";
     position: fixed;
     inset: 0;
