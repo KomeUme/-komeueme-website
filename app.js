@@ -1757,7 +1757,7 @@ function renderGallery() {
     const arranged = selectedIds.length ? list : sortWorks(list, sortMode, category);
     const defaultCount = Number.isFinite(limit) && limit > 0 ? limit : arranged.length;
     const isLoadMore = gallery.dataset.loadMore === "true";
-    const pageSize = Number.parseInt(gallery.dataset.pageSize || "", 10) || 12;
+    const pageSize = Number.parseInt(gallery.dataset.pageSize || "", 10) || 15;
     const returnState = getReturnStateForGallery(galleryId);
     const stableList = isLoadMore && prev?.sortMode === sortMode && prev?.arranged?.length === arranged.length ? prev.arranged : arranged;
     let shownCount = isLoadMore
