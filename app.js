@@ -1389,6 +1389,17 @@ function getShopUrlScore(url) {
   return match ? Number(match[1]) : 0;
 }
 
+function getShopPrice(url) {
+  const itemId = String(url ?? "").match(/\/items\/(\d+)/)?.[1];
+  if (!itemId || typeof shopPricesByItemId === "undefined") return null;
+  const price = Number(shopPricesByItemId[itemId]);
+  return Number.isFinite(price) && price >= 0 ? price : null;
+}
+
+function formatShopPrice(price) {
+  return `¥${Number(price).toLocaleString("ja-JP")}`;
+}
+
 function getShopWorkItems() {
   if (!Array.isArray(works)) return [];
   return works
@@ -1401,6 +1412,7 @@ function getShopWorkItems() {
         title: workText(work, "title"),
         image: getWorkListImagePath(work.images?.[0] || work.image || ""),
         url: shopUrl,
+        price: getShopPrice(shopUrl),
         detailUrl: getWorkDetailPagePath(work),
         status: shopStatus,
         categoryKey: getWorkDetailCategoryKey(work),
@@ -1447,11 +1459,17 @@ function getShopWorkCategoryLabel(key) {
 }
 
 function renderShopCard(item) {
+  const priceMarkup = item.status === "available" && Number.isFinite(item.price)
+    ? `<span class="shop-item-price">${escapeHtml(formatShopPrice(item.price))}</span>`
+    : "";
   const imageMarkup = `
           <span class="shop-item-image-wrap">
             <img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.title)}" loading="lazy">
           </span>
-          <span class="shop-item-title">${escapeHtml(item.title)}</span>`;
+          <span class="shop-item-info">
+            <span class="shop-item-title">${escapeHtml(item.title)}</span>
+            ${priceMarkup}
+          </span>`;
   if (!item.url || item.status !== "available") {
     return `
       <article class="shop-item is-${escapeHtml(item.status || "preparing")}" data-shop-item-id="${escapeHtml(item.id)}">

@@ -141,21 +141,26 @@ body.viewer-open .shop-access-dropdown {
   }
 }
 
-.shop-access-menu {
+.shop-access-dropdown .shop-access-menu {
   top: 100%;
   right: 0;
   left: auto;
-  min-width: 118px;
+  min-width: 190px;
 }
 
 .shop-access-menu-title {
   display: block;
-  padding: 8px 10px;
+  padding: 12px 14px 10px;
   color: #383d46;
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 600;
   line-height: 1.25;
   border-bottom: 1px solid var(--line);
+}
+
+.shop-access-menu a {
+  padding: 10px 14px;
+  font-size: 13px;
 }
 
 .shop-access-dropdown:hover .shop-access-menu,
@@ -883,7 +888,8 @@ main {
 .shop-item-link {
   display: grid;
   grid-template-rows: auto auto;
-  gap: 10px;
+  gap: 9px;
+  align-content: start;
   color: inherit;
 }
 
@@ -929,14 +935,28 @@ main {
   aspect-ratio: 1;
 }
 
+.shop-item-info {
+  display: grid;
+  gap: 4px;
+  align-content: start;
+}
+
 .shop-item-title {
   display: block;
   color: #555c66;
   font-size: 12px;
-  min-height: 2.9em;
   line-height: 1.45;
   overflow: hidden;
-  text-align: center;
+  text-align: left;
+}
+
+.shop-item-price {
+  display: block;
+  color: #8b9199;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.4;
+  text-align: left;
 }
 
 .shop-item-link.is-disabled {
@@ -2596,19 +2616,19 @@ footer {
     right: 48px;
     left: auto;
     display: none;
-    width: 132px;
+    width: 190px;
     margin: 0;
-    padding: 6px 12px 9px;
+    padding: 10px 16px 14px;
     background: rgba(255, 255, 255, 0.96);
     border: 1px solid rgba(16, 16, 20, 0.1);
     box-shadow: 0 10px 24px rgba(0, 0, 0, 0.1);
   }
 
   .site-header > .shop-access-dropdown > .shop-access-menu .shop-access-menu-title {
-    margin-bottom: 6px;
-    padding: 5px 0 8px;
+    margin-bottom: 8px;
+    padding: 6px 0 10px;
     color: #383d46;
-    font-size: 15px;
+    font-size: 16px;
     font-weight: 600;
     line-height: 1.25;
     border-bottom: 1px solid rgba(16, 16, 20, 0.12);
@@ -2620,8 +2640,10 @@ footer {
 
   .site-header > .shop-access-dropdown > .shop-access-menu a {
     width: max-content;
-    padding: 5px 0;
+    padding: 7px 0;
     color: #737982;
+    font-size: 13px;
+    line-height: 1.4;
     border: 0;
     opacity: 0.76;
   }
@@ -3342,29 +3364,29 @@ footer {
   }
 
   .shop-item-grid {
-    grid-template-columns: repeat(6, minmax(0, 1fr));
-    gap: 10px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px 14px;
     align-items: stretch;
   }
 
   .shop-item {
-    grid-column: span 2;
+    grid-column: auto;
     height: 100%;
   }
 
   .shop-item.is-wide-landscape,
   .shop-item.is-extreme-landscape {
-    grid-column: span 3;
+    grid-column: auto;
   }
 
   .shop-page[data-shop-scope="digital"] .shop-item.is-wide-landscape,
   .shop-page[data-shop-scope="digital"] .shop-item.is-extreme-landscape {
-    grid-column: span 2;
+    grid-column: auto;
   }
 
   .shop-item-link {
     height: 100%;
-    gap: 6px;
+    gap: 7px;
   }
 
   .shop-item-image-wrap {
@@ -3374,8 +3396,15 @@ footer {
 
   .shop-item-title {
     font-size: 11px;
-    min-height: 32px;
     line-height: 1.35;
+  }
+
+  .shop-item-info {
+    gap: 3px;
+  }
+
+  .shop-item-price {
+    font-size: 10.5px;
   }
 
   .newsletter-fields {
