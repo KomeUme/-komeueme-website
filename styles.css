@@ -145,7 +145,17 @@ body.viewer-open .shop-access-dropdown {
   top: 100%;
   right: 0;
   left: auto;
-  min-width: 108px;
+  min-width: 118px;
+}
+
+.shop-access-menu-title {
+  display: block;
+  padding: 8px 10px;
+  color: #383d46;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.25;
+  border-bottom: 1px solid var(--line);
 }
 
 .shop-access-dropdown:hover .shop-access-menu,
@@ -2588,10 +2598,20 @@ footer {
     display: none;
     width: 132px;
     margin: 0;
-    padding: 6px 12px;
+    padding: 6px 12px 9px;
     background: rgba(255, 255, 255, 0.96);
     border: 1px solid rgba(16, 16, 20, 0.1);
     box-shadow: 0 10px 24px rgba(0, 0, 0, 0.1);
+  }
+
+  .site-header > .shop-access-dropdown > .shop-access-menu .shop-access-menu-title {
+    margin-bottom: 6px;
+    padding: 5px 0 8px;
+    color: #383d46;
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.25;
+    border-bottom: 1px solid rgba(16, 16, 20, 0.12);
   }
 
   .site-header > .shop-access-dropdown.is-open > .shop-access-menu {

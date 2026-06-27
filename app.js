@@ -121,6 +121,7 @@ function setupShopAccess() {
   submenu.className = "shop-access-menu nav-submenu";
   submenu.setAttribute("role", "menu");
   submenu.innerHTML = `
+    <span class="shop-access-menu-title" data-i18n="nav_shop">販売</span>
     <a href="${escapeHtml(appendPageVersion(`${base}shop.html`))}" data-i18n="shop_choice_print" role="menuitem">版画</a>
     <a href="${escapeHtml(appendPageVersion(`${base}shop-digital.html`))}" data-i18n="shop_choice_digital" role="menuitem">デジタル</a>
   `;
