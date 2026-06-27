@@ -103,11 +103,10 @@ function setupShopAccess() {
   const wrapper = document.createElement("div");
   wrapper.className = "shop-access-dropdown";
 
-  const shopAccess = document.createElement("button");
-  shopAccess.type = "button";
+  const shopAccess = document.createElement("a");
+  shopAccess.href = appendPageVersion(`${base}shop.html`);
   shopAccess.className = `shop-access${isShopPage ? " active" : ""}`;
-  shopAccess.setAttribute("aria-label", document.documentElement.lang === "en" ? "Shop menu" : "販売メニュー");
-  shopAccess.setAttribute("aria-expanded", "false");
+  shopAccess.setAttribute("aria-label", document.documentElement.lang === "en" ? "Print shop" : "版画販売");
   shopAccess.setAttribute("aria-haspopup", "menu");
   shopAccess.innerHTML = `
     <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
@@ -140,22 +139,7 @@ function setupShopAccess() {
 
   const closeShopMenu = () => {
     wrapper.classList.remove("is-open");
-    document.body.classList.remove("shop-menu-open");
-    shopAccess.setAttribute("aria-expanded", "false");
   };
-  shopAccess.addEventListener("click", () => {
-    document.body.classList.remove("menu-open");
-    const menuButton = header.querySelector(".nav-menu-toggle");
-    menuButton?.setAttribute("aria-expanded", "false");
-    menuButton?.setAttribute("aria-label", "メニュー");
-    if (!window.matchMedia("(max-width: 768px)").matches) {
-      window.location.href = appendPageVersion(`${base}shop.html`);
-      return;
-    }
-    const isOpen = wrapper.classList.toggle("is-open");
-    document.body.classList.toggle("shop-menu-open", isOpen);
-    shopAccess.setAttribute("aria-expanded", isOpen ? "true" : "false");
-  });
   submenu.addEventListener("click", closeShopMenu);
   document.addEventListener("click", (event) => {
     if (!wrapper.contains(event.target)) closeShopMenu();
@@ -245,9 +229,7 @@ function setupMobileMenu() {
   };
 
   button.addEventListener("click", () => {
-    document.body.classList.remove("shop-menu-open");
     shopAccess?.classList.remove("is-open");
-    shopAccess?.querySelector(".shop-access")?.setAttribute("aria-expanded", "false");
     const isOpen = document.body.classList.toggle("menu-open");
     button.setAttribute("aria-expanded", isOpen ? "true" : "false");
     button.setAttribute("aria-label", isOpen ? "閉じる" : "メニュー");
@@ -1413,6 +1395,7 @@ function getShopWorkItems() {
         image: getWorkListImagePath(work.images?.[0] || work.image || ""),
         url: shopUrl,
         price: getShopPrice(shopUrl),
+        size: workText(work, "size"),
         detailUrl: getWorkDetailPagePath(work),
         status: shopStatus,
         categoryKey: getWorkDetailCategoryKey(work),
@@ -1462,12 +1445,18 @@ function renderShopCard(item) {
   const priceMarkup = item.status === "available" && Number.isFinite(item.price)
     ? `<span class="shop-item-price">${escapeHtml(formatShopPrice(item.price))}</span>`
     : "";
+  const sizeMarkup = item.size
+    ? `<span class="shop-item-size">${escapeHtml(item.size)}</span>`
+    : "";
   const imageMarkup = `
           <span class="shop-item-image-wrap">
             <img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.title)}" loading="lazy">
           </span>
           <span class="shop-item-info">
-            <span class="shop-item-title">${escapeHtml(item.title)}</span>
+            <span class="shop-item-identity">
+              <span class="shop-item-title">${escapeHtml(item.title)}</span>
+              ${sizeMarkup}
+            </span>
             ${priceMarkup}
           </span>`;
   if (!item.url || item.status !== "available") {
