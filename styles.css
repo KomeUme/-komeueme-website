@@ -76,6 +76,84 @@ body.viewer-open .lang-switch {
   display: none;
 }
 
+body.viewer-open .shop-access-dropdown {
+  display: none;
+}
+
+.shop-access-dropdown {
+  position: relative;
+  padding-bottom: 6px;
+  margin-bottom: -6px;
+}
+
+.shop-access {
+  display: inline-flex;
+  width: 18px;
+  height: 20px;
+  padding: 0 0 6px;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-bottom: 1px solid transparent;
+  background: transparent;
+  color: #747b86;
+  opacity: 0.76;
+  cursor: pointer;
+  transition: color 160ms ease, opacity 160ms ease, border-color 160ms ease;
+}
+
+.shop-access:hover,
+.shop-access:focus-visible,
+.shop-access.active {
+  border-color: #aeb4bd;
+  color: var(--ink);
+  opacity: 1;
+}
+
+.shop-access svg {
+  width: 14px;
+  height: 14px;
+}
+
+@keyframes shop-access-hop {
+  0%,
+  18%,
+  100% {
+    transform: translateY(0);
+  }
+  7% {
+    transform: translateY(-3px);
+  }
+  12% {
+    transform: translateY(-1px);
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .shop-access:hover svg {
+    animation: shop-access-hop 1.4s ease-in-out infinite;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shop-access:hover svg {
+    animation: none;
+  }
+}
+
+.shop-access-menu {
+  top: 100%;
+  right: 0;
+  left: auto;
+  min-width: 108px;
+}
+
+.shop-access-dropdown:hover .shop-access-menu,
+.shop-access-dropdown:focus-within .shop-access-menu,
+.shop-access-dropdown.is-open .shop-access-menu {
+  display: block;
+}
+
 .auto-translation-notice {
   position: fixed;
   top: 56px;
@@ -2432,7 +2510,8 @@ footer {
     z-index: 3001;
   }
 
-  body.menu-open::before {
+  body.menu-open::before,
+  body.shop-menu-open::before {
     content: "";
     position: fixed;
     inset: 0;
@@ -2477,6 +2556,74 @@ footer {
     font-size: 12px;
     letter-spacing: 0.08em;
     line-height: 1;
+  }
+
+  .site-header > .shop-access-dropdown {
+    position: static;
+    width: 34px;
+    margin: 0;
+    padding: 0;
+    z-index: 3002;
+  }
+
+  .site-header > .shop-access-dropdown > .shop-access {
+    width: 34px;
+    height: 22px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: #4e5460;
+  }
+
+  .site-header > .shop-access-dropdown > .shop-access svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .site-header > .shop-access-dropdown > .shop-access-menu {
+    position: absolute;
+    top: 48px;
+    right: 48px;
+    left: auto;
+    display: none;
+    width: 132px;
+    margin: 0;
+    padding: 6px 12px;
+    background: rgba(255, 255, 255, 0.96);
+    border: 1px solid rgba(16, 16, 20, 0.1);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.1);
+  }
+
+  .site-header > .shop-access-dropdown.is-open > .shop-access-menu {
+    display: block;
+  }
+
+  .site-header > .shop-access-dropdown > .shop-access-menu a {
+    width: max-content;
+    padding: 5px 0;
+    color: #737982;
+    border: 0;
+    opacity: 0.76;
+  }
+
+  .site-header > .shop-access-dropdown > .shop-access-menu a::before {
+    content: "・";
+    display: inline-block;
+    width: 1em;
+    margin-right: 5px;
+    color: rgba(16, 16, 20, 0.32);
+  }
+
+  .site-header > .shop-access-dropdown > .shop-access-menu a.active {
+    color: var(--ink);
+    opacity: 1;
+  }
+
+  .site-header > .shop-access-dropdown > .shop-access-menu a.active::after {
+    content: "✓";
+    margin-left: 7px;
+    color: #6f7680;
+    font-size: 10px;
   }
 
   .nav-menu-icon {

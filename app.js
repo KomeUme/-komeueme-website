@@ -91,29 +91,74 @@ function normalizeInternalPageLinks() {
   });
 }
 
-function setupShopNavDropdown() {
+function setupShopAccess() {
   const nav = document.querySelector(".site-header .nav");
   const shopLink = nav?.querySelector(":scope > a.shop-link");
-  if (!nav || !shopLink || shopLink.closest(".nav-dropdown")) return;
+  const header = document.querySelector(".site-header");
+  if (!nav || !header || header.querySelector(".shop-access-dropdown")) return;
 
   const base = detectSiteBasePath();
-
+  const currentPage = getNavPageKey(window.location.href);
+  const isShopPage = /^shop(?:-print|-digital)?$/.test(currentPage);
   const wrapper = document.createElement("div");
-  wrapper.className = "nav-item nav-dropdown";
+  wrapper.className = "shop-access-dropdown";
 
-  shopLink.classList.add("nav-trigger");
-  shopLink.setAttribute("href", appendPageVersion(`${base}shop.html`));
+  const shopAccess = document.createElement("button");
+  shopAccess.type = "button";
+  shopAccess.className = `shop-access${isShopPage ? " active" : ""}`;
+  shopAccess.setAttribute("aria-label", document.documentElement.lang === "en" ? "Shop menu" : "販売メニュー");
+  shopAccess.setAttribute("aria-expanded", "false");
+  shopAccess.setAttribute("aria-haspopup", "menu");
+  shopAccess.innerHTML = `
+    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path>
+      <path d="M3 6h18"></path>
+      <path d="M16 10a4 4 0 0 1-8 0"></path>
+    </svg>
+  `;
 
   const submenu = document.createElement("div");
-  submenu.className = "nav-submenu";
+  submenu.className = "shop-access-menu nav-submenu";
+  submenu.setAttribute("role", "menu");
   submenu.innerHTML = `
-          <a href="${escapeHtml(appendPageVersion(`${base}shop.html`))}" data-i18n="shop_choice_print">版画</a>
-          <a href="${escapeHtml(appendPageVersion(`${base}shop-digital.html`))}" data-i18n="shop_choice_digital">デジタル</a>
-        `;
+    <a href="${escapeHtml(appendPageVersion(`${base}shop.html`))}" data-i18n="shop_choice_print" role="menuitem">版画</a>
+    <a href="${escapeHtml(appendPageVersion(`${base}shop-digital.html`))}" data-i18n="shop_choice_digital" role="menuitem">デジタル</a>
+  `;
+  const activeShopSelector =
+    currentPage === "shop-digital" ? 'a[href*="shop-digital.html"]' : isShopPage ? 'a[href*="shop.html"]' : null;
+  const activeShopLink = activeShopSelector ? submenu.querySelector(activeShopSelector) : null;
+  if (activeShopLink) {
+    activeShopLink.classList.add("active");
+    activeShopLink.setAttribute("aria-current", "page");
+  }
 
-  shopLink.insertAdjacentElement("beforebegin", wrapper);
-  wrapper.appendChild(shopLink);
-  wrapper.appendChild(submenu);
+  wrapper.append(shopAccess, submenu);
+  nav.appendChild(wrapper);
+  shopLink?.closest(".nav-item.nav-dropdown")?.remove();
+  shopLink?.remove();
+
+  const closeShopMenu = () => {
+    wrapper.classList.remove("is-open");
+    document.body.classList.remove("shop-menu-open");
+    shopAccess.setAttribute("aria-expanded", "false");
+  };
+  shopAccess.addEventListener("click", () => {
+    document.body.classList.remove("menu-open");
+    const menuButton = header.querySelector(".nav-menu-toggle");
+    menuButton?.setAttribute("aria-expanded", "false");
+    menuButton?.setAttribute("aria-label", "メニュー");
+    if (!window.matchMedia("(max-width: 768px)").matches) {
+      window.location.href = appendPageVersion(`${base}shop.html`);
+      return;
+    }
+    const isOpen = wrapper.classList.toggle("is-open");
+    document.body.classList.toggle("shop-menu-open", isOpen);
+    shopAccess.setAttribute("aria-expanded", isOpen ? "true" : "false");
+  });
+  submenu.addEventListener("click", closeShopMenu);
+  document.addEventListener("click", (event) => {
+    if (!wrapper.contains(event.target)) closeShopMenu();
+  });
 }
 
 function getNavPageKey(url) {
@@ -155,6 +200,7 @@ function setupMobileMenu() {
   const brand = header?.querySelector(".brand");
   const nav = header?.querySelector(".nav");
   const langSwitch = document.querySelector(".lang-switch");
+  const shopAccess = header?.querySelector(".shop-access-dropdown");
   const mobileQuery = window.matchMedia("(max-width: 768px)");
   if (!header || !brand || !nav) return;
 
@@ -180,8 +226,12 @@ function setupMobileMenu() {
       if (button.previousElementSibling !== langSwitch) {
         button.insertAdjacentElement("beforebegin", langSwitch);
       }
-    } else if (langSwitch.parentElement !== document.body) {
-      document.body.insertBefore(langSwitch, header);
+      if (shopAccess && button.previousElementSibling !== shopAccess) {
+        button.insertAdjacentElement("beforebegin", shopAccess);
+      }
+    } else {
+      if (langSwitch.parentElement !== document.body) document.body.insertBefore(langSwitch, header);
+      if (shopAccess && shopAccess.parentElement !== nav) nav.appendChild(shopAccess);
     }
   };
 
@@ -194,6 +244,9 @@ function setupMobileMenu() {
   };
 
   button.addEventListener("click", () => {
+    document.body.classList.remove("shop-menu-open");
+    shopAccess?.classList.remove("is-open");
+    shopAccess?.querySelector(".shop-access")?.setAttribute("aria-expanded", "false");
     const isOpen = document.body.classList.toggle("menu-open");
     button.setAttribute("aria-expanded", isOpen ? "true" : "false");
     button.setAttribute("aria-label", isOpen ? "閉じる" : "メニュー");
@@ -2659,7 +2712,7 @@ function runStartupStep(step) {
 function initializeSite() {
   [
     normalizeInternalPageLinks,
-    setupShopNavDropdown,
+    setupShopAccess,
     syncNavActiveLinks,
     setupMobileMenu,
     setupWorkDetailBackLink,
