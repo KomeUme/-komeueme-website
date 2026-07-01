@@ -455,205 +455,6 @@ function getWorkDetailPagePath(work, workIds = null, source = "") {
   return `${basePath}?${params.toString()}`;
 }
 
-function attachDetailImageZoomPan(surface, image) {
-  if (!surface || !image) return null;
-  if (surface.__imageZoomController) return surface.__imageZoomController;
-
-  const pointers = new Map();
-  let scale = 1;
-  let panX = 0;
-  let panY = 0;
-  let isDragging = false;
-  let isPinching = false;
-  let dragPointerId = null;
-  let dragStartX = 0;
-  let dragStartY = 0;
-  let panStartX = 0;
-  let panStartY = 0;
-  let pinchStartDistance = 0;
-  let pinchStartScale = 1;
-  let mousePointerId = null;
-  let lastTapTime = 0;
-  let lastTapX = 0;
-  let lastTapY = 0;
-  let gestureMoved = false;
-
-  const clampScale = (value) => Math.min(5, Math.max(1, value));
-  const applyTransform = () => {
-    const isZoomed = scale > 1.001;
-    if (!isZoomed) {
-      scale = 1;
-      panX = 0;
-      panY = 0;
-    }
-    image.style.transform = `translate(${Math.round(panX)}px, ${Math.round(panY)}px) scale(${scale})`;
-    image.classList.toggle("is-image-zoomed", isZoomed);
-    image.classList.toggle("is-image-dragging", isDragging && isZoomed);
-    surface.classList.toggle("is-image-zoomed", isZoomed);
-  };
-  const reset = () => {
-    scale = 1;
-    panX = 0;
-    panY = 0;
-    isDragging = false;
-    isPinching = false;
-    dragPointerId = null;
-    pinchStartDistance = 0;
-    mousePointerId = null;
-    pointers.clear();
-    applyTransform();
-  };
-  const startDrag = (pointerId, x, y) => {
-    dragPointerId = pointerId;
-    dragStartX = x;
-    dragStartY = y;
-    panStartX = panX;
-    panStartY = panY;
-    isDragging = false;
-    gestureMoved = false;
-  };
-  const startPinch = () => {
-    const points = Array.from(pointers.values()).slice(0, 2);
-    if (points.length < 2) return;
-    pinchStartDistance = Math.hypot(points[0].x - points[1].x, points[0].y - points[1].y);
-    pinchStartScale = scale;
-    isPinching = pinchStartDistance > 0;
-    isDragging = false;
-    dragPointerId = null;
-    gestureMoved = false;
-    applyTransform();
-  };
-
-  surface.addEventListener("wheel", (event) => {
-    if (mousePointerId === null) return;
-    event.preventDefault();
-    const factor = Math.exp(-event.deltaY * 0.002);
-    scale = clampScale(scale * factor);
-    if (scale <= 1.001) {
-      scale = 1;
-      panX = 0;
-      panY = 0;
-    }
-    applyTransform();
-  }, { passive: false });
-
-  surface.addEventListener("pointerdown", (event) => {
-    if (event.pointerType === "mouse") {
-      if (event.button !== 0) return;
-      mousePointerId = event.pointerId;
-      startDrag(event.pointerId, event.clientX, event.clientY);
-      surface.setPointerCapture?.(event.pointerId);
-      if (scale > 1.001) event.preventDefault();
-      return;
-    }
-    if (event.pointerType !== "touch") return;
-    pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
-    if (pointers.size === 2) {
-      surface.setPointerCapture?.(event.pointerId);
-      startPinch();
-      event.preventDefault();
-      return;
-    }
-    if (scale > 1.001) {
-      surface.setPointerCapture?.(event.pointerId);
-      startDrag(event.pointerId, event.clientX, event.clientY);
-      event.preventDefault();
-    }
-  });
-
-  surface.addEventListener("pointermove", (event) => {
-    if (event.pointerType === "touch" && pointers.has(event.pointerId)) {
-      pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
-      if (isPinching && pointers.size >= 2) {
-        const points = Array.from(pointers.values()).slice(0, 2);
-        const distance = Math.hypot(points[0].x - points[1].x, points[0].y - points[1].y);
-        if (pinchStartDistance > 0) {
-          scale = clampScale(pinchStartScale * (distance / pinchStartDistance));
-          if (scale <= 1.001) {
-            scale = 1;
-            panX = 0;
-            panY = 0;
-          }
-          gestureMoved = true;
-          event.preventDefault();
-          applyTransform();
-        }
-        return;
-      }
-    }
-    if (event.pointerId !== dragPointerId || scale <= 1.001) return;
-    const dx = event.clientX - dragStartX;
-    const dy = event.clientY - dragStartY;
-    if (!isDragging && (Math.abs(dx) > 3 || Math.abs(dy) > 3)) isDragging = true;
-    if (!isDragging) return;
-    panX = panStartX + dx;
-    panY = panStartY + dy;
-    gestureMoved = true;
-    event.preventDefault();
-    applyTransform();
-  });
-
-  const releasePointer = (event) => {
-    if (event.pointerType === "mouse") {
-      if (mousePointerId !== event.pointerId) return;
-      mousePointerId = null;
-      if (surface.hasPointerCapture?.(event.pointerId)) surface.releasePointerCapture(event.pointerId);
-      dragPointerId = null;
-      isDragging = false;
-      applyTransform();
-      return;
-    }
-    if (event.pointerType !== "touch") return;
-    pointers.delete(event.pointerId);
-    if (surface.hasPointerCapture?.(event.pointerId)) surface.releasePointerCapture(event.pointerId);
-    if (isPinching && pointers.size < 2) {
-      isPinching = false;
-      pinchStartDistance = 0;
-      if (scale <= 1.001) {
-        reset();
-        return;
-      } else if (pointers.size === 1) {
-        const [pointerId, point] = pointers.entries().next().value;
-        startDrag(pointerId, point.x, point.y);
-      }
-      gestureMoved = true;
-    } else if (event.pointerId === dragPointerId) {
-      dragPointerId = null;
-      isDragging = false;
-    }
-    const now = Date.now();
-    const tapDistance = Math.hypot(event.clientX - lastTapX, event.clientY - lastTapY);
-    if (!gestureMoved && now - lastTapTime < 300 && tapDistance < 32) {
-      reset();
-      lastTapTime = 0;
-      return;
-    }
-    if (!gestureMoved) {
-      lastTapTime = now;
-      lastTapX = event.clientX;
-      lastTapY = event.clientY;
-    }
-    if (!pointers.size) gestureMoved = false;
-    applyTransform();
-  };
-
-  surface.addEventListener("pointerup", releasePointer);
-  surface.addEventListener("pointercancel", releasePointer);
-  surface.addEventListener("dblclick", (event) => {
-    event.preventDefault();
-    reset();
-  });
-  image.addEventListener("dragstart", (event) => event.preventDefault());
-
-  const controller = {
-    reset,
-    isZoomed: () => scale > 1.001,
-  };
-  surface.__imageZoomController = controller;
-  applyTransform();
-  return controller;
-}
-
 function renderWorkDetailPage() {
   const article = document.querySelector(".work-detail[data-work-id]");
   if (!article || !Array.isArray(works) || !works.length) return;
@@ -732,7 +533,7 @@ function renderWorkDetailPage() {
       : "";
     media.innerHTML = `
       <figure class="work-detail-main">
-        <img class="work-detail-main-image" data-work-detail-main-image src="${escapeHtml(encodeImageSrc(images[0]))}" alt="${escapeHtml(images.length > 1 ? `${titleText} 1` : titleText)}">
+        <img class="work-detail-main-image js-detail-viewer-source" data-work-detail-main-image data-work-id="${escapeHtml(workId)}" data-work-index="0" src="${escapeHtml(encodeImageSrc(images[0]))}" alt="${escapeHtml(images.length > 1 ? `${titleText} 1` : titleText)}">
       </figure>
       ${pageControls}
       <div class="work-detail-thumbnails" data-work-detail-thumbnails aria-label="${escapeHtml(thumbnailLabel)}">
@@ -750,15 +551,12 @@ function renderWorkDetailPage() {
     const storyPrevButton = media.querySelector("[data-story-page-prev]");
     const storyNextButton = media.querySelector("[data-story-page-next]");
     const storyPageSelect = media.querySelector("[data-story-page-select]");
-    const mainArea = media.querySelector(".work-detail-main");
-    const zoomController = attachDetailImageZoomPan(mainArea, mainImage);
-    media.__imageZoomController = zoomController;
     const activateIndex = (index) => {
       const safeIndex = Math.min(Math.max(Number(index) || 0, 0), images.length - 1);
-      zoomController?.reset();
       if (mainImage) {
         mainImage.setAttribute("src", encodeImageSrc(images[safeIndex]));
         mainImage.setAttribute("alt", images.length > 1 ? `${titleText} ${safeIndex + 1}` : titleText);
+        mainImage.dataset.workIndex = String(safeIndex);
       }
       thumbButtons.forEach((button) => {
         const isActive = Number(button.dataset.workIndex || "-1") === safeIndex;
@@ -917,7 +715,6 @@ function attachWorkDetailThumbnailControls() {
     const storyPrevButton = media.querySelector("[data-story-page-prev]");
     const storyNextButton = media.querySelector("[data-story-page-next]");
     const storyPageSelect = media.querySelector("[data-story-page-select]");
-    const zoomController = media.__imageZoomController || attachDetailImageZoomPan(mainArea, mainImage);
     if (!thumbnailList || !mainImage || !thumbButtons.length) return;
 
     const getActiveIndex = () => {
@@ -930,9 +727,9 @@ function attachWorkDetailThumbnailControls() {
       const nextSrc = thumbImage?.getAttribute("src");
       if (!nextSrc) return;
       const nextIndex = Math.max(thumbButtons.indexOf(button), 0);
-      zoomController?.reset();
       mainImage.setAttribute("src", nextSrc);
       mainImage.setAttribute("alt", thumbImage.getAttribute("alt") || mainImage.getAttribute("alt") || "");
+      mainImage.dataset.workIndex = String(nextIndex);
       thumbButtons.forEach((thumbButton) => {
         const isActive = thumbButton === button;
         thumbButton.classList.toggle("is-active", isActive);
@@ -986,10 +783,6 @@ function attachWorkDetailThumbnailControls() {
       };
 
       mainArea.addEventListener("touchstart", (event) => {
-        if (zoomController?.isZoomed()) {
-          resetTouch();
-          return;
-        }
         if (event.touches.length !== 1) {
           resetTouch();
           return;
@@ -1004,10 +797,6 @@ function attachWorkDetailThumbnailControls() {
       }, { passive: true });
 
       mainArea.addEventListener("touchmove", (event) => {
-        if (zoomController?.isZoomed()) {
-          resetTouch();
-          return;
-        }
         if (!isTrackingTouch || event.touches.length !== 1) return;
         const touch = event.touches[0];
         touchLastX = touch.clientX;
@@ -1021,10 +810,6 @@ function attachWorkDetailThumbnailControls() {
       }, { passive: false });
 
       mainArea.addEventListener("touchend", () => {
-        if (zoomController?.isZoomed()) {
-          resetTouch();
-          return;
-        }
         if (!isTrackingTouch) return;
         const deltaX = touchLastX - touchStartX;
         const deltaY = touchLastY - touchStartY;
@@ -2337,12 +2122,14 @@ function attachWorkDetailLinkMemory() {
 
 function attachGalleryViewer() {
   const map = new Map(works.map((work) => [String(work.id), work]));
-  const links = document.querySelectorAll('.js-work-link[data-work-id]:not([data-work-detail-link="true"])');
-  if (!links.length) return;
+  const links = Array.from(document.querySelectorAll('.js-work-link[data-work-id]:not([data-work-detail-link="true"])'));
+  const detailSources = Array.from(document.querySelectorAll(".js-detail-viewer-source[data-work-id]"));
+  const sources = [...links, ...detailSources];
+  if (!sources.length) return;
 
   let viewer = document.querySelector(".image-viewer");
   if (viewer?.__openWork) {
-    links.forEach((link) => {
+    sources.forEach((link) => {
       if (link.dataset.viewerBound === "true") return;
       link.dataset.viewerBound = "true";
       link.addEventListener("click", (event) => {
@@ -2518,7 +2305,7 @@ function attachGalleryViewer() {
     currentWorkPage = link.dataset.workPage || getVersionedWorkPagePath(work);
     currentImages = work.images?.length ? work.images : [work.image];
     currentTitle = workText(work, "title") || "";
-    index = 0;
+    index = Math.min(Math.max(Number(link.dataset.workIndex) || 0, 0), currentImages.length - 1);
     viewer.classList.toggle("is-mini-chara", work.subcategory === "mini-chara");
     const layout = link.closest(".gallery-grid[data-gallery]")?.dataset.galleryLayout || "";
     if (detailBtn) {
@@ -2532,7 +2319,7 @@ function attachGalleryViewer() {
   };
   viewer.__openWork = openWork;
 
-  links.forEach((link) => {
+  sources.forEach((link) => {
     if (link.dataset.viewerBound === "true") return;
     link.dataset.viewerBound = "true";
     link.addEventListener("click", (event) => {
@@ -2560,6 +2347,10 @@ function attachGalleryViewer() {
       hasMoved = false;
       return;
     }
+    if (isZoomed) return;
+    event.preventDefault();
+    event.stopPropagation();
+    close();
   });
   image.addEventListener("pointerdown", (event) => {
     if (event.pointerType === "mouse") {
@@ -2978,6 +2769,7 @@ function initializeSite() {
     attachImageProtection,
     renderWorkDetailPage,
     attachWorkDetailThumbnailControls,
+    attachGalleryViewer,
     renderFeatureImages,
     renderGallery,
     renderShopPage,

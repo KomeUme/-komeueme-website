@@ -1843,7 +1843,6 @@ main {
   background: rgba(255, 255, 255, 0.84);
   min-width: 0;
   touch-action: pan-y;
-  overflow: hidden;
 }
 
 .work-detail-main-image {
@@ -1855,24 +1854,9 @@ main {
   margin: 0 auto;
   min-width: 0;
   cursor: zoom-in;
-  transform: translate(0, 0) scale(1);
-  transform-origin: center center;
   user-select: none;
-  will-change: transform;
   -webkit-touch-callout: none;
   -webkit-user-drag: none;
-}
-
-.work-detail-main.is-image-zoomed {
-  touch-action: none;
-}
-
-.work-detail-main-image.is-image-zoomed {
-  cursor: grab;
-}
-
-.work-detail-main-image.is-image-dragging {
-  cursor: grabbing;
 }
 
 @media (min-width: 769px) {
