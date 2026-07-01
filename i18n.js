@@ -109,7 +109,7 @@ const I18N = {
     btn_profile_2: "略歴 2",
     btn_unset_url: "URL未設定",
     label_sns: "SNS",
-    artwork_inquiry_cta: "作品についての問い合わせ",
+    artwork_inquiry_cta: "作品についてのお問い合わせ",
     label_contact: "Contact",
     newsletter_title: "展示などのお知らせを受け取る",
     newsletter_desc: "展示などの重要なお知らせをメールでお送りします。",

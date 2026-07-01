@@ -2518,6 +2518,7 @@ footer {
 .newsletter-toggle-plus,
 .newsletter-toggle-minus {
   display: block;
+  transform: translateY(-2px);
 }
 
 .newsletter-toggle-minus,
