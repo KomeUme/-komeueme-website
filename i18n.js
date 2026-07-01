@@ -29,6 +29,22 @@ const I18N = {
     nav_shop: "販売",
     shop_contact: "販売",
     selected_works: "Selected Works",
+    page_title_sample_news: "展示のお知らせ（仮） | Kome Ume",
+    sample_news_label: "展示のお知らせ",
+    sample_news_date: "2026.09.12－09.27",
+    sample_news_title: "米鵜めえ 木版画展（仮）",
+    sample_news_place: "会場：〇〇ギャラリー",
+    sample_news_more: "詳細を見る →",
+    sample_news_image_alt: "仮展示DM画像",
+    sample_news_detail_lead: "現在、展示のお知らせを掲載した場合の見本を表示しています。",
+    sample_news_period_label: "会期",
+    sample_news_period: "2026年9月12日（土）－9月27日（日）",
+    sample_news_venue_label: "会場",
+    sample_news_venue: "〇〇ギャラリー",
+    sample_news_hours_label: "時間",
+    sample_news_hours: "11:00－18:00（最終日は17:00まで）",
+    sample_news_body: "木版画作品を中心とした展示を予定しています。詳細が決まり次第、会場情報や在廊予定などをこのページでお知らせします。",
+    sample_news_back: "トップページへ戻る",
     top_hero_title: "<span class=\"name-stack\"><span class=\"name-main\">米鵜めえ</span></span>",
     top_hero_lead: "私は制作を通し、自身の価値観の可視化を目的としている。\n過去、現在、未来において同じモチーフを見たとしても、自身の感性や周りの環境の変化により、そのモチーフから受け取る情報の異なることが往々にしてある。\nその為、作品制作を通し今現在の自身の価値観を測り、自身が何を重要視しているのか、その移り変わりを観察している。",
     intro_statement_title: "はじめに",
@@ -195,6 +211,22 @@ const I18N = {
     nav_shop: "Shop",
     shop_contact: "Shop",
     selected_works: "Selected Works",
+    page_title_sample_news: "Exhibition Notice (Sample) | Kome Ume",
+    sample_news_label: "Exhibition Notice",
+    sample_news_date: "Sep 12－27, 2026",
+    sample_news_title: "Kome Ume Woodblock Exhibition (Sample)",
+    sample_news_place: "Venue: Sample Gallery",
+    sample_news_more: "View details →",
+    sample_news_image_alt: "Sample exhibition flyer",
+    sample_news_detail_lead: "This is a sample showing how an exhibition notice would appear.",
+    sample_news_period_label: "Dates",
+    sample_news_period: "September 12－27, 2026",
+    sample_news_venue_label: "Venue",
+    sample_news_venue: "Sample Gallery",
+    sample_news_hours_label: "Hours",
+    sample_news_hours: "11:00－18:00 (until 17:00 on the final day)",
+    sample_news_body: "The exhibition will primarily feature woodblock prints. Venue information and the artist's attendance schedule will be posted here when confirmed.",
+    sample_news_back: "Back to TOP",
     top_hero_title: "<span class=\"name-stack\"><span class=\"name-main\">米鵜めえ</span></span>",
     top_hero_lead: "Through making work, I aim to visualize my own values.\nEven when looking at the same motif across past, present, and future, what I perceive can differ as my sensibility and surrounding environment change.\nBy creating works, I observe my current values, what I prioritize, and how those priorities shift over time.",
     intro_statement_title: "Introduction",
@@ -402,6 +434,10 @@ function applyLang(lang) {
   document.querySelectorAll("[data-i18n-placeholder]").forEach((el) => {
     const key = el.dataset.i18nPlaceholder;
     if (dict[key]) el.setAttribute("placeholder", dict[key]);
+  });
+  document.querySelectorAll("[data-i18n-alt]").forEach((el) => {
+    const key = el.dataset.i18nAlt;
+    if (dict[key]) el.setAttribute("alt", dict[key]);
   });
   document.querySelectorAll(".copy-done-label").forEach((el) => {
     el.textContent = dict.copy_done || I18N.ja.copy_done;
