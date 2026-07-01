@@ -324,6 +324,13 @@ main {
   margin-bottom: 30px;
 }
 
+.top-hero-left {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 16px;
+}
+
 .top-hero-copy {
   position: relative;
   display: flex;
@@ -333,6 +340,11 @@ main {
   background: rgba(255, 255, 255, 0.74);
   padding: 28px 28px 24px;
   border-radius: 8px;
+}
+
+.top-hero-left .top-hero-copy {
+  flex: 1 1 auto;
+  height: auto;
 }
 
 .top-name-block {
@@ -474,6 +486,37 @@ main {
 
 .top-notice {
   margin: 0 0 34px;
+}
+
+.top-hero-left .top-notice {
+  flex: 0 0 auto;
+  margin: 0;
+}
+
+.top-hero-left .top-notice-link {
+  grid-template-columns: 94px minmax(0, 1fr);
+  min-height: 112px;
+}
+
+.top-hero-left .top-notice-image {
+  padding: 8px;
+}
+
+.top-hero-left .top-notice-image img {
+  height: 94px;
+}
+
+.top-hero-left .top-notice-content {
+  padding: 14px 14px 31px;
+}
+
+.top-hero-left .top-notice-title {
+  font-size: clamp(15px, 1.55vw, 19px);
+}
+
+.top-hero-left .top-notice-more {
+  right: 14px;
+  bottom: 11px;
 }
 
 .top-notice-link {
