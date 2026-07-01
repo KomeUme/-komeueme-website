@@ -2430,6 +2430,7 @@ footer {
   font-size: 20px;
   font-weight: 300;
   line-height: 1;
+  transform: translateX(3px);
 }
 
 .newsletter-signup {
@@ -2742,7 +2743,7 @@ footer {
   padding: 9px 13px;
   border-radius: 999px;
   pointer-events: none;
-  z-index: 2;
+  z-index: 4;
 }
 
 .viewer-loading::before {

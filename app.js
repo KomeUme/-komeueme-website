@@ -2303,6 +2303,7 @@ function attachGalleryViewer() {
   const loading = viewer.querySelector(".viewer-loading");
   const detailBtn = viewer.querySelector(".viewer-detail");
   let loadingTimer = null;
+  let loadingRequestId = 0;
   const closeBtn = viewer.querySelector(".viewer-close");
   const prevBtn = viewer.querySelector(".viewer-prev");
   const nextBtn = viewer.querySelector(".viewer-next");
@@ -2439,7 +2440,8 @@ function attachGalleryViewer() {
     image.classList.remove("is-pinching", "is-panning");
   };
 
-  const hideLoading = () => {
+  const hideLoading = (requestId = null) => {
+    if (requestId !== null && requestId !== loadingRequestId) return;
     if (loadingTimer) window.clearTimeout(loadingTimer);
     loadingTimer = null;
     if (loading) loading.classList.remove("is-visible", "is-error");
@@ -2449,17 +2451,35 @@ function attachGalleryViewer() {
     if (!currentImages.length) return;
     resetPointerState();
     setZoom(false);
+    const requestId = ++loadingRequestId;
+    const nextSrc = currentImages[index];
+    const expectedSrc = new URL(nextSrc, document.baseURI).href;
     if (loading) {
       loading.textContent = uiT("loading_updating", "読み込み中");
       loading.classList.remove("is-visible", "is-error");
     }
     if (loadingTimer) window.clearTimeout(loadingTimer);
     loadingTimer = window.setTimeout(() => {
-      if (loading) loading.classList.add("is-visible");
+      if (requestId === loadingRequestId && loading) loading.classList.add("is-visible");
     }, 1000);
-    image.src = currentImages[index];
+    image.onload = () => {
+      if ((image.currentSrc || image.src) !== expectedSrc) return;
+      hideLoading(requestId);
+    };
+    image.onerror = () => {
+      if (requestId !== loadingRequestId || (image.currentSrc || image.src) !== expectedSrc) return;
+      if (loadingTimer) window.clearTimeout(loadingTimer);
+      loadingTimer = null;
+      if (loading) loading.classList.add("is-visible", "is-error");
+      if (loading) loading.textContent = uiT("loading_failed", "読み込み失敗");
+    };
+    image.src = nextSrc;
     image.alt = currentTitle;
-    if (image.complete && image.naturalWidth > 0) hideLoading();
+    window.queueMicrotask(() => {
+      if (requestId === loadingRequestId && image.complete && image.naturalWidth > 0) {
+        hideLoading(requestId);
+      }
+    });
     meta.textContent = `${currentTitle}  ${index + 1}/${currentImages.length}`;
     viewer.__viewerState = { currentImages: [...currentImages], currentTitle, index };
   };
@@ -2471,6 +2491,7 @@ function attachGalleryViewer() {
     draw();
   };
   const close = () => {
+    loadingRequestId += 1;
     hideLoading();
     resetPointerState();
     setZoom(false);
@@ -2707,15 +2728,6 @@ function attachGalleryViewer() {
     if (swipePointerId !== event.pointerId) return;
     swipePointerId = null;
     swipeMoved = false;
-  });
-  image.addEventListener("load", () => {
-    hideLoading();
-  });
-  image.addEventListener("error", () => {
-    if (loadingTimer) window.clearTimeout(loadingTimer);
-    loadingTimer = null;
-    if (loading) loading.classList.add("is-visible", "is-error");
-    if (loading) loading.textContent = uiT("loading_failed", "読み込み失敗");
   });
   nextBtn.onclick = next;
   prevBtn.onclick = prev;
