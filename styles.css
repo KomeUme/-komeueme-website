@@ -506,17 +506,20 @@ main {
 
 .top-notice-empty .top-notice-label {
   flex: 0 0 auto;
-  color: #686f79;
+  color: #747a83;
   font-size: 11px;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.04em;
 }
 
 .top-notice-empty .top-notice-label::before {
-  width: 3px;
-  height: 3px;
-  margin-right: 6px;
-  background: #9ba0a7;
-  vertical-align: 3px;
+  display: inline-block;
+  width: 4px;
+  height: 4px;
+  margin-right: 7px;
+  border: 1px solid #aeb3ba;
+  border-radius: 50%;
+  background: transparent;
+  vertical-align: 2px;
 }
 
 .top-notice-empty-text {
@@ -2411,18 +2414,21 @@ footer {
 }
 
 .artwork-inquiry-arrow {
-  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  flex: 0 0 1.25em;
+  width: 1.25em;
   color: #8d949d;
   font-family: "Helvetica Neue", Arial, "Hiragino Sans", "Yu Gothic", sans-serif;
-  font-size: 0;
+  font-size: 20px;
   font-weight: 300;
   line-height: 1;
-  opacity: 0.72;
 }
 
 .artwork-inquiry-arrow::before {
   content: ">";
   font-size: 11px;
+  line-height: 1;
 }
 
 .newsletter-signup {
