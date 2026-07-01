@@ -493,6 +493,24 @@ main {
   margin: 0;
 }
 
+.top-notice-empty {
+  display: grid;
+  gap: 8px;
+  min-height: 76px;
+  box-sizing: border-box;
+  padding: 15px 18px;
+  border: 1px solid #d4d6da;
+  border-radius: 7px;
+  background: rgba(250, 250, 248, 0.72);
+}
+
+.top-notice-empty-text {
+  color: #747a83;
+  font-family: "Hiragino Mincho ProN", "Yu Mincho", "Times New Roman", serif;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
 .top-hero-left .top-notice-link {
   grid-template-columns: 94px minmax(0, 1fr);
   min-height: 112px;
@@ -535,6 +553,11 @@ main {
 .top-notice-link:focus-visible {
   border-color: #bfc3c9;
   background: rgba(255, 255, 255, 0.94);
+}
+
+.top-notice-link.has-no-image,
+.top-hero-left .top-notice-link.has-no-image {
+  grid-template-columns: minmax(0, 1fr);
 }
 
 .top-notice-image {
@@ -620,6 +643,10 @@ main {
   grid-template-columns: minmax(260px, 42%) minmax(0, 1fr);
   gap: 44px;
   align-items: start;
+}
+
+.notice-detail-layout.has-no-image {
+  grid-template-columns: minmax(0, 720px);
 }
 
 .notice-detail-visual {

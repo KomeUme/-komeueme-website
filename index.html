@@ -52,21 +52,11 @@
           </div>
         </div>
 
-        <section class="top-notice" aria-labelledby="top-notice-title">
-          <a class="top-notice-link" href="news-sample.html">
-            <span class="top-notice-image">
-              <img src="assets/works/list/work-01-01.jpg" alt="仮展示DM画像" data-i18n-alt="sample_news_image_alt">
-            </span>
-            <span class="top-notice-content">
-              <span class="top-notice-meta">
-                <span class="top-notice-label" data-i18n="sample_news_label">展示のお知らせ</span>
-                <time datetime="2026-09-12" data-i18n="sample_news_date">2026.09.12－09.27</time>
-              </span>
-              <span class="top-notice-title" id="top-notice-title" data-i18n="sample_news_title">米鵜めえ 木版画展（仮）</span>
-              <span class="top-notice-place" data-i18n="sample_news_place">会場：〇〇ギャラリー</span>
-              <span class="top-notice-more" data-i18n="sample_news_more">詳細を見る →</span>
-            </span>
-          </a>
+        <section class="top-notice" data-top-news aria-labelledby="top-notice-title">
+          <div class="top-notice-empty">
+            <span class="top-notice-label" id="top-notice-title" data-i18n="current_news_label">お知らせ</span>
+            <span class="top-notice-empty-text" data-i18n="current_news_empty">現在お知らせはございません。</span>
+          </div>
         </section>
       </div>
       <figure class="top-hero-media">
@@ -139,6 +129,7 @@
   </main>
 
   <footer>© Kome Ume</footer>
+  <script src="news-data.js?v=20260701a"></script>
   <script src="data.js?v=20260624a"></script>
   <script src="app.js?v=20260624a"></script>
   <script src="i18n.js?v=20260624a"></script>

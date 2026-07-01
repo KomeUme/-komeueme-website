@@ -46,6 +46,144 @@ function workText(work, field) {
   return work?.[field];
 }
 
+function newsText(item, field) {
+  const lang = getCurrentLang();
+  if (lang === "en") {
+    const translatedKey = `${field}_en`;
+    if (String(item?.[translatedKey] ?? "").trim()) return item[translatedKey];
+  }
+  return item?.[field] ?? "";
+}
+
+function getNewsItems() {
+  return Array.isArray(window.newsItems) ? window.newsItems : [];
+}
+
+function getNewsBoundary(value, endOfDay = false) {
+  const text = String(value ?? "").trim();
+  if (!text) return null;
+  const normalized = /^\d{4}-\d{2}-\d{2}$/.test(text)
+    ? `${text}T${endOfDay ? "23:59:59" : "00:00:00"}`
+    : text;
+  const date = new Date(normalized);
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
+function getCurrentTopNews() {
+  const now = new Date();
+  return getNewsItems()
+    .filter((item) => {
+      if (!item || item.published === false || !String(item.id ?? "").trim()) return false;
+      const from = getNewsBoundary(item.displayFrom);
+      const until = getNewsBoundary(item.displayUntil, true);
+      return (!from || now >= from) && (!until || now <= until);
+    })
+    .sort((a, b) => {
+      const aDate = getNewsBoundary(a.displayFrom)?.getTime() || 0;
+      const bDate = getNewsBoundary(b.displayFrom)?.getTime() || 0;
+      return bDate - aDate;
+    })[0] || null;
+}
+
+function renderTopNews() {
+  const container = document.querySelector("[data-top-news]");
+  if (!container) return;
+  const item = getCurrentTopNews();
+  if (!item) {
+    container.innerHTML = `
+      <div class="top-notice-empty">
+        <span class="top-notice-label" id="top-notice-title" data-i18n="current_news_label">${escapeHtml(uiT("current_news_label", "お知らせ"))}</span>
+        <span class="top-notice-empty-text" data-i18n="current_news_empty">${escapeHtml(uiT("current_news_empty", "現在お知らせはございません。"))}</span>
+      </div>
+    `;
+    return;
+  }
+
+  const id = String(item.id);
+  const title = withFallback(newsText(item, "title"));
+  const date = String(newsText(item, "date") || "");
+  const place = String(newsText(item, "place") || "");
+  const image = String(item.image || "").trim();
+  const imageAlt = String(newsText(item, "imageAlt") || title);
+  container.innerHTML = `
+    <a class="top-notice-link${image ? "" : " has-no-image"}" href="news.html?id=${encodeURIComponent(id)}">
+      ${image ? `
+        <span class="top-notice-image">
+          <img src="${escapeHtml(encodeImageSrc(image))}" alt="${escapeHtml(imageAlt)}">
+        </span>
+      ` : ""}
+      <span class="top-notice-content">
+        <span class="top-notice-meta">
+          <span class="top-notice-label" id="top-notice-title">${escapeHtml(uiT("current_news_label", "お知らせ"))}</span>
+          ${date ? `<time>${escapeHtml(date)}</time>` : ""}
+        </span>
+        <span class="top-notice-title">${escapeHtml(title)}</span>
+        ${place ? `<span class="top-notice-place">${escapeHtml(place)}</span>` : ""}
+        <span class="top-notice-more">${escapeHtml(uiT("news_more", "詳細を見る →"))}</span>
+      </span>
+    </a>
+  `;
+}
+
+function renderNewsDetailPage() {
+  const page = document.querySelector("[data-news-detail]");
+  if (!page) return;
+  const id = new URLSearchParams(window.location.search).get("id") || "";
+  const item = getNewsItems().find((entry) => String(entry?.id ?? "") === id);
+  if (!item || item.published === false) {
+    document.title = uiT("page_title_news", "お知らせ | Kome Ume");
+    page.innerHTML = `
+      <section class="intro notice-detail-head">
+        <p class="top-notice-label">${escapeHtml(uiT("current_news_label", "お知らせ"))}</p>
+        <h1>${escapeHtml(uiT("news_not_found", "お知らせが見つかりません。"))}</h1>
+        <a class="notice-detail-back" href="index.html">${escapeHtml(uiT("news_back", "トップページへ戻る"))}</a>
+      </section>
+    `;
+    return;
+  }
+
+  const title = withFallback(newsText(item, "title"));
+  const lead = String(newsText(item, "lead") || "");
+  const image = String(item.image || "").trim();
+  const imageAlt = String(newsText(item, "imageAlt") || title);
+  const rows = [
+    ["news_period_label", "会期", newsText(item, "period")],
+    ["news_venue_label", "会場", newsText(item, "venue")],
+    ["news_hours_label", "時間", newsText(item, "hours")],
+  ].filter(([, , value]) => String(value ?? "").trim());
+  const body = String(newsText(item, "body") || "");
+  document.title = `${title} | Kome Ume`;
+  page.innerHTML = `
+    <section class="intro notice-detail-head">
+      <p class="top-notice-label">${escapeHtml(uiT("current_news_label", "お知らせ"))}</p>
+      <h1>${escapeHtml(title)}</h1>
+      ${lead ? `<p>${escapeHtml(lead)}</p>` : ""}
+    </section>
+    <section class="notice-detail-layout${image ? "" : " has-no-image"}">
+      ${image ? `
+        <figure class="notice-detail-visual">
+          <img src="${escapeHtml(encodeImageSrc(image))}" alt="${escapeHtml(imageAlt)}">
+        </figure>
+      ` : ""}
+      <div class="notice-detail-copy">
+        <h2>${escapeHtml(title)}</h2>
+        ${rows.length ? `
+          <dl class="notice-detail-list">
+            ${rows.map(([key, fallback, value]) => `
+              <div>
+                <dt>${escapeHtml(uiT(key, fallback))}</dt>
+                <dd>${escapeHtml(value)}</dd>
+              </div>
+            `).join("")}
+          </dl>
+        ` : ""}
+        ${body ? `<p class="notice-detail-body">${escapeHtml(body).replace(/\n/g, "<br>")}</p>` : ""}
+        <a class="notice-detail-back" href="index.html">${escapeHtml(uiT("news_back", "トップページへ戻る"))}</a>
+      </div>
+    </section>
+  `;
+}
+
 function detectSiteBasePath() {
   const pages = [
     "index",
@@ -62,6 +200,7 @@ function detectSiteBasePath() {
     "shop",
     "shop-print",
     "shop-digital",
+    "news",
   ];
   const path = window.location.pathname;
   if (/\/work-[^/]+\.html$/.test(path)) {
@@ -2122,7 +2261,8 @@ function attachWorkDetailLinkMemory() {
 }
 
 function attachGalleryViewer() {
-  const map = new Map(works.map((work) => [String(work.id), work]));
+  const workList = typeof works !== "undefined" && Array.isArray(works) ? works : [];
+  const map = new Map(workList.map((work) => [String(work.id), work]));
   const links = Array.from(document.querySelectorAll('.js-work-link[data-work-id]:not([data-work-detail-link="true"])'));
   const detailSources = Array.from(document.querySelectorAll(".js-detail-viewer-source[data-work-id]"));
   const sources = [...links, ...detailSources];
@@ -2815,6 +2955,8 @@ window.renderFeatureImages = renderFeatureImages;
 window.renderGallery = renderGallery;
 window.renderShopPage = renderShopPage;
 window.attachWorkDetailThumbnailControls = attachWorkDetailThumbnailControls;
+window.renderTopNews = renderTopNews;
+window.renderNewsDetailPage = renderNewsDetailPage;
 
 function runStartupStep(step) {
   try {
@@ -2835,6 +2977,8 @@ function initializeSite() {
     renderWorkDetailPage,
     attachWorkDetailThumbnailControls,
     attachGalleryViewer,
+    renderTopNews,
+    renderNewsDetailPage,
     renderFeatureImages,
     renderGallery,
     renderShopPage,

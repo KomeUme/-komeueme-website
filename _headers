@@ -10,6 +10,9 @@
 /data.js
   Cache-Control: no-store, max-age=0, must-revalidate
 
+/news-data.js
+  Cache-Control: no-store, max-age=0, must-revalidate
+
 /i18n.js
   Cache-Control: no-store, max-age=0, must-revalidate
 
