@@ -1898,15 +1898,18 @@ main {
   z-index: 2;
   display: none;
   align-items: center;
-  gap: 9px;
+  gap: 10px;
   transform: translate(-50%, -50%);
-  padding: 9px 13px;
-  border-radius: 999px;
-  background: rgba(25, 27, 31, 0.72);
-  color: #fff;
-  font-size: 12px;
+  padding: 10px 14px;
+  border: 1px solid rgba(205, 208, 213, 0.9);
+  border-radius: 2px;
+  background: rgba(247, 247, 245, 0.94);
+  color: #737982;
+  font-family: "Hiragino Mincho ProN", "Yu Mincho", "Times New Roman", serif;
+  font-size: 11px;
   line-height: 1;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.08em;
+  box-shadow: 0 3px 12px rgba(23, 27, 33, 0.06);
   pointer-events: none;
 }
 
@@ -1915,8 +1918,8 @@ main {
   width: 13px;
   height: 13px;
   box-sizing: border-box;
-  border: 1.5px solid rgba(255, 255, 255, 0.35);
-  border-top-color: #fff;
+  border: 1px solid #d3d6da;
+  border-top-color: #737982;
   border-radius: 50%;
   animation: viewer-loading-spin 0.75s linear infinite;
 }
@@ -2455,8 +2458,8 @@ footer {
 .artwork-inquiry-arrow {
   display: grid;
   place-items: center;
-  flex: 0 0 25px;
-  width: 25px;
+  flex: 0 0 auto;
+  width: 1.25em;
   color: #8d949d;
   font-family: "Helvetica Neue", Arial, "Hiragino Sans", "Yu Gothic", sans-serif;
   font-size: 0;
@@ -2466,10 +2469,9 @@ footer {
 
 .artwork-inquiry-arrow::before {
   content: ">";
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 300;
   line-height: 1;
-  transform: translateX(3px);
 }
 
 .newsletter-signup {
@@ -2774,13 +2776,17 @@ footer {
   transform: translate(-50%, -50%);
   display: none;
   align-items: center;
-  gap: 9px;
-  color: #f6f6f8;
-  font-size: 12px;
-  letter-spacing: 0.04em;
-  background: rgba(0, 0, 0, 0.55);
-  padding: 9px 13px;
-  border-radius: 999px;
+  gap: 10px;
+  padding: 10px 14px;
+  border: 1px solid rgba(205, 208, 213, 0.9);
+  border-radius: 2px;
+  background: rgba(247, 247, 245, 0.94);
+  color: #737982;
+  font-family: "Hiragino Mincho ProN", "Yu Mincho", "Times New Roman", serif;
+  font-size: 11px;
+  line-height: 1;
+  letter-spacing: 0.08em;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.14);
   pointer-events: none;
   z-index: 4;
 }
@@ -2790,8 +2796,8 @@ footer {
   width: 13px;
   height: 13px;
   box-sizing: border-box;
-  border: 1.5px solid rgba(255, 255, 255, 0.35);
-  border-top-color: #fff;
+  border: 1px solid #d3d6da;
+  border-top-color: #737982;
   border-radius: 50%;
   animation: viewer-loading-spin 0.75s linear infinite;
 }
