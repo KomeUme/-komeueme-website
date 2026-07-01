@@ -2607,12 +2607,9 @@ function attachGalleryViewer() {
   image.addEventListener("click", (event) => {
     if (hasMoved) {
       hasMoved = false;
-      return;
     }
-    if (isZoomed) return;
     event.preventDefault();
     event.stopPropagation();
-    close();
   });
   image.addEventListener("pointerdown", (event) => {
     if (event.pointerType === "mouse") {
