@@ -2416,18 +2416,19 @@ footer {
 .artwork-inquiry-arrow {
   display: grid;
   place-items: center;
-  flex: 0 0 1.25em;
-  width: 1.25em;
+  flex: 0 0 25px;
+  width: 25px;
   color: #8d949d;
   font-family: "Helvetica Neue", Arial, "Hiragino Sans", "Yu Gothic", sans-serif;
-  font-size: 20px;
+  font-size: 0;
   font-weight: 300;
   line-height: 1;
 }
 
 .artwork-inquiry-arrow::before {
   content: ">";
-  font-size: 11px;
+  font-size: 20px;
+  font-weight: 300;
   line-height: 1;
 }
 
