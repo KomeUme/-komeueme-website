@@ -178,7 +178,7 @@ const I18N = {
     next_episode: "次の話",
     viewer_detail: "詳細を見る",
     auto_translation_notice: "作品キャプションは自動翻訳です",
-    loading_updating: "更新中",
+    loading_updating: "読み込み中",
     loading_failed: "読み込み失敗",
   },
   en: {
@@ -360,7 +360,7 @@ const I18N = {
     next_episode: "Next episode",
     viewer_detail: "View details",
     auto_translation_notice: "Work captions are automatically translated.",
-    loading_updating: "Updating...",
+    loading_updating: "Loading...",
     loading_failed: "Load failed",
   },
 };

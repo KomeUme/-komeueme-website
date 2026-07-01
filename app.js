@@ -604,6 +604,7 @@ function renderWorkDetailPage() {
     activateIndex(0);
   }
 
+  attachGalleryViewer();
   updateWorkDetailPager(work, returnState);
 }
 
@@ -2150,7 +2151,7 @@ function attachGalleryViewer() {
       <button class="viewer-detail" type="button" hidden>${uiT("viewer_detail", "詳細を見る")}</button>
       <button class="viewer-prev" type="button" aria-label="previous">‹</button>
       <img class="viewer-image" alt="">
-      <div class="viewer-loading">${uiT("loading_updating", "更新中")}</div>
+      <div class="viewer-loading" role="status" aria-live="polite">${uiT("loading_updating", "読み込み中")}</div>
       <button class="viewer-next" type="button" aria-label="next">›</button>
       <div class="viewer-meta"></div>
     `;
@@ -2189,8 +2190,9 @@ function attachGalleryViewer() {
   let lastTapY = 0;
   const touchPointers = new Map();
   let isPinching = false;
-  let pinchStartDistance = 0;
-  let pinchStartScale = 1;
+  let pinchLastDistance = 0;
+  let pinchLastCenterX = 0;
+  let pinchLastCenterY = 0;
   let currentWorkId = "";
   let currentWorkPage = "";
   const savedViewerState = viewer.__viewerState;
@@ -2201,12 +2203,17 @@ function attachGalleryViewer() {
   }
 
   const applyImageTransform = () => {
-    const tx = Math.round(panX);
-    const ty = Math.round(panY);
-    image.style.transform = `translate(${tx}px, ${ty}px) scale(${zoomScale})`;
+    image.style.transform = `translate(${panX}px, ${panY}px) scale(${zoomScale})`;
   };
 
   const clampZoomScale = (scale) => Math.min(5, Math.max(1, scale));
+
+  const syncZoomState = () => {
+    image.classList.toggle("is-zoomed", isZoomed);
+    image.classList.toggle("is-panning", isPanning && isZoomed);
+    if (closeBtn) closeBtn.hidden = isZoomed;
+    applyImageTransform();
+  };
 
   const setZoom = (zoomed, scale = 2.5) => {
     zoomScale = zoomed ? clampZoomScale(scale) : 1;
@@ -2218,10 +2225,30 @@ function attachGalleryViewer() {
       isPinching = false;
       image.classList.remove("is-pinching");
     }
-    image.classList.toggle("is-zoomed", isZoomed);
-    image.classList.toggle("is-panning", isPanning && isZoomed);
-    if (closeBtn) closeBtn.hidden = isZoomed;
-    applyImageTransform();
+    syncZoomState();
+  };
+
+  const zoomAroundPoint = (nextScale, clientX, clientY, targetX = clientX, targetY = clientY) => {
+    const clampedScale = clampZoomScale(nextScale);
+    if (clampedScale <= 1.01) {
+      zoomScale = 1;
+      panX = 0;
+      panY = 0;
+      isZoomed = false;
+      isPanning = false;
+      syncZoomState();
+      return;
+    }
+    const rect = image.getBoundingClientRect();
+    const baseCenterX = (rect.left + rect.right) / 2 - panX;
+    const baseCenterY = (rect.top + rect.bottom) / 2 - panY;
+    const anchorX = (clientX - baseCenterX - panX) / zoomScale;
+    const anchorY = (clientY - baseCenterY - panY) / zoomScale;
+    zoomScale = clampedScale;
+    panX = targetX - baseCenterX - anchorX * zoomScale;
+    panY = targetY - baseCenterY - anchorY * zoomScale;
+    isZoomed = true;
+    syncZoomState();
   };
 
   const trackTouchPointer = (event) => {
@@ -2229,9 +2256,10 @@ function attachGalleryViewer() {
     touchPointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
     if (touchPointers.size === 2) {
       const points = Array.from(touchPointers.values());
-      pinchStartDistance = Math.hypot(points[0].x - points[1].x, points[0].y - points[1].y);
-      pinchStartScale = zoomScale;
-      isPinching = pinchStartDistance > 0;
+      pinchLastDistance = Math.hypot(points[0].x - points[1].x, points[0].y - points[1].y);
+      pinchLastCenterX = (points[0].x + points[1].x) / 2;
+      pinchLastCenterY = (points[0].y + points[1].y) / 2;
+      isPinching = pinchLastDistance > 0;
       image.classList.toggle("is-pinching", isPinching);
       pointerDown = false;
       isPanning = false;
@@ -2246,6 +2274,9 @@ function attachGalleryViewer() {
     touchPointers.delete(event.pointerId);
     if (isPinching && touchPointers.size < 2) {
       isPinching = false;
+      pinchLastDistance = 0;
+      pinchLastCenterX = 0;
+      pinchLastCenterY = 0;
       image.classList.remove("is-pinching");
       if (zoomScale <= 1.01) setZoom(false);
       return true;
@@ -2253,19 +2284,42 @@ function attachGalleryViewer() {
     return false;
   };
 
+  const resetPointerState = () => {
+    touchPointers.clear();
+    isPinching = false;
+    pinchLastDistance = 0;
+    pinchLastCenterX = 0;
+    pinchLastCenterY = 0;
+    pointerDown = false;
+    mouseZoomPointerId = null;
+    isPanning = false;
+    hasMoved = false;
+    swipePointerId = null;
+    swipeMoved = false;
+    image.classList.remove("is-pinching", "is-panning");
+  };
+
+  const hideLoading = () => {
+    if (loadingTimer) window.clearTimeout(loadingTimer);
+    loadingTimer = null;
+    if (loading) loading.classList.remove("is-visible", "is-error");
+  };
+
   const draw = () => {
     if (!currentImages.length) return;
+    resetPointerState();
     setZoom(false);
     if (loading) {
-      loading.textContent = uiT("loading_updating", "更新中");
-      loading.classList.remove("is-visible");
+      loading.textContent = uiT("loading_updating", "読み込み中");
+      loading.classList.remove("is-visible", "is-error");
     }
     if (loadingTimer) window.clearTimeout(loadingTimer);
     loadingTimer = window.setTimeout(() => {
       if (loading) loading.classList.add("is-visible");
-    }, 500);
+    }, 1000);
     image.src = currentImages[index];
     image.alt = currentTitle;
+    if (image.complete && image.naturalWidth > 0) hideLoading();
     meta.textContent = `${currentTitle}  ${index + 1}/${currentImages.length}`;
     viewer.__viewerState = { currentImages: [...currentImages], currentTitle, index };
   };
@@ -2277,6 +2331,8 @@ function attachGalleryViewer() {
     draw();
   };
   const close = () => {
+    hideLoading();
+    resetPointerState();
     setZoom(false);
     viewer.classList.remove("is-open");
     document.body.classList.remove("viewer-open");
@@ -2370,10 +2426,9 @@ function attachGalleryViewer() {
       }
       return;
     }
-    if (trackTouchPointer(event)) return;
+    if (event.pointerType === "touch" && touchPointers.size >= 1) return;
     if (!isZoomed || isPinching) return;
     event.preventDefault();
-    event.stopPropagation();
     pointerDown = true;
     hasMoved = false;
     isPanning = false;
@@ -2389,7 +2444,7 @@ function attachGalleryViewer() {
     event.stopPropagation();
     const factor = Math.exp(-event.deltaY * 0.002);
     const nextScale = clampZoomScale(zoomScale * factor);
-    setZoom(nextScale > 1.001, nextScale);
+    zoomAroundPoint(nextScale, event.clientX, event.clientY);
   }, { passive: false });
   image.addEventListener("pointermove", (event) => {
     if (!pointerDown || !isZoomed || isPinching) return;
@@ -2406,7 +2461,6 @@ function attachGalleryViewer() {
     applyImageTransform();
   });
   image.addEventListener("pointerup", (event) => {
-    releaseTouchPointer(event);
     if (!pointerDown) return;
     if (image.hasPointerCapture(event.pointerId)) {
       image.releasePointerCapture(event.pointerId);
@@ -2417,7 +2471,6 @@ function attachGalleryViewer() {
     image.classList.remove("is-panning");
   });
   image.addEventListener("pointercancel", (event) => {
-    releaseTouchPointer(event);
     if (event.pointerId === mouseZoomPointerId) mouseZoomPointerId = null;
     pointerDown = false;
     isPanning = false;
@@ -2441,16 +2494,19 @@ function attachGalleryViewer() {
       if (isPinching && touchPointers.size >= 2) {
         const points = Array.from(touchPointers.values()).slice(0, 2);
         const distance = Math.hypot(points[0].x - points[1].x, points[0].y - points[1].y);
-        if (pinchStartDistance > 0) {
-          zoomScale = clampZoomScale(pinchStartScale * (distance / pinchStartDistance));
-          isZoomed = zoomScale > 1.01;
-          if (!isZoomed) {
-            panX = 0;
-            panY = 0;
-          }
-          image.classList.toggle("is-zoomed", isZoomed);
-          if (closeBtn) closeBtn.hidden = isZoomed;
-          applyImageTransform();
+        if (pinchLastDistance > 0) {
+          const centerX = (points[0].x + points[1].x) / 2;
+          const centerY = (points[0].y + points[1].y) / 2;
+          zoomAroundPoint(
+            zoomScale * (distance / pinchLastDistance),
+            pinchLastCenterX,
+            pinchLastCenterY,
+            centerX,
+            centerY
+          );
+          pinchLastDistance = distance;
+          pinchLastCenterX = centerX;
+          pinchLastCenterY = centerY;
         }
         return;
       }
@@ -2466,6 +2522,15 @@ function attachGalleryViewer() {
         swipePointerId = null;
         swipeMoved = false;
         hasMoved = true;
+        return;
+      }
+      if (hasMoved) {
+        lastTapTime = 0;
+        swipePointerId = null;
+        swipeMoved = false;
+        window.setTimeout(() => {
+          hasMoved = false;
+        }, 0);
         return;
       }
       const now = Date.now();
@@ -2504,12 +2569,12 @@ function attachGalleryViewer() {
     swipeMoved = false;
   });
   image.addEventListener("load", () => {
-    if (loadingTimer) window.clearTimeout(loadingTimer);
-    if (loading) loading.classList.remove("is-visible");
+    hideLoading();
   });
   image.addEventListener("error", () => {
     if (loadingTimer) window.clearTimeout(loadingTimer);
-    if (loading) loading.classList.add("is-visible");
+    loadingTimer = null;
+    if (loading) loading.classList.add("is-visible", "is-error");
     if (loading) loading.textContent = uiT("loading_failed", "読み込み失敗");
   });
   nextBtn.onclick = next;
