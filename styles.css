@@ -2114,6 +2114,40 @@ footer {
   text-align: right;
 }
 
+.artwork-inquiry-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 52px;
+  margin: 24px 0 0;
+  padding: 0 18px;
+  border: 1px solid #e1e4e8;
+  background: #fbfbfa;
+  color: #454b54;
+  font-family: "Hiragino Mincho ProN", "Yu Mincho", "Times New Roman", serif;
+  font-size: clamp(14px, 1.45vw, 17px);
+  font-weight: 400;
+  line-height: 1.45;
+}
+
+.artwork-inquiry-link:hover,
+.artwork-inquiry-link:focus-visible {
+  border-color: #c8ccd2;
+  background: #fff;
+}
+
+.artwork-inquiry-arrow {
+  flex: 0 0 auto;
+  color: #8d949d;
+  font-family: "Helvetica Neue", Arial, "Hiragino Sans", "Yu Gothic", sans-serif;
+  font-size: 17px;
+  font-weight: 300;
+  line-height: 1;
+}
+
 .newsletter-signup {
   box-sizing: border-box;
   width: 100%;
@@ -2291,7 +2325,6 @@ footer {
 }
 
 .site-mini-contact .label-sns::before,
-.site-mini-contact .label-inquiry::before,
 .site-mini-contact .label-contact::before {
   display: inline-block;
   width: 14px;
@@ -2316,22 +2349,6 @@ footer {
   height: 15px;
   margin-right: 6px;
   background: url("assets/icons/mail-mono.svg") no-repeat center / contain;
-  vertical-align: -2px;
-}
-
-.site-mini-contact .label-inquiry::before {
-  content: "";
-  display: inline-block;
-  box-sizing: border-box;
-  width: 15px;
-  height: 15px;
-  margin-right: 6px;
-  border: 1px solid currentColor;
-  border-radius: 2px;
-  background:
-    linear-gradient(currentColor, currentColor) 3px 4px / 7px 1px no-repeat,
-    linear-gradient(currentColor, currentColor) 3px 7px / 7px 1px no-repeat,
-    linear-gradient(currentColor, currentColor) 3px 10px / 5px 1px no-repeat;
   vertical-align: -2px;
 }
 
