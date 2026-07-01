@@ -672,7 +672,8 @@ function renderWorkDetailPage() {
       : "";
     media.innerHTML = `
       <figure class="work-detail-main">
-        <img class="work-detail-main-image js-detail-viewer-source" data-work-detail-main-image data-work-id="${escapeHtml(workId)}" data-work-index="0" src="${escapeHtml(encodeImageSrc(images[0]))}" alt="${escapeHtml(images.length > 1 ? `${titleText} 1` : titleText)}">
+        <img class="work-detail-main-image js-detail-viewer-source" data-work-detail-main-image data-work-id="${escapeHtml(workId)}" data-work-index="0" alt="${escapeHtml(images.length > 1 ? `${titleText} 1` : titleText)}">
+        <span class="work-detail-loading" data-work-detail-loading role="status" aria-live="polite">${escapeHtml(uiT("loading_updating", "読み込み中"))}</span>
       </figure>
       ${pageControls}
       <div class="work-detail-thumbnails" data-work-detail-thumbnails aria-label="${escapeHtml(thumbnailLabel)}">
@@ -690,11 +691,50 @@ function renderWorkDetailPage() {
     const storyPrevButton = media.querySelector("[data-story-page-prev]");
     const storyNextButton = media.querySelector("[data-story-page-next]");
     const storyPageSelect = media.querySelector("[data-story-page-select]");
+    const detailLoading = media.querySelector("[data-work-detail-loading]");
+    let detailLoadingTimer = null;
+    let detailLoadingRequestId = 0;
+    const hideDetailLoading = (requestId = null) => {
+      if (requestId !== null && requestId !== detailLoadingRequestId) return;
+      if (detailLoadingTimer) window.clearTimeout(detailLoadingTimer);
+      detailLoadingTimer = null;
+      detailLoading?.classList.remove("is-visible", "is-error");
+    };
+    const loadDetailImage = (src, alt) => {
+      if (!mainImage) return;
+      const requestId = ++detailLoadingRequestId;
+      const expectedSrc = new URL(src, document.baseURI).href;
+      hideDetailLoading();
+      if (detailLoading) detailLoading.textContent = uiT("loading_updating", "読み込み中");
+      detailLoadingTimer = window.setTimeout(() => {
+        if (requestId === detailLoadingRequestId) detailLoading?.classList.add("is-visible");
+      }, 1000);
+      mainImage.onload = () => {
+        if ((mainImage.currentSrc || mainImage.src) !== expectedSrc) return;
+        hideDetailLoading(requestId);
+      };
+      mainImage.onerror = () => {
+        if (requestId !== detailLoadingRequestId || (mainImage.currentSrc || mainImage.src) !== expectedSrc) return;
+        if (detailLoadingTimer) window.clearTimeout(detailLoadingTimer);
+        detailLoadingTimer = null;
+        detailLoading?.classList.add("is-visible", "is-error");
+        if (detailLoading) detailLoading.textContent = uiT("loading_failed", "読み込み失敗");
+      };
+      mainImage.src = src;
+      mainImage.alt = alt;
+      window.queueMicrotask(() => {
+        if (requestId === detailLoadingRequestId && mainImage.complete && mainImage.naturalWidth > 0) {
+          hideDetailLoading(requestId);
+        }
+      });
+    };
     const activateIndex = (index) => {
       const safeIndex = Math.min(Math.max(Number(index) || 0, 0), images.length - 1);
       if (mainImage) {
-        mainImage.setAttribute("src", encodeImageSrc(images[safeIndex]));
-        mainImage.setAttribute("alt", images.length > 1 ? `${titleText} ${safeIndex + 1}` : titleText);
+        loadDetailImage(
+          encodeImageSrc(images[safeIndex]),
+          images.length > 1 ? `${titleText} ${safeIndex + 1}` : titleText
+        );
         mainImage.dataset.workIndex = String(safeIndex);
       }
       thumbButtons.forEach((button) => {
@@ -708,6 +748,7 @@ function renderWorkDetailPage() {
       const activeThumb = thumbButtons.find((button) => Number(button.dataset.workIndex || "-1") === safeIndex);
       if (activeThumb) activeThumb.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
     };
+    media.__activateWorkDetailIndex = activateIndex;
     const stepStoryPage = (offset) => {
       const current = Number(storyPageSelect?.value || 0);
       activateIndex(current + offset);
@@ -867,6 +908,10 @@ function attachWorkDetailThumbnailControls() {
       const nextSrc = thumbImage?.getAttribute("src");
       if (!nextSrc) return;
       const nextIndex = Math.max(thumbButtons.indexOf(button), 0);
+      if (typeof media.__activateWorkDetailIndex === "function") {
+        media.__activateWorkDetailIndex(nextIndex);
+        return;
+      }
       mainImage.setAttribute("src", nextSrc);
       mainImage.setAttribute("alt", thumbImage.getAttribute("alt") || mainImage.getAttribute("alt") || "");
       mainImage.dataset.workIndex = String(nextIndex);
