@@ -260,12 +260,16 @@ function setupShopAccess() {
   submenu.className = "shop-access-menu nav-submenu";
   submenu.setAttribute("role", "menu");
   submenu.innerHTML = `
-    <span class="shop-access-menu-title" data-i18n="nav_shop">販売</span>
+    <a class="shop-access-menu-title" href="${escapeHtml(appendPageVersion(`${base}shop.html`))}" data-i18n="nav_shop" role="menuitem">販売</a>
     <a href="${escapeHtml(appendPageVersion(`${base}shop.html`))}" data-i18n="shop_choice_print" role="menuitem">版画</a>
     <a href="${escapeHtml(appendPageVersion(`${base}shop-digital.html`))}" data-i18n="shop_choice_digital" role="menuitem">デジタル</a>
   `;
   const activeShopSelector =
-    currentPage === "shop-digital" ? 'a[href*="shop-digital.html"]' : isShopPage ? 'a[href*="shop.html"]' : null;
+    currentPage === "shop-digital"
+      ? 'a[href*="shop-digital.html"]'
+      : isShopPage
+        ? 'a:not(.shop-access-menu-title)[href*="shop.html"]'
+        : null;
   const activeShopLink = activeShopSelector ? submenu.querySelector(activeShopSelector) : null;
   if (activeShopLink) {
     activeShopLink.classList.add("active");
@@ -277,8 +281,6 @@ function setupShopAccess() {
   shopLink?.closest(".nav-item.nav-dropdown")?.remove();
   shopLink?.remove();
 
-  const shopMenuTransferKey = "komeume-shop-menu-open";
-  let hasUsedInitialShopTap = false;
   const setShopMenuOpen = (isOpen) => {
     wrapper.classList.toggle("is-open", isOpen);
     document.body.classList.toggle("shop-menu-open", isOpen);
@@ -292,41 +294,11 @@ function setupShopAccess() {
     const menuButton = header.querySelector(".nav-menu-toggle");
     menuButton?.setAttribute("aria-expanded", "false");
     menuButton?.setAttribute("aria-label", "メニュー");
-    if (hasUsedInitialShopTap) {
-      setShopMenuOpen(!wrapper.classList.contains("is-open"));
-      return;
-    }
-    hasUsedInitialShopTap = true;
-    setShopMenuOpen(true);
-    try {
-      window.sessionStorage.setItem(shopMenuTransferKey, "true");
-    } catch (error) {
-      // The menu still opens before navigation when storage is unavailable.
-    }
-    window.location.href = appendPageVersion(`${base}shop.html`);
+    setShopMenuOpen(!wrapper.classList.contains("is-open"));
   });
   submenu.addEventListener("click", closeShopMenu);
   document.addEventListener("click", (event) => {
     if (!wrapper.contains(event.target)) closeShopMenu();
-  });
-  try {
-    if (window.sessionStorage.getItem(shopMenuTransferKey) === "true") {
-      window.sessionStorage.removeItem(shopMenuTransferKey);
-      hasUsedInitialShopTap = true;
-      setShopMenuOpen(true);
-    }
-  } catch (error) {
-    // Ignore storage restrictions; normal navigation remains available.
-  }
-  window.addEventListener("pageshow", (event) => {
-    if (!event.persisted) return;
-    hasUsedInitialShopTap = false;
-    setShopMenuOpen(false);
-    try {
-      window.sessionStorage.removeItem(shopMenuTransferKey);
-    } catch (error) {
-      // Ignore storage restrictions; the page-local state is already reset.
-    }
   });
 }
 
@@ -1462,6 +1434,19 @@ function sortWorks(list, sortMode, category) {
       return getIdScore(b.id) - getIdScore(a.id);
     });
   }
+  if (sortMode === "category") {
+    return [...list].sort((a, b) => {
+      const subcategoryDiff = String(a.subcategory ?? "").localeCompare(String(b.subcategory ?? ""), "ja");
+      if (subcategoryDiff) return subcategoryDiff;
+      if (category === "digital-mini-chara") {
+        const catDiff = getMiniCharaCatPriority(b) - getMiniCharaCatPriority(a);
+        if (catDiff) return catDiff;
+      }
+      const yearDiff = getYearScore(b.year) - getYearScore(a.year);
+      if (yearDiff) return yearDiff;
+      return getIdScore(b.id) - getIdScore(a.id);
+    });
+  }
   if (sortMode === "random") return shuffle(list);
   return arrangeBySimilarity(list);
 }
@@ -1471,6 +1456,7 @@ function getGallerySortLabel(sortMode) {
   if (sortMode === "story-asc") return uiT("sort_story_asc", "第一話から");
   if (sortMode === "story-desc") return uiT("sort_story_desc", "最新話から");
   if (sortMode === "size") return uiT("sort_size", "作品サイズ順");
+  if (sortMode === "category") return uiT("sort_category", "カテゴリー順");
   return uiT("sort_year", "制作年度順");
 }
 

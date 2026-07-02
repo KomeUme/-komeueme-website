@@ -148,7 +148,7 @@ body.viewer-open .shop-access-dropdown {
   min-width: 190px;
 }
 
-.shop-access-menu-title {
+.shop-access-menu a.shop-access-menu-title {
   display: none;
   padding: 12px 14px 10px;
   color: #383d46;
@@ -3025,7 +3025,7 @@ footer {
     box-shadow: 0 10px 24px rgba(0, 0, 0, 0.1);
   }
 
-  .site-header > .shop-access-dropdown > .shop-access-menu .shop-access-menu-title {
+  .site-header > .shop-access-dropdown > .shop-access-menu a.shop-access-menu-title {
     display: block;
     margin-bottom: 8px;
     padding: 6px 0 10px;
