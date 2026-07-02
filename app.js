@@ -278,6 +278,7 @@ function setupShopAccess() {
   shopLink?.remove();
 
   const shopMenuTransferKey = "komeume-shop-menu-open";
+  let hasUsedInitialShopTap = false;
   const setShopMenuOpen = (isOpen) => {
     wrapper.classList.toggle("is-open", isOpen);
     document.body.classList.toggle("shop-menu-open", isOpen);
@@ -291,6 +292,11 @@ function setupShopAccess() {
     const menuButton = header.querySelector(".nav-menu-toggle");
     menuButton?.setAttribute("aria-expanded", "false");
     menuButton?.setAttribute("aria-label", "メニュー");
+    if (hasUsedInitialShopTap) {
+      setShopMenuOpen(!wrapper.classList.contains("is-open"));
+      return;
+    }
+    hasUsedInitialShopTap = true;
     setShopMenuOpen(true);
     try {
       window.sessionStorage.setItem(shopMenuTransferKey, "true");
@@ -306,11 +312,22 @@ function setupShopAccess() {
   try {
     if (window.sessionStorage.getItem(shopMenuTransferKey) === "true") {
       window.sessionStorage.removeItem(shopMenuTransferKey);
+      hasUsedInitialShopTap = true;
       setShopMenuOpen(true);
     }
   } catch (error) {
     // Ignore storage restrictions; normal navigation remains available.
   }
+  window.addEventListener("pageshow", (event) => {
+    if (!event.persisted) return;
+    hasUsedInitialShopTap = false;
+    setShopMenuOpen(false);
+    try {
+      window.sessionStorage.removeItem(shopMenuTransferKey);
+    } catch (error) {
+      // Ignore storage restrictions; the page-local state is already reset.
+    }
+  });
 }
 
 function getNavPageKey(url) {
