@@ -277,28 +277,40 @@ function setupShopAccess() {
   shopLink?.closest(".nav-item.nav-dropdown")?.remove();
   shopLink?.remove();
 
+  const shopMenuTransferKey = "komeume-shop-menu-open";
+  const setShopMenuOpen = (isOpen) => {
+    wrapper.classList.toggle("is-open", isOpen);
+    document.body.classList.toggle("shop-menu-open", isOpen);
+    shopAccess.setAttribute("aria-expanded", isOpen ? "true" : "false");
+  };
   const closeShopMenu = () => {
-    wrapper.classList.remove("is-open");
-    document.body.classList.remove("shop-menu-open");
-    shopAccess.setAttribute("aria-expanded", "false");
+    setShopMenuOpen(false);
   };
   shopAccess.addEventListener("click", () => {
     document.body.classList.remove("menu-open");
     const menuButton = header.querySelector(".nav-menu-toggle");
     menuButton?.setAttribute("aria-expanded", "false");
     menuButton?.setAttribute("aria-label", "メニュー");
-    if (!window.matchMedia("(max-width: 768px)").matches) {
-      window.location.href = appendPageVersion(`${base}shop.html`);
-      return;
+    setShopMenuOpen(true);
+    try {
+      window.sessionStorage.setItem(shopMenuTransferKey, "true");
+    } catch (error) {
+      // The menu still opens before navigation when storage is unavailable.
     }
-    const isOpen = wrapper.classList.toggle("is-open");
-    document.body.classList.toggle("shop-menu-open", isOpen);
-    shopAccess.setAttribute("aria-expanded", isOpen ? "true" : "false");
+    window.location.href = appendPageVersion(`${base}shop.html`);
   });
   submenu.addEventListener("click", closeShopMenu);
   document.addEventListener("click", (event) => {
     if (!wrapper.contains(event.target)) closeShopMenu();
   });
+  try {
+    if (window.sessionStorage.getItem(shopMenuTransferKey) === "true") {
+      window.sessionStorage.removeItem(shopMenuTransferKey);
+      setShopMenuOpen(true);
+    }
+  } catch (error) {
+    // Ignore storage restrictions; normal navigation remains available.
+  }
 }
 
 function getNavPageKey(url) {
