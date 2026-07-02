@@ -320,11 +320,17 @@ function syncNavActiveLinks() {
   const currentKey = getNavPageKey(window.location.href);
   const navLinks = Array.from(nav.querySelectorAll("a[href]"));
   navLinks.forEach((link) => {
+    if (link.classList.contains("shop-access-menu-title")) {
+      link.classList.remove("active");
+      link.removeAttribute("aria-current");
+      return;
+    }
     const isCurrent = getNavPageKey(link.href) === currentKey;
     if (isCurrent) {
       link.classList.add("active");
       link.setAttribute("aria-current", "page");
     } else {
+      link.classList.remove("active");
       link.removeAttribute("aria-current");
     }
   });
