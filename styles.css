@@ -2410,16 +2410,6 @@ footer {
   margin-top: 22px;
 }
 
-.profile-page-updated {
-  margin: 44px 0 -38px;
-  color: #a2a7af;
-  font-family: "Helvetica Neue", Arial, "Hiragino Sans", "Yu Gothic", sans-serif;
-  font-size: 10px;
-  line-height: 1.4;
-  letter-spacing: 0;
-  text-align: right;
-}
-
 .site-page-updated {
   margin: 14px 0 0;
   color: #a2a7af;
@@ -3041,8 +3031,10 @@ footer {
   }
 
   .site-header > .shop-access-dropdown > .shop-access-menu a {
-    width: max-content;
-    padding: 7px 0;
+    display: block;
+    box-sizing: border-box;
+    width: 100%;
+    padding: 8px 6px;
     color: #737982;
     font-size: 12px;
     line-height: 1.4;
