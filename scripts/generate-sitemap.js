@@ -27,7 +27,7 @@ function formatDate(date) {
 function main() {
   const lastmod = formatDate(new Date());
   const files = fs.readdirSync(root)
-    .filter((file) => file.endsWith(".html") && !excluded.has(file))
+    .filter((file) => file.endsWith(".html") && !excluded.has(file) && !/^google.+\.html$/i.test(file))
     .sort((a, b) => {
       if (a === "index.html") return -1;
       if (b === "index.html") return 1;
