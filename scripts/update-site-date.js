@@ -4,7 +4,7 @@ const { execFileSync } = require("child_process");
 
 const root = path.resolve(__dirname, "..");
 const i18nPath = path.join(root, "i18n.js");
-const visibleFilePattern = /^(?:index|about|profile|shop|hanga|hanga-wood|hanga-copper|digital-illustration|digital-mini-chara|manga-4koma|manga-story|work-\d+)\.html$|^(?:app|data|i18n|styles)\.js$|^assets\/|^icons\/|^text\//;
+const visibleFilePattern = /^(?:index|about|profile|privacy|news|shop|hanga|hanga-wood|hanga-copper|digital-illustration|digital-mini-chara|manga-4koma|manga-story|work-\d+)\.html$|^(?:app|data|i18n|styles)\.js$|^assets\/|^icons\/|^text\//;
 
 function formatToday() {
   const now = new Date();
