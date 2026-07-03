@@ -37,6 +37,7 @@
 - 作品サイズの `size` は `NNNmm×NNNmm` 形式で統一する（`mm` 省略を禁止）
 - 作品画像を追加したら、公開前に `node scripts/prepare-work-images.js <画像パス...>` を実行し、長辺をWeb向け上限に自動調整する（拡大はしない）
 - 作品画像を追加・差し替えたら、一覧表示用に `node scripts/generate-list-thumbnails.js` を実行し、`assets/works/list/` の長辺800px派生画像を更新する
+- 一覧画像生成時は `assets/works/list/avif/` に長辺400pxの1倍版と800pxの2倍版も生成する。一覧表示はAVIFの`srcset`を優先し、非対応環境では従来のJPEG/PNGへフォールバックする。詳細画像・全画面ビューアはズーム品質を優先して元画像を使う
 - 作品画像の原本は `/Users/IHEI1/展示関係/portfolio-img` を正本とし、Web側では原本を直接使わない
 - 作品画像をWebサイトへ取り込む時は、`node scripts/import-work-image.js <sourcePath> <destFileName>` を使い、`assets/works` へコピー・リネーム・最適化してから使用する
 - コピー元が `/Users/IHEI1/展示関係/portfolio-img` 配下の場合、原本は絶対に削除・移動・上書きしない（常に「コピーのみ」）
@@ -47,6 +48,9 @@
 - 全公開HTMLには静的なdescription、canonical、OGP、Twitter Cardを置く。作品詳細は作品名と代表画像を使い、JavaScript実行を前提にメタ情報を生成しない。静的ページ追加・作品ページ再生成後は `node scripts/apply-site-meta.js` を実行する
 - canonicalとOGPの基準URLは `https://komeueme-website.pages.dev` とし、独自ドメイン導入時は生成スクリプト内の基準URLも同時に変更する
 - 全ページのフッターから `privacy.html` へ移動できる導線を維持する。プライバシーページにはGoogleフォーム、Mailchimp、BASE、アクセスログ、情報の利用目的・保管・削除・連絡先を記載する
+- faviconはルートの `favicon.svg` を使用し、`scripts/apply-site-meta.js` と作品ページ生成スクリプトの両方で全HTMLへ静的に出力する
+- `robots.txt` は全ページを許可し、`sitemap.xml` を案内する。サイト構成変更後は `node scripts/generate-sitemap.js` を実行する。`404.html` とリダイレクト専用ページはサイトマップへ含めない
+- 公開日更新、メタ情報、サイトマップの更新漏れ防止には `.githooks/pre-commit` を使う。新しい作業環境では `node scripts/install-git-hooks.js` を一度実行して有効化する
 - 下位カテゴリを持つカテゴリ（版画/デジタル/漫画）は、全ページのヘッダーで同じドロップダウン構造を維持し、各カテゴリページの `intro` 内に控えめな下位カテゴリ導線を置く
 - ヘッダーのドロップダウンや下位リストを追加した場合、現在ページのチェックマーク表示は個別HTMLの手動 `active` だけに依存せず、`app.js` の共通URL照合処理で自動反映される構造にする
 - 販売は作品カテゴリーとは役割が異なるため、作品カテゴリーリスト内に含めない。全ページのヘッダーに独立したショッピングバッグを置く。PCではバッグを `About` の隣へ通常ナビと同じ濃さ・大きさで置き、ホバー時に版画販売・デジタル販売の下位リストを表示する。PCでは親タイトル「販売」を出さない。モバイルではバッグを言語切替とメニューボタンの間へ同等の操作寸法で置き、展開中は作品メニューと同じ背景暗幕を表示する
@@ -118,6 +122,7 @@
 
 ## トップヒーロー運用ルール（再現性必須）
 - ヒーロータイトルは `data-i18n-html="top_hero_title"` を使う（HTML入り文言のため `data-i18n` は使わない）
+- 作家名の直下には活動分野「版画を中心に制作」を一行で表示し、作家ステートメントより弱い階層を維持する
 - トップの切替画像は常に5枚で運用する
 - 5枚のうち2枚は「木版画かつ1000mm超」から選出する
 - 切替画像の候補選出はページ読み込みごとにランダム再抽選する

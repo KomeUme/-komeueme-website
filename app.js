@@ -587,6 +587,21 @@ function getWorkListImagePath(imagePath) {
   return path.replace(/^assets\/works\//, "assets/works/list/");
 }
 
+function getResponsiveListImageMarkup(imagePath, alt, attributes = "") {
+  const path = String(imagePath || "");
+  const src = encodeImageSrc(path);
+  const extension = path.match(/\.[^.\/]+$/)?.[0] || "";
+  if (!extension || !path.startsWith("assets/works/list/")) {
+    return `<img src="${escapeHtml(src)}" alt="${escapeHtml(alt)}"${attributes}>`;
+  }
+  const base = path.slice(path.lastIndexOf("/") + 1, -extension.length);
+  const avifBase = `assets/works/list/avif/${base}`;
+  return `<picture class="responsive-work-picture">
+            <source type="image/avif" srcset="${escapeHtml(encodeImageSrc(`${avifBase}-1x.avif`))} 1x, ${escapeHtml(encodeImageSrc(`${avifBase}-2x.avif`))} 2x">
+            <img src="${escapeHtml(src)}" alt="${escapeHtml(alt)}"${attributes}>
+          </picture>`;
+}
+
 function getWorkDetailPagePath(work, workIds = null, source = "") {
   const id = String(work?.id ?? "").replace(/[^a-zA-Z0-9_-]/g, "");
   const basePath = id ? `work-${id}.html` : getWorkPagePath(work);
@@ -1520,7 +1535,7 @@ function renderGalleryWorkCard(work, orderedIds) {
   return `
       <article class="${getWorkCardClass(work)}" data-work-id="${escapeHtml(work.id)}">
         <a class="work-image-link js-work-link" href="${escapeHtml(detailPath)}" data-work-id="${escapeHtml(work.id)}" data-work-page="${escapeHtml(detailPath)}" data-work-detail-link="true">
-          <img src="${escapeHtml(listImage)}" alt="${escapeHtml(title)}" loading="lazy">
+          ${getResponsiveListImageMarkup(listImage, title, ' loading="lazy"')}
         </a>
         <div class="caption">
           <h3 class="caption-title">${escapeHtml(title)}</h3>
@@ -2029,7 +2044,7 @@ function renderGallery() {
       <article class="top-selected-item" data-work-id="${escapeHtml(work.id)}">
         <a class="top-selected-link js-work-link" href="${escapeHtml(detailPath)}" data-work-id="${escapeHtml(work.id)}" data-work-page="${escapeHtml(detailPath)}" data-work-source="top-selected" data-work-detail-link="true">
           <span class="top-selected-image-wrap">
-            <img src="${escapeHtml(firstImage)}" alt="${escapeHtml(title)}" loading="lazy">
+            ${getResponsiveListImageMarkup(firstImage, title, ' loading="lazy"')}
           </span>
           <span class="top-selected-title">${escapeHtml(title)}</span>
         </a>

@@ -6,9 +6,16 @@
 3. スタイル変更時は既存スケールに合わせる（13/14/15/16/20px帯中心）
 4. 実装
    - 画像元が `/Users/IHEI1/展示関係/portfolio-img` の場合は「コピーのみ」で取り込み、原本を削除/移動/上書きしない
+   - 作品画像を変更した場合は `node scripts/generate-list-thumbnails.js` で一覧JPEG/PNGとAVIF 1倍・2倍版を生成する
 5. レビュー（デザイン/実装/文言）
 6. i18n全ページ確認
-7. 完了記録
+7. `node scripts/apply-site-meta.js` と `node scripts/generate-sitemap.js` を実行
+8. 完了記録
+
+## 公開準備
+- 新しい作業環境では最初に `node scripts/install-git-hooks.js` を実行する
+- コミット時に `.githooks/pre-commit` がサイト更新日、静的メタ情報、サイトマップを更新してステージする
+- 名刺URLとInstagram URLは `docs/traffic_sources.md` のUTM付きURLを使い分ける
 
 ## 実装チェックリスト
 - デザイン

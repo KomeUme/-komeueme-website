@@ -7,8 +7,10 @@ const vm = require('vm');
 const ROOT = path.resolve(__dirname, '..');
 const WORKS_DIR = path.join(ROOT, 'assets', 'works');
 const LIST_DIR = path.join(WORKS_DIR, 'list');
+const AVIF_DIR = path.join(LIST_DIR, 'avif');
 const MAX_LONG_EDGE = 800;
 const JPG_QUALITY = '82';
+const AVIF_QUALITY = '70';
 
 function run(cmd, args) {
   const r = spawnSync(cmd, args, { encoding: 'utf8' });
@@ -77,6 +79,8 @@ function makeThumbnail(source) {
     fs.copyFileSync(source, dest);
     after = before;
   }
+  makeAvifVariant(dest, name, 400, '1x');
+  makeAvifVariant(dest, name, 800, '2x');
   return {
     name,
     before,
@@ -86,6 +90,22 @@ function makeThumbnail(source) {
   };
 }
 
+function makeAvifVariant(source, name, maxLongEdge, suffix) {
+  const base = path.basename(name, path.extname(name));
+  const dest = path.join(AVIF_DIR, `${base}-${suffix}.avif`);
+  const temp = path.join(
+    require('os').tmpdir(),
+    `komeume-${process.pid}-${base}-${suffix}${path.extname(source)}`
+  );
+  fs.copyFileSync(source, temp);
+  const { w, h } = getSize(temp);
+  if (Math.max(w, h) > maxLongEdge) {
+    run('sips', ['-Z', String(maxLongEdge), temp]);
+  }
+  run('sips', ['-s', 'format', 'avif', '-s', 'formatOptions', AVIF_QUALITY, temp, '--out', dest]);
+  fs.unlinkSync(temp);
+}
+
 function formatBytes(bytes) {
   return `${(bytes / 1024).toFixed(0)}KB`;
 }
@@ -93,6 +113,7 @@ function formatBytes(bytes) {
 function main() {
   const sources = collectSources(process.argv.slice(2));
   fs.mkdirSync(LIST_DIR, { recursive: true });
+  fs.mkdirSync(AVIF_DIR, { recursive: true });
 
   let beforeTotal = 0;
   let afterTotal = 0;

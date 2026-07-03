@@ -13,6 +13,7 @@ const pageMeta = {
   "about.html": ["About | Kome Ume", "米鵜めえのSNSと仕事に関する連絡先。", defaultImage],
   "profile.html": ["Profile | Kome Ume", "米鵜めえの略歴、受賞歴、展示歴、学歴。", defaultImage],
   "privacy.html": ["プライバシーポリシー | Kome Ume", "Kome Umeウェブサイトにおける個人情報の取り扱いについて。", defaultImage],
+  "404.html": ["ページが見つかりません | Kome Ume", "指定されたページは見つかりませんでした。", defaultImage],
   "news.html": ["お知らせ | Kome Ume", "米鵜めえの展示などに関するお知らせ。", defaultImage],
   "hanga.html": ["版画 | Kome Ume", "米鵜めえの版画作品一覧。", "assets/works/work-12-01.jpg"],
   "hanga-wood.html": ["木版画 | Kome Ume", "米鵜めえの木版画作品一覧。", "assets/works/work-12-01.jpg"],
@@ -65,6 +66,7 @@ function buildMeta(file, title, description, image) {
   const imageUrl = `${siteUrl}/${encodeURI(image)}`;
   const type = file.startsWith("work-") ? "article" : "website";
   return `  <!-- site-meta:start -->
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <meta name="description" content="${escapeAttribute(description)}">
   <link rel="canonical" href="${escapeAttribute(canonical)}">
   <meta property="og:locale" content="ja_JP">

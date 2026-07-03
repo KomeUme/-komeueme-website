@@ -25,3 +25,5 @@
 - 言語切替後も title/caption/導線文言が破綻しない
 - 全公開ページにdescription / canonical / `og:title` / `og:description` / `og:image` が1件ずつ存在する
 - OGP画像のローカル参照先が存在し、公開URLから取得できる
+- 全ページで `favicon.svg` が参照される
+- `robots.txt` のSitemap URLと `sitemap.xml` の公開URLが一致する

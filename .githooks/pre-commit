@@ -1,0 +1,8 @@
+#!/bin/sh
+set -eu
+
+node scripts/update-site-date.js
+node scripts/apply-site-meta.js
+node scripts/generate-sitemap.js
+
+git add i18n.js sitemap.xml -- '*.html'

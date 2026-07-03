@@ -58,6 +58,10 @@ img {
   height: auto;
 }
 
+.responsive-work-picture {
+  display: contents;
+}
+
 .lang-switch {
   position: fixed;
   top: 14px;
@@ -350,6 +354,15 @@ main {
 .top-name-block {
   display: grid;
   margin-top: 6px;
+}
+
+.top-artist-field {
+  margin: 5px 0 0;
+  color: #858b94;
+  font-family: "Hiragino Mincho ProN", "Yu Mincho", "Times New Roman", serif;
+  font-size: 11px;
+  line-height: 1.5;
+  letter-spacing: 0.08em;
 }
 
 .top-intro-block {
@@ -2441,6 +2454,41 @@ footer {
   color: #9a9fa7 !important;
   font-size: 10px !important;
   text-align: right;
+}
+
+.not-found-page {
+  min-height: calc(100vh - 190px);
+  display: grid;
+  align-items: center;
+  max-width: 760px;
+}
+
+.not-found-page .intro {
+  padding: clamp(30px, 7vw, 70px);
+  border: 1px solid var(--line);
+  background: rgba(250, 250, 248, 0.84);
+}
+
+.not-found-code {
+  margin: 0 0 12px;
+  color: #a2a7af;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+}
+
+.not-found-page .intro > p:not(.not-found-code) {
+  margin: 18px 0 0;
+  color: #737982;
+  font-size: 13px;
+}
+
+.not-found-home {
+  display: inline-block;
+  margin-top: 28px;
+  padding-bottom: 2px;
+  color: #343942;
+  font-size: 13px;
+  border-bottom: 1px solid #aeb3bb;
 }
 
 .site-mini-contact {
