@@ -357,7 +357,7 @@ main {
 }
 
 .top-artist-field {
-  margin: 5px 0 0;
+  margin: 12px 0 0;
   color: #858b94;
   font-family: "Hiragino Mincho ProN", "Yu Mincho", "Times New Roman", serif;
   font-size: 11px;
@@ -367,7 +367,7 @@ main {
 
 .top-intro-block {
   position: relative;
-  margin-top: 16px;
+  margin-top: 8px;
   padding-top: 18px;
 }
 
@@ -3523,7 +3523,7 @@ footer {
   }
 
   .top-intro-block {
-    margin-top: 16px;
+    margin-top: 8px;
     padding-top: 18px;
   }
 
@@ -4130,7 +4130,7 @@ footer {
   }
 
   .top-intro-block {
-    margin-top: 16px;
+    margin-top: 8px;
     padding-top: 18px;
   }
 
