@@ -196,14 +196,14 @@ function buildHeader(work) {
 }
 
 function buildContact() {
-  return `    <section class="site-mini-contact">
-      <div><strong class="label-sns" data-i18n="label_sns">SNS</strong> <a href="https://www.instagram.com/komeume1121/" target="_blank" rel="noopener noreferrer">@komeume1121</a></div>
-      <div><strong class="label-contact" data-i18n="label_contact">Contact</strong> <a href="mailto:komeume1121@gmail.com">komeume1121@gmail.com</a></div>
-    </section>
+  return `    <a class="artwork-inquiry-link" href="https://forms.gle/iZknXdwi54VeKm268" target="_blank" rel="noopener noreferrer">
+      <span data-i18n="artwork_inquiry_cta">作品についてのお問い合わせ</span>
+      <span class="artwork-inquiry-arrow" aria-hidden="true">→</span>
+    </a>
 
     <details class="newsletter-signup">
       <summary>
-        <h2 id="newsletter-title" data-i18n="newsletter_title">展示・販売のお知らせを受け取る</h2>
+        <h2 id="newsletter-title" data-i18n="newsletter_title">展示などのお知らせを受け取る</h2>
         <span class="newsletter-toggle-mark" aria-hidden="true"><span class="newsletter-toggle-plus">+</span><span class="newsletter-toggle-minus">−</span></span>
       </summary>
       <div class="newsletter-body" aria-labelledby="newsletter-title">
