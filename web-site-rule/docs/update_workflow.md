@@ -12,6 +12,13 @@
 7. `node scripts/apply-site-meta.js` と `node scripts/generate-sitemap.js` を実行
 8. 完了記録
 
+## Profile・作家略歴PDFの更新
+- `profile-data.json` を正本として、基本情報・ステートメント・学歴・受賞歴・展示歴・連絡先を更新する
+- 初回のみ `python3 -m pip install -r requirements-pdf.txt` でPDF生成依存を導入する
+- 更新後は `python3 scripts/generate-profile-assets.py` を実行し、`profile.html` と `assets/documents/kome-ume-cv-ja.pdf` を同時に再生成する
+- `profile.html` の `PROFILE_DATA_START` から `PROFILE_DATA_END` までは個別に手編集しない
+- PDF生成後は `pdfinfo` と `pdftoppm` で2ページ構成・文字切れ・改ページ・QRコードを確認する
+
 ## 公開準備
 - 新しい作業環境では最初に `node scripts/install-git-hooks.js` を実行する
 - コミット時に `.githooks/pre-commit` がサイト更新日、静的メタ情報、サイトマップを更新してステージする

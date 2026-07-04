@@ -2973,6 +2973,24 @@ footer {
   margin-bottom: 14px;
 }
 
+.profile-cv-link {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-top: 10px;
+  color: #69717b;
+  font-size: 12px;
+  line-height: 1.4;
+  text-decoration: underline;
+  text-decoration-color: rgba(105, 113, 123, 0.42);
+  text-underline-offset: 4px;
+}
+
+.profile-cv-link:hover {
+  color: #343940;
+  text-decoration-color: currentColor;
+}
+
 .profile-accordion summary {
   list-style: none;
   cursor: pointer;
@@ -3389,6 +3407,10 @@ footer {
   .intro h1 {
     order: 1;
     font-size: clamp(26px, 7vw, 44px);
+  }
+
+  .profile-cv-link {
+    order: 2;
   }
 
   .intro p {

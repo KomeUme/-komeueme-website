@@ -47,6 +47,7 @@
 - ページ追加時は `<title data-i18n="page_title_*">` と `<h1>` を必須とする
 - 全公開HTMLには静的なdescription、canonical、OGP、Twitter Cardを置く。作品詳細は作品名と代表画像を使い、JavaScript実行を前提にメタ情報を生成しない。静的ページ追加・作品ページ再生成後は `node scripts/apply-site-meta.js` を実行する
 - canonicalとOGPの基準URLは `https://komeueme-website.pages.dev` とし、独自ドメイン導入時は生成スクリプト内の基準URLも同時に変更する
+- トップページの検索結果用タイトルは「米鵜めえ｜木版画作家・公式ポートフォリオ」を基準とし、`scripts/apply-site-meta.js` のdescription・OGP・`WebSite`/`Person`構造化データと `i18n.js` のページタイトルを一致させる
 - 全ページのフッターから `privacy.html` へ移動できる導線を維持する。プライバシーページにはGoogleフォーム、Mailchimp、BASE、アクセスログ、情報の利用目的・保管・削除・連絡先を記載する
 - faviconはルートの `favicon.svg` を使用し、`scripts/apply-site-meta.js` と作品ページ生成スクリプトの両方で全HTMLへ静的に出力する
 - `robots.txt` は全ページを許可し、`sitemap.xml` を案内する。サイト構成変更後は `node scripts/generate-sitemap.js` を実行する。`404.html` とリダイレクト専用ページはサイトマップへ含めない
@@ -83,6 +84,8 @@
 - 「作品についてのお問い合わせ」のGoogleフォームURLは `https://forms.gle/iZknXdwi54VeKm268` を正とし、各掲載HTMLと `scripts/generate-work-pages.js` の生成内容を一致させる
 - Profileの更新日はSNS・Contactブロック直後に置き、トップページのサイト更新日と同じ `.site-page-updated` の余白・右寄せを使う
 - Profileはキュレーターが実績をすぐ確認できるよう、基本情報・受賞歴・展示歴を初期展開する。学歴は情報量を抑えるため初期状態では閉じる
+- Profileの基本情報・ステートメント・学歴・受賞歴・展示歴・連絡先は `profile-data.json` を正本とする。更新後は `python3 scripts/generate-profile-assets.py` を実行し、Profile本文と日本語版作家CV PDFを同じデータから再生成する
+- 作家CVは `assets/documents/kome-ume-cv-ja.pdf` のA4縦2ページを基準とし、Profile上部に作品より弱い「作家略歴（PDF）」導線を置く。PDF生成後はページ画像化して文字切れ・重なり・改ページを確認する
 - 販売ページは「Online Shop」説明カードではなく、販売中作品と関連グッズの一覧として運用する。作品と関連グッズは混在させず、販売ページ内で「作品」「関連グッズ」を分ける
 - 販売ページの作品一覧は `data.js` の `works` から生成する。初期表示は `shopStatus` が販売可能な作品だけを出す「販売中のみ」とし、切替で販売準備中・Sold out も含む「すべて表示」を使えるようにする。並びは常にカテゴリー順とし、同じカテゴリー内では作品サイズの大きい順に並べる。販売中作品は作品名の下に `shopPricesByItemId` の税込販売価格を小さく控えめに表示し、販売準備中・Sold outでは価格を表示しない。販売不可は薄い表示で示す
 - BASE側で価格・公開状況を変更した場合は、BASEの商品IDを基準に `shopPricesByItemId` と各作品の `shopStatus` を同期する。公開商品は `available`、非公開商品は `preparing` とし、状態変更後は `node scripts/generate-work-pages.js` で詳細ページの販売導線も再生成する

@@ -5,11 +5,12 @@ const vm = require("vm");
 
 const root = path.resolve(__dirname, "..");
 const siteUrl = "https://komeueme-website.pages.dev";
+const siteName = "米鵜めえ | Kome Ume";
 const defaultImage = "assets/works/work-12-01.jpg";
 const privacyVersion = "20260704a";
 
 const pageMeta = {
-  "index.html": ["Kome Ume portfolio", "米鵜めえの作品、展示情報、略歴を掲載するポートフォリオサイト。", defaultImage],
+  "index.html": ["米鵜めえ｜木版画作家・公式ポートフォリオ", "木版画作家・米鵜めえの公式ポートフォリオ。木版画を中心とした作品、展示情報、受賞歴・略歴を掲載しています。", defaultImage],
   "about.html": ["About | Kome Ume", "米鵜めえのSNSと仕事に関する連絡先。", defaultImage],
   "profile.html": ["Profile | Kome Ume", "米鵜めえの略歴、受賞歴、展示歴、学歴。", defaultImage],
   "privacy.html": ["プライバシーポリシー | Kome Ume", "Kome Umeウェブサイトにおける個人情報の取り扱いについて。", defaultImage],
@@ -46,7 +47,7 @@ function loadWorks() {
 
 function getMeta(file, works) {
   const workMatch = file.match(/^work-(.+)\.html$/);
-  if (!workMatch) return pageMeta[file] || ["Kome Ume portfolio", pageMeta["index.html"][1], defaultImage];
+  if (!workMatch) return pageMeta[file] || [pageMeta["index.html"][0], pageMeta["index.html"][1], defaultImage];
 
   const work = works.get(workMatch[1].replace(/^0+(?=\d)/, "")) || works.get(workMatch[1]);
   if (!work) return [`作品 | Kome Ume`, "米鵜めえの作品詳細。", defaultImage];
@@ -65,13 +66,31 @@ function buildMeta(file, title, description, image) {
   const canonical = `${siteUrl}${pagePath}`;
   const imageUrl = `${siteUrl}/${encodeURI(image)}`;
   const type = file.startsWith("work-") ? "article" : "website";
+  const structuredData = file === "index.html"
+    ? `
+  <script type="application/ld+json">${JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      name: "米鵜めえ",
+      alternateName: "Kome Ume",
+      url: `${siteUrl}/`,
+      inLanguage: ["ja", "en"],
+      publisher: {
+        "@type": "Person",
+        name: "米鵜めえ",
+        alternateName: "Kome Ume",
+        url: `${siteUrl}/profile.html`,
+        sameAs: ["https://www.instagram.com/komeume1121/"],
+      },
+    })}</script>`
+    : "";
   return `  <!-- site-meta:start -->
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <meta name="description" content="${escapeAttribute(description)}">
   <link rel="canonical" href="${escapeAttribute(canonical)}">
   <meta property="og:locale" content="ja_JP">
   <meta property="og:type" content="${type}">
-  <meta property="og:site_name" content="Kome Ume">
+  <meta property="og:site_name" content="${escapeAttribute(siteName)}">
   <meta property="og:title" content="${escapeAttribute(title)}">
   <meta property="og:description" content="${escapeAttribute(description)}">
   <meta property="og:url" content="${escapeAttribute(canonical)}">
@@ -81,6 +100,7 @@ function buildMeta(file, title, description, image) {
   <meta name="twitter:title" content="${escapeAttribute(title)}">
   <meta name="twitter:description" content="${escapeAttribute(description)}">
   <meta name="twitter:image" content="${escapeAttribute(imageUrl)}">
+${structuredData}
   <!-- site-meta:end -->`;
 }
 
