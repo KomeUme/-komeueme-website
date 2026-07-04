@@ -2976,19 +2976,23 @@ footer {
 .profile-cv-link {
   display: inline-flex;
   align-items: baseline;
-  gap: 8px;
-  margin-top: 10px;
-  color: #69717b;
-  font-size: 12px;
+  gap: 6px;
+  margin-top: 12px;
+  color: #858b93;
+  font-size: 11px;
   line-height: 1.4;
   text-decoration: underline;
-  text-decoration-color: rgba(105, 113, 123, 0.42);
-  text-underline-offset: 4px;
+  text-decoration-color: rgba(133, 139, 147, 0.24);
+  text-underline-offset: 3px;
+}
+
+.profile-cv-link span[aria-hidden="true"] {
+  opacity: 0.68;
 }
 
 .profile-cv-link:hover {
-  color: #343940;
-  text-decoration-color: currentColor;
+  color: #59616b;
+  text-decoration-color: rgba(89, 97, 107, 0.58);
 }
 
 .profile-accordion summary {
