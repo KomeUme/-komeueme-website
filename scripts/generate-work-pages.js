@@ -10,8 +10,8 @@ const siteUrl = "https://komeueme-website.pages.dev";
 const detailPageVersion = "20260704a";
 const styleVersion = "20260705a";
 const dataVersion = "20260624a";
-const appVersion = "20260704a";
-const i18nVersion = "20260705a";
+const appVersion = "20260705b";
+const i18nVersion = "20260705b";
 const privacyVersion = "20260704a";
 
 // 作品情報の正本は data.js。作品追加・修正後はこのスクリプトを再実行する。

@@ -24,6 +24,80 @@ function isImage(file) {
   return /\.(jpe?g|png|webp)$/i.test(file);
 }
 
+function getJpegOrientationInfo(file) {
+  if (!/\.(jpe?g)$/i.test(file)) return null;
+  const buffer = fs.readFileSync(file);
+  if (buffer.length < 4 || buffer.readUInt16BE(0) !== 0xffd8) return null;
+
+  let offset = 2;
+  while (offset + 4 <= buffer.length) {
+    if (buffer[offset] !== 0xff) break;
+    const marker = buffer[offset + 1];
+    if (marker === 0xda || marker === 0xd9) break;
+    const length = buffer.readUInt16BE(offset + 2);
+    if (length < 2 || offset + 2 + length > buffer.length) break;
+    const payload = offset + 4;
+    if (
+      marker === 0xe1
+      && length >= 16
+      && buffer.toString("ascii", payload, payload + 6) === "Exif\u0000\u0000"
+    ) {
+      const tiff = payload + 6;
+      const byteOrder = buffer.toString("ascii", tiff, tiff + 2);
+      const littleEndian = byteOrder === "II";
+      if (!littleEndian && byteOrder !== "MM") return null;
+      const readUInt16 = (at) => littleEndian ? buffer.readUInt16LE(at) : buffer.readUInt16BE(at);
+      const readUInt32 = (at) => littleEndian ? buffer.readUInt32LE(at) : buffer.readUInt32BE(at);
+      if (readUInt16(tiff + 2) !== 42) return null;
+      const ifd = tiff + readUInt32(tiff + 4);
+      if (ifd + 2 > buffer.length) return null;
+      const count = readUInt16(ifd);
+      for (let index = 0; index < count; index += 1) {
+        const entry = ifd + 2 + (index * 12);
+        if (entry + 12 > buffer.length) return null;
+        if (readUInt16(entry) !== 0x0112) continue;
+        return {
+          orientation: readUInt16(entry + 8),
+          valueOffset: entry + 8,
+          littleEndian,
+        };
+      }
+    }
+    offset += 2 + length;
+  }
+  return null;
+}
+
+function setJpegOrientation(file, orientation) {
+  const info = getJpegOrientationInfo(file);
+  if (!info) return;
+  const buffer = fs.readFileSync(file);
+  if (info.littleEndian) {
+    buffer.writeUInt16LE(orientation, info.valueOffset);
+  } else {
+    buffer.writeUInt16BE(orientation, info.valueOffset);
+  }
+  fs.writeFileSync(file, buffer);
+}
+
+function normalizeJpegOrientation(file, orientation) {
+  const operations = {
+    2: [['-f', 'horizontal']],
+    3: [['-r', '180']],
+    4: [['-f', 'vertical']],
+    5: [['-r', '90'], ['-f', 'horizontal']],
+    6: [['-r', '90']],
+    7: [['-r', '90'], ['-f', 'vertical']],
+    8: [['-r', '270']],
+  };
+  for (const args of operations[orientation] || []) {
+    run('sips', [...args, file]);
+  }
+  if (orientation >= 2 && orientation <= 8) {
+    setJpegOrientation(file, 1);
+  }
+}
+
 function getSize(file) {
   const out = run('sips', ['-g', 'pixelWidth', '-g', 'pixelHeight', file]);
   const w = Number((out.match(/pixelWidth:\s*(\d+)/) || [])[1] || 0);
@@ -62,10 +136,12 @@ function collectSources(args) {
 function makeThumbnail(source) {
   const name = path.basename(source);
   const dest = path.join(LIST_DIR, name);
-  const { w, h } = getSize(source);
-  const target = targetSize(w, h);
+  const orientation = getJpegOrientationInfo(source)?.orientation || 1;
 
   fs.copyFileSync(source, dest);
+  normalizeJpegOrientation(dest, orientation);
+  const { w, h } = getSize(dest);
+  const target = targetSize(w, h);
   if (target.changed) {
     run('sips', ['-z', String(target.h), String(target.w), dest]);
   }
@@ -75,7 +151,7 @@ function makeThumbnail(source) {
 
   const before = fs.statSync(source).size;
   let after = fs.statSync(dest).size;
-  if (after > before) {
+  if (after > before && orientation === 1) {
     fs.copyFileSync(source, dest);
     after = before;
   }

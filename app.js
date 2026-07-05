@@ -1355,6 +1355,7 @@ function syncGalleryAvailability(gallery, galleryId, hasWorks) {
 
 function getGallerySortMode(gallery, galleryId, prev) {
   if (prev?.sortMode) return prev.sortMode;
+  if (galleryId === "digital-mini-chara") return "category";
   if (galleryId === "hanga" || galleryId.startsWith("hanga-")) return "size";
   if (hasGallerySortControls(galleryId)) return "year";
   return gallery.dataset.sort || "default";
