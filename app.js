@@ -46,6 +46,155 @@ function workText(work, field) {
   return work?.[field];
 }
 
+function canUseInlineDetailImageZoom() {
+  if (!window.matchMedia) return true;
+  return window.matchMedia("(hover: hover)").matches === true
+    && window.matchMedia("(any-pointer: fine)").matches === true;
+}
+
+function attachDetailImageZoomPan(surface, image) {
+  if (!surface || !image || !canUseInlineDetailImageZoom()) return null;
+  if (surface.__imageZoomController) return surface.__imageZoomController;
+
+  image.draggable = false;
+  let scale = 1;
+  let panX = 0;
+  let panY = 0;
+  let isDragging = false;
+  let hasMoved = false;
+  let isMouseDown = false;
+  let dragStartX = 0;
+  let dragStartY = 0;
+  let panStartX = 0;
+  let panStartY = 0;
+  let lastClientX = 0;
+  let lastClientY = 0;
+
+  const clampScale = (value) => Math.min(5, Math.max(1, value));
+  const isZoomed = () => scale > 1.001;
+  const isPointInsideSurface = (clientX, clientY) => {
+    const rect = surface.getBoundingClientRect();
+    return clientX >= rect.left && clientX <= rect.right && clientY >= rect.top && clientY <= rect.bottom;
+  };
+  const applyTransform = () => {
+    if (!isZoomed()) {
+      scale = 1;
+      panX = 0;
+      panY = 0;
+    }
+    image.style.transform = `translate(${Math.round(panX)}px, ${Math.round(panY)}px) scale(${scale})`;
+    image.classList.toggle("is-image-zoomed", isZoomed());
+    image.classList.toggle("is-image-dragging", isDragging && isZoomed());
+    surface.classList.toggle("is-image-zoomed", isZoomed());
+  };
+  const zoomAroundPoint = (nextScale, clientX, clientY) => {
+    const clampedScale = clampScale(nextScale);
+    if (clampedScale <= 1.001) {
+      reset(true);
+      return;
+    }
+    const rect = image.getBoundingClientRect();
+    const baseCenterX = (rect.left + rect.right) / 2 - panX;
+    const baseCenterY = (rect.top + rect.bottom) / 2 - panY;
+    const anchorX = (clientX - baseCenterX - panX) / scale;
+    const anchorY = (clientY - baseCenterY - panY) / scale;
+    scale = clampedScale;
+    panX = clientX - baseCenterX - anchorX * scale;
+    panY = clientY - baseCenterY - anchorY * scale;
+    applyTransform();
+  };
+  const reset = (keepMouseDown = false) => {
+    scale = 1;
+    panX = 0;
+    panY = 0;
+    isDragging = false;
+    hasMoved = false;
+    if (!keepMouseDown) isMouseDown = false;
+    applyTransform();
+  };
+
+  const handleWheel = (event) => {
+    const clientX = Number.isFinite(event.clientX) ? event.clientX : lastClientX;
+    const clientY = Number.isFinite(event.clientY) ? event.clientY : lastClientY;
+    if (!isPointInsideSurface(clientX, clientY)) return;
+    const isPrimaryButtonWheel = (Number(event.buttons) & 1) === 1;
+    if (!isMouseDown && !isPrimaryButtonWheel) return;
+    isMouseDown = true;
+    lastClientX = clientX;
+    lastClientY = clientY;
+    event.preventDefault();
+    event.stopPropagation();
+    hasMoved = true;
+    const factor = Math.exp(-event.deltaY * 0.002);
+    zoomAroundPoint(scale * factor, clientX, clientY);
+  };
+
+  const startMouse = (event) => {
+    if (event.button !== 0) return;
+    const alreadyZoomed = isZoomed();
+    isMouseDown = true;
+    dragStartX = event.clientX;
+    dragStartY = event.clientY;
+    lastClientX = event.clientX;
+    lastClientY = event.clientY;
+    panStartX = panX;
+    panStartY = panY;
+    isDragging = false;
+    hasMoved = false;
+    if (alreadyZoomed) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    image.classList.toggle("is-image-dragging", alreadyZoomed);
+  };
+
+  const moveMouse = (event) => {
+    lastClientX = event.clientX;
+    lastClientY = event.clientY;
+    if (!isMouseDown || !isZoomed()) return;
+    const dx = event.clientX - dragStartX;
+    const dy = event.clientY - dragStartY;
+    if (!isDragging && (Math.abs(dx) > 3 || Math.abs(dy) > 3)) {
+      isDragging = true;
+      hasMoved = true;
+    }
+    if (!isDragging) return;
+    event.preventDefault();
+    event.stopPropagation();
+    panX = panStartX + dx;
+    panY = panStartY + dy;
+    applyTransform();
+  };
+
+  const releaseMouse = () => {
+    if (!isMouseDown && !isDragging) return;
+    isMouseDown = false;
+    isDragging = false;
+    applyTransform();
+  };
+
+  surface.addEventListener("mousedown", startMouse);
+  window.addEventListener("mousemove", moveMouse);
+  window.addEventListener("mouseup", releaseMouse);
+  window.addEventListener("blur", releaseMouse);
+  window.addEventListener("wheel", handleWheel, { passive: false, capture: true });
+  surface.addEventListener("dblclick", (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    reset();
+  });
+  surface.addEventListener("click", (event) => {
+    if (!isZoomed() && !hasMoved) return;
+    event.preventDefault();
+    event.stopPropagation();
+    hasMoved = false;
+  }, true);
+
+  const controller = { reset, isZoomed };
+  surface.__imageZoomController = controller;
+  return controller;
+}
+
 function newsText(item, field) {
   const lang = getCurrentLang();
   if (lang === "en") {
@@ -708,6 +857,9 @@ function renderWorkDetailPage() {
     `;
 
     const mainImage = media.querySelector("[data-work-detail-main-image]");
+    const mainArea = media.querySelector(".work-detail-main");
+    const zoomController = attachDetailImageZoomPan(mainArea, mainImage);
+    media.__imageZoomController = zoomController;
     const thumbButtons = Array.from(media.querySelectorAll("[data-work-detail-thumb]"));
     const thumbnailList = media.querySelector("[data-work-detail-thumbnails]");
     const storyPrevButton = media.querySelector("[data-story-page-prev]");
@@ -752,6 +904,7 @@ function renderWorkDetailPage() {
     };
     const activateIndex = (index) => {
       const safeIndex = Math.min(Math.max(Number(index) || 0, 0), images.length - 1);
+      zoomController?.reset();
       if (mainImage) {
         loadDetailImage(
           encodeImageSrc(images[safeIndex]),
@@ -918,6 +1071,8 @@ function attachWorkDetailThumbnailControls() {
     const storyPrevButton = media.querySelector("[data-story-page-prev]");
     const storyNextButton = media.querySelector("[data-story-page-next]");
     const storyPageSelect = media.querySelector("[data-story-page-select]");
+    const zoomController = media.__imageZoomController || attachDetailImageZoomPan(mainArea, mainImage);
+    media.__imageZoomController = zoomController;
     if (!thumbnailList || !mainImage || !thumbButtons.length) return;
 
     const getActiveIndex = () => {
@@ -934,6 +1089,7 @@ function attachWorkDetailThumbnailControls() {
         media.__activateWorkDetailIndex(nextIndex);
         return;
       }
+      zoomController?.reset();
       mainImage.setAttribute("src", nextSrc);
       mainImage.setAttribute("alt", thumbImage.getAttribute("alt") || mainImage.getAttribute("alt") || "");
       mainImage.dataset.workIndex = String(nextIndex);
@@ -990,6 +1146,10 @@ function attachWorkDetailThumbnailControls() {
       };
 
       mainArea.addEventListener("touchstart", (event) => {
+        if (zoomController?.isZoomed()) {
+          resetTouch();
+          return;
+        }
         if (event.touches.length !== 1) {
           resetTouch();
           return;
@@ -1004,6 +1164,10 @@ function attachWorkDetailThumbnailControls() {
       }, { passive: true });
 
       mainArea.addEventListener("touchmove", (event) => {
+        if (zoomController?.isZoomed()) {
+          resetTouch();
+          return;
+        }
         if (!isTrackingTouch || event.touches.length !== 1) return;
         const touch = event.touches[0];
         touchLastX = touch.clientX;
@@ -1017,6 +1181,10 @@ function attachWorkDetailThumbnailControls() {
       }, { passive: false });
 
       mainArea.addEventListener("touchend", () => {
+        if (zoomController?.isZoomed()) {
+          resetTouch();
+          return;
+        }
         if (!isTrackingTouch) return;
         const deltaX = touchLastX - touchStartX;
         const deltaY = touchLastY - touchStartY;
@@ -2344,7 +2512,15 @@ function attachWorkDetailLinkMemory() {
 
 function attachGalleryViewer() {
   const workList = typeof works !== "undefined" && Array.isArray(works) ? works : [];
-  const map = new Map(workList.map((work) => [String(work.id), work]));
+  const map = new Map();
+  workList.forEach((work) => {
+    const rawId = String(work.id ?? "");
+    if (!rawId) return;
+    map.set(rawId, work);
+    const numericId = String(Number(rawId));
+    if (numericId !== "NaN") map.set(numericId, work);
+    map.set(rawId.padStart(2, "0"), work);
+  });
   const links = Array.from(document.querySelectorAll('.js-work-link[data-work-id]:not([data-work-detail-link="true"])'));
   const detailSources = Array.from(document.querySelectorAll(".js-detail-viewer-source[data-work-id]"));
   const sources = [...links, ...detailSources];
@@ -2404,6 +2580,8 @@ function attachGalleryViewer() {
   let dragStartY = 0;
   let panStartX = 0;
   let panStartY = 0;
+  let lastMouseX = 0;
+  let lastMouseY = 0;
   let swipePointerId = null;
   let swipeStartX = 0;
   let swipeStartY = 0;
@@ -2474,6 +2652,23 @@ function attachGalleryViewer() {
     syncZoomState();
   };
 
+  const isPointInsideViewerImage = (clientX, clientY) => {
+    const rect = image.getBoundingClientRect();
+    return clientX >= rect.left && clientX <= rect.right && clientY >= rect.top && clientY <= rect.bottom;
+  };
+
+  const handleViewerWheel = (event) => {
+    if (!viewer.classList.contains("is-open")) return;
+    const clientX = Number.isFinite(event.clientX) && event.clientX !== 0 ? event.clientX : lastMouseX;
+    const clientY = Number.isFinite(event.clientY) && event.clientY !== 0 ? event.clientY : lastMouseY;
+    if (!isPointInsideViewerImage(clientX, clientY)) return;
+    event.preventDefault();
+    event.stopPropagation();
+    hasMoved = true;
+    const factor = Math.exp(-event.deltaY * 0.002);
+    zoomAroundPoint(zoomScale * factor, clientX, clientY);
+  };
+
   const trackTouchPointer = (event) => {
     if (event.pointerType !== "touch") return false;
     touchPointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
@@ -2520,6 +2715,14 @@ function attachGalleryViewer() {
     swipePointerId = null;
     swipeMoved = false;
     image.classList.remove("is-pinching", "is-panning");
+  };
+
+  const releaseMousePointer = () => {
+    if (!pointerDown && !isPanning) return;
+    pointerDown = false;
+    mouseZoomPointerId = null;
+    isPanning = false;
+    image.classList.remove("is-panning");
   };
 
   const hideLoading = (requestId = null) => {
@@ -2657,6 +2860,8 @@ function attachGalleryViewer() {
       isPanning = false;
       dragStartX = event.clientX;
       dragStartY = event.clientY;
+      lastMouseX = event.clientX;
+      lastMouseY = event.clientY;
       panStartX = panX;
       panStartY = panY;
       image.setPointerCapture(event.pointerId);
@@ -2678,15 +2883,12 @@ function attachGalleryViewer() {
     panStartY = panY;
     image.setPointerCapture(event.pointerId);
   });
-  image.addEventListener("wheel", (event) => {
-    if (mouseZoomPointerId === null || !pointerDown) return;
-    event.preventDefault();
-    event.stopPropagation();
-    const factor = Math.exp(-event.deltaY * 0.002);
-    const nextScale = clampZoomScale(zoomScale * factor);
-    zoomAroundPoint(nextScale, event.clientX, event.clientY);
-  }, { passive: false });
+  window.addEventListener("wheel", handleViewerWheel, { passive: false, capture: true });
   image.addEventListener("pointermove", (event) => {
+    if (event.pointerType === "mouse") {
+      lastMouseX = event.clientX;
+      lastMouseY = event.clientY;
+    }
     if (!pointerDown || !isZoomed || isPinching) return;
     const dx = event.clientX - dragStartX;
     const dy = event.clientY - dragStartY;
@@ -2705,10 +2907,7 @@ function attachGalleryViewer() {
     if (image.hasPointerCapture(event.pointerId)) {
       image.releasePointerCapture(event.pointerId);
     }
-    pointerDown = false;
-    if (event.pointerId === mouseZoomPointerId) mouseZoomPointerId = null;
-    isPanning = false;
-    image.classList.remove("is-panning");
+    releaseMousePointer();
   });
   image.addEventListener("pointercancel", (event) => {
     if (event.pointerId === mouseZoomPointerId) mouseZoomPointerId = null;
@@ -2717,6 +2916,8 @@ function attachGalleryViewer() {
     hasMoved = false;
     image.classList.remove("is-panning");
   });
+  window.addEventListener("mouseup", releaseMousePointer);
+  window.addEventListener("blur", releaseMousePointer);
   viewer.addEventListener("pointerdown", (event) => {
     if (trackTouchPointer(event)) return;
     if (isPinching) return;
