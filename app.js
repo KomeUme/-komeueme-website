@@ -1975,6 +1975,12 @@ function renderShopPage() {
     panel.classList.toggle("is-active", isActive);
     panel.hidden = !isActive;
   });
+  const shopNote = document.querySelector("[data-shop-note]");
+  if (shopNote) {
+    const noteKey = activePanel === "goods" ? "shop_goods_note" : "shop_print_note";
+    shopNote.dataset.i18nHtml = noteKey;
+    shopNote.innerHTML = uiT(noteKey, "");
+  }
   const setupShopDropdown = (controlSelector, toggleSelector, menuSelector, optionSelector, currentSelector, value, datasetKey) => {
     page.querySelectorAll(controlSelector).forEach((control) => {
       const toggle = control.querySelector(toggleSelector);

@@ -1282,6 +1282,14 @@ main {
   text-align: left;
 }
 
+.shop-print-note-group {
+  display: block;
+}
+
+.shop-print-note-group + .shop-print-note-group {
+  margin-top: 1em;
+}
+
 .shop-related-nav {
   display: flex;
   justify-content: flex-end;
