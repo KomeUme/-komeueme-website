@@ -1287,7 +1287,19 @@ main {
 }
 
 .shop-print-note-group + .shop-print-note-group {
-  margin-top: 1em;
+  position: relative;
+  margin-top: 1.25em;
+  padding-top: 1.15em;
+}
+
+.shop-print-note-group + .shop-print-note-group::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 32px;
+  height: 1px;
+  background: rgba(142, 148, 157, 0.42);
 }
 
 .shop-related-nav {
