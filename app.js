@@ -388,6 +388,7 @@ function setupShopAccess() {
   const base = detectSiteBasePath();
   const currentPage = getNavPageKey(window.location.href);
   const isShopPage = /^shop(?:-print|-digital)?$/.test(currentPage);
+  const isPrintShopPage = currentPage === "shop" || currentPage === "shop-print";
   const wrapper = document.createElement("div");
   wrapper.className = "shop-access-dropdown";
 
@@ -443,7 +444,9 @@ function setupShopAccess() {
     const menuButton = header.querySelector(".nav-menu-toggle");
     menuButton?.setAttribute("aria-expanded", "false");
     menuButton?.setAttribute("aria-label", "メニュー");
-    setShopMenuOpen(!wrapper.classList.contains("is-open"));
+    closeShopMenu();
+    if (isPrintShopPage) return;
+    window.location.assign(appendPageVersion(`${base}shop.html`));
   });
   submenu.addEventListener("click", closeShopMenu);
   document.addEventListener("click", (event) => {
@@ -489,6 +492,17 @@ function syncNavActiveLinks() {
     const hasActiveSubmenu = Boolean(dropdown.querySelector(".nav-submenu .active"));
     if (trigger) trigger.classList.toggle("active", hasActiveSubmenu || trigger.classList.contains("active"));
   });
+
+  if (nav.dataset.samePageGuard !== "true") {
+    nav.dataset.samePageGuard = "true";
+    nav.addEventListener("click", (event) => {
+      const link = event.target.closest("a[href]");
+      if (!link || !nav.contains(link)) return;
+      if (getNavPageKey(link.href) === getNavPageKey(window.location.href)) {
+        event.preventDefault();
+      }
+    });
+  }
 }
 
 function setupMobileMenu() {
@@ -1701,13 +1715,18 @@ function renderGalleryWorkCard(work, orderedIds) {
   const size = cleanWorkInfoValue(workText(work, "size"));
   const caption = cleanWorkInfoValue(workText(work, "caption"));
   const detailPath = getWorkDetailPagePath(work, orderedIds);
+  const hasVideo = Boolean(work.hasVideo || work.video || (Array.isArray(work.videos) && work.videos.length));
+  const videoLabel = uiT("work_video_available", "制作動画あり");
   return `
-      <article class="${getWorkCardClass(work)}" data-work-id="${escapeHtml(work.id)}">
+      <article class="${getWorkCardClass(work)}${hasVideo ? " has-video" : ""}" data-work-id="${escapeHtml(work.id)}">
         <a class="work-image-link js-work-link" href="${escapeHtml(detailPath)}" data-work-id="${escapeHtml(work.id)}" data-work-page="${escapeHtml(detailPath)}" data-work-detail-link="true">
           ${getResponsiveListImageMarkup(listImage, title, ' loading="lazy"')}
         </a>
         <div class="caption">
-          <h3 class="caption-title">${escapeHtml(title)}</h3>
+          <div class="caption-heading">
+            <h3 class="caption-title">${escapeHtml(title)}</h3>
+            ${hasVideo ? `<span class="work-video-badge" aria-label="${escapeHtml(videoLabel)}" title="${escapeHtml(videoLabel)}">VIDEO</span>` : ""}
+          </div>
           <div class="caption-meta-list">
             <p class="caption-meta"><span>${escapeHtml(uiT("cap_year", "制作年"))}</span><span>${escapeHtml(withFallback(year))}</span></p>
             <p class="caption-meta"><span>${escapeHtml(uiT("cap_technique", "技法"))}</span><span>${escapeHtml(withFallback(technique))}</span></p>

@@ -597,7 +597,7 @@ const works = [
     "year": "2025年",
     "technique": "水性木版、透明水彩・水干 / 灰煮楮紙中厚口",
     "size": "1440mm×750mm",
-    "caption": "季節の移り替わりには天候が荒れやすい。突風が吹き、雨が打ち付け雷鳴が轟く、そんな日には胸の高揚が収まらない。が、隣人はそうではないようだ。同じ現象でも、感じ方は人それぞれ。では、人間以外は？",
+    "caption": "人間の営みに欠かせないものがいくつかある。それは途方もない進化の果てに廃されなかった、一見無意味な行為であるが、しかし、実感を持って必要とされるものである。今夜もまた、我々は微睡みの中に落ちる。",
     "image": "assets/works/work-26-01.jpg",
     "images": [
       "assets/works/work-26-01.jpg",
@@ -667,6 +667,7 @@ const works = [
       "assets/works/work-30-01.jpg",
       "assets/works/work-30-02.jpg"
     ],
+    "hasVideo": true,
     "shopUrl": "https://komeume1121.base.shop/items/148228654",
     "shopStatus": "available"
   },
@@ -1004,7 +1005,7 @@ const WORK_TRANSLATIONS = {
     title_en: "Foundation",
     year_en: "2025",
     technique_en: "Water-based woodblock, transparent watercolor, mud pigment / medium haidakouzo paper",
-    caption_en: "Weather tends to become rough when the seasons change. On days when gusts blow, rain beats down, and thunder roars, my excitement will not settle. But my neighbor does not seem to feel the same. Even with the same phenomenon, each person feels differently. Then what about beings other than humans?"
+    caption_en: "There are several things indispensable to human life. They are seemingly meaningless acts that were not discarded through an immeasurably long process of evolution, yet they are experienced as necessary. Tonight, once again, we sink into slumber."
   },
   "27": {
     title_en: "Transparent",
