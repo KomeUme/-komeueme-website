@@ -1071,7 +1071,7 @@ function renderWorkShopCta(article, work) {
   link.href = shopUrl;
   link.target = "_blank";
   link.rel = "noopener noreferrer";
-  link.textContent = uiT("work_shop_available", "販売ページ →");
+  link.textContent = uiT("work_shop_available", "販売中　販売ページを見る →");
   shopBlock.appendChild(link);
   placeShopBlock();
 }

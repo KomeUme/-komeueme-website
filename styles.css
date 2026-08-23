@@ -468,9 +468,18 @@ main {
   margin: 0 auto;
 }
 
-.top-hero-detail-link {
+.top-hero-links {
   grid-row: 3;
-  justify-self: end;
+  justify-self: stretch;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 18px;
+  width: 100%;
+}
+
+.top-hero-detail-link,
+.top-hero-shop-link {
   margin-top: 0;
   color: #4e5460;
   font-size: 13px;
@@ -480,9 +489,17 @@ main {
   transition: opacity 0.16s ease, color 0.16s ease;
 }
 
-.top-hero-detail-link:hover {
+.top-hero-detail-link:hover,
+.top-hero-shop-link:hover {
   color: #2a2c31;
   opacity: 1;
+}
+
+.top-hero-shop-link {
+  color: #6c727c;
+  font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
+  font-size: 12px;
+  opacity: 0.72;
 }
 
 .actions.top-actions {
@@ -1066,6 +1083,17 @@ main {
 
 .shop-intro {
   margin-bottom: 42px;
+}
+
+.shop-intro .shop-intro-note {
+  max-width: 39em;
+  margin: 9px auto 0;
+  color: #858b94;
+  font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
+  font-size: 11px;
+  line-height: 1.65;
+  letter-spacing: 0.035em;
+  text-align: center;
 }
 
 .shop-page {
@@ -3668,10 +3696,18 @@ footer {
     transform: none;
   }
 
-  .top-hero-detail-link {
+  .top-hero-links {
     grid-row: 2;
-    justify-self: end;
+    gap: 12px;
+  }
+
+  .top-hero-detail-link,
+  .top-hero-shop-link {
     font-size: 11px;
+  }
+
+  .top-hero-shop-link {
+    font-size: 10.5px;
   }
 
   .top-selected {
